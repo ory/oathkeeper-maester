@@ -1,0 +1,7 @@
+apiVersion: oathkeeper.ory.sh/v1alpha1
+kind: Rule
+metadata:
+  name: rule-sample
+spec:
+  # Add fields here
+  foo: bar
