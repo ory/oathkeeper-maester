@@ -1,4 +1,4 @@
-module github.com/oathkeeper-k8s-controller
+module github.com/ory/oathkeeper-k8s-controller
 
 go 1.12
 

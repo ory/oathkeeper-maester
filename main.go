@@ -19,8 +19,8 @@ import (
 	"flag"
 	"os"
 
-	oathkeeperv1alpha1 "github.com/oathkeeper-k8s-controller/api/v1alpha1"
-	"github.com/oathkeeper-k8s-controller/controllers"
+	oathkeeperv1alpha1 "github.com/ory/oathkeeper-k8s-controller/api/v1alpha1"
+	"github.com/ory/oathkeeper-k8s-controller/controllers"
 	apiv1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"

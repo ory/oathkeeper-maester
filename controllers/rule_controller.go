@@ -17,8 +17,9 @@ package controllers
 
 import (
 	"context"
+
 	"github.com/go-logr/logr"
-	oathkeeperv1alpha1 "github.com/oathkeeper-k8s-controller/api/v1alpha1"
+	oathkeeperv1alpha1 "github.com/ory/oathkeeper-k8s-controller/api/v1alpha1"
 	apiv1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/types"
 	ctrl "sigs.k8s.io/controller-runtime"
