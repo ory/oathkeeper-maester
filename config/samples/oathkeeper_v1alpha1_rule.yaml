@@ -11,11 +11,10 @@ spec:
   match:
     url: "http://gh.ij"
     methods: ["GET", "POST"]
-  authenticator:
-    handler: "handler1"
-    config:
-      map1:
-        key1: value1
-        key2: ["value2", "value3", "value4"]
-      key3: false
-      key4: 100
+  authenticators":
+  - handler: anonymous
+  authorizer:
+    handler: allow
+  mutator":
+    handler: noop
+    config: {}
