@@ -16,25 +16,12 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"encoding/json"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime"
 )
 
-// RuleSpec defines the desired state of Rule
-type RuleSpec struct {
-	ID             string           `json:"id"`
-	Upstream       *Upstream        `json:"upstream"`
-	Match          *Match           `json:"match"`
-	Authenticators []*Authenticator `json:"authenticators,omitempty"`
-	Authorizer     *Authorizer      `json:"autohrizer,omitempty"`
-	Mutator        *Mutator         `json:"mutator,omitempty"`
-}
-
-// RuleStatus defines the observed state of Rule
-type RuleStatus struct {
-}
-
 // +kubebuilder:object:root=true
-
 // Rule is the Schema for the rules API
 type Rule struct {
 	metav1.TypeMeta   `json:",inline"`
@@ -45,12 +32,67 @@ type Rule struct {
 }
 
 // +kubebuilder:object:root=true
-
 // RuleList contains a list of Rule
 type RuleList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
 	Items           []Rule `json:"items"`
+}
+
+// RuleSpec defines the desired state of Rule
+type RuleSpec struct {
+	ID             string           `json:"id"`
+	Upstream       *Upstream        `json:"upstream"`
+	Match          *Match           `json:"match"`
+	Authenticators []*Authenticator `json:"authenticators,omitempty"`
+	Authorizer     *Authorizer      `json:"authorizer,omitempty"`
+	Mutator        *Mutator         `json:"mutator,omitempty"`
+}
+
+// RuleStatus defines the observed state of Rule
+type RuleStatus struct {
+}
+
+type Upstream struct {
+	URL string `json:"url"`
+	// +optional
+	StripPath *string `json:"strip_path,omitempty"`
+	// +optional
+	PreserveHost *bool `json:"preserve_host,omitempty"`
+}
+
+type Match struct {
+	URL     string   `json:"url"`
+	Methods []string `json:"methods"`
+}
+
+type Authenticator struct {
+	*Handler `json:",inline"`
+}
+
+type Authorizer struct {
+	*Handler `json:",inline"`
+}
+
+type Mutator struct {
+	*Handler `json:",inline"`
+}
+
+type Handler struct {
+	Name string `json:"handler"`
+	// +kubebuilder:validation:Type=object
+	Config *runtime.RawExtension `json:"config,omitempty"`
+}
+
+func (rl *RuleList) ToOathkeeperRules() ([]byte, error) {
+
+	var rulesSpecList []RuleSpec
+
+	for _, rule := range rl.Items {
+		rulesSpecList = append(rulesSpecList, rule.Spec)
+	}
+
+	return json.MarshalIndent(rulesSpecList, "", "  ")
 }
 
 func init() {

@@ -41,30 +41,6 @@ var _ = Describe("Rule", func() {
 		// Add any teardown steps that needs to be executed after each test
 	})
 
-	t := true
-
-	h := &Handler{
-		Name: "sample-handler",
-		Config: &runtime.RawExtension{
-			Raw: []byte("{}"),
-		},
-	}
-
-	rs := RuleSpec{
-		ID: "sample-rule1",
-		Upstream: &Upstream{
-			URL:          "https://url.com",
-			PreserveHost: &t,
-		},
-		Match: &Match{
-			URL:     "https://url2.com",
-			Methods: []string{"GET", "POST"},
-		},
-		Authenticators: []*Authenticator{&Authenticator{h}},
-		Authorizer:     &Authorizer{h},
-		Mutator:        &Mutator{h},
-	}
-
 	// Add Tests for OpenAPI validation (or additonal CRD features) specified in
 	// your API definition.
 	// Avoid adding tests for vanilla CRUD operations because they would
@@ -77,6 +53,31 @@ var _ = Describe("Rule", func() {
 				Name:      "foo",
 				Namespace: "default",
 			}
+
+			t := true
+
+			h := &Handler{
+				Name: "sample-handler",
+				Config: &runtime.RawExtension{
+					Raw: []byte("{}"),
+				},
+			}
+
+			rs := RuleSpec{
+				ID: "sample-rule1",
+				Upstream: &Upstream{
+					URL:          "https://url.com",
+					PreserveHost: &t,
+				},
+				Match: &Match{
+					URL:     "https://url2.com",
+					Methods: []string{"GET", "POST"},
+				},
+				Authenticators: []*Authenticator{&Authenticator{h}},
+				Authorizer:     &Authorizer{h},
+				Mutator:        &Mutator{h},
+			}
+
 			created = &Rule{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "foo",
@@ -97,7 +98,128 @@ var _ = Describe("Rule", func() {
 			Expect(k8sClient.Delete(context.TODO(), created)).To(Succeed())
 			Expect(k8sClient.Get(context.TODO(), key, created)).ToNot(Succeed())
 		})
-
 	})
 
+	var template = `[
+  {
+    "id": "some-id-1",
+    "upstream": {
+      "url": "http://my-backend-service1",
+      "strip_path": "/api/v1",
+      "preserve_host": true
+    },
+    "match": {
+      "url": "http://my-app/some-route1",
+      "methods": [
+        "GET",
+        "POST"
+      ]
+    },
+    "authenticators": [
+      {
+        "handler": "allow"
+      }
+    ],
+    "mutator": {
+      "handler": "noop"
+    }
+  },
+  {
+    "id": "some-id-2",
+    "upstream": {
+      "url": "http://my-backend-service2",
+      "preserve_host": false
+    },
+    "match": {
+      "url": "http://my-app/some-route2",
+      "methods": [
+        "GET",
+        "POST"
+      ]
+    },
+    "authenticators": [
+      {
+        "handler": "allow"
+      },
+      {
+        "handler": "noop"
+      }
+    ]
+  }
+]`
+
+	Context("ToOathkeeperRules", func() {
+
+		It("Should return a JSON array of raw Oathkeeper rules", func() {
+
+			s := "/api/v1"
+
+			t1 := true
+			t2 := false
+
+			h1 := &Handler{
+				Name: "allow",
+			}
+
+			h2 := &Handler{
+				Name: "noop",
+			}
+
+			rs1 := RuleSpec{
+				ID: "some-id-1",
+				Upstream: &Upstream{
+					URL:          "http://my-backend-service1",
+					StripPath:    &s,
+					PreserveHost: &t1,
+				},
+				Match: &Match{
+					URL:     "http://my-app/some-route1",
+					Methods: []string{"GET", "POST"},
+				},
+				Authenticators: []*Authenticator{&Authenticator{h1}},
+				Mutator:        &Mutator{h2},
+			}
+
+			rs2 := RuleSpec{
+				ID: "some-id-2",
+				Upstream: &Upstream{
+					URL:          "http://my-backend-service2",
+					PreserveHost: &t2,
+				},
+				Match: &Match{
+					URL:     "http://my-app/some-route2",
+					Methods: []string{"GET", "POST"},
+				},
+				Authenticators: []*Authenticator{&Authenticator{h1}, {h2}},
+			}
+
+			created1 := Rule{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "foo1",
+					Namespace: "default",
+				},
+				Spec:   rs1,
+				Status: RuleStatus{},
+			}
+
+			created2 := Rule{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "foo2",
+					Namespace: "default",
+				},
+				Spec:   rs2,
+				Status: RuleStatus{},
+			}
+
+			list := &RuleList{Items: []Rule{created1, created2}}
+
+			By("transforming the receiver into a slice of bytes")
+
+			raw, err := list.ToOathkeeperRules()
+
+			Expect(err).To(BeNil())
+			Expect(string(raw)).To(Equal(template))
+
+		})
+	})
 })

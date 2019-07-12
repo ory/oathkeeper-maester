@@ -17,31 +17,45 @@ package controllers
 
 import (
 	"context"
-	"fmt"
-
 	"github.com/go-logr/logr"
+	oathkeeperv1alpha1 "github.com/oathkeeper-k8s-controller/api/v1alpha1"
+	apiv1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/types"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-
-	oathkeeperv1alpha1 "github.com/oathkeeper-k8s-controller/api/v1alpha1"
 )
 
 // RuleReconciler reconciles a Rule object
 type RuleReconciler struct {
 	client.Client
-	Log logr.Logger
+	Log           logr.Logger
+	RuleConfigmap types.NamespacedName
 }
 
 // +kubebuilder:rbac:groups=oathkeeper.ory.sh,resources=rules,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=oathkeeper.ory.sh,resources=rules/status,verbs=get;update;patch
+// +kubebuilder:rbac:groups="",resources=configmaps,verbs=get;list;watch;create;update;patch;delete
 
 func (r *RuleReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
+
 	ctx := context.Background()
 	_ = r.Log.WithValues("rule", req.NamespacedName)
+	rulesList := &oathkeeperv1alpha1.RuleList{}
 
-	rule := &oathkeeperv1alpha1.Rule{}
-	r.Get(ctx, req.NamespacedName, rule)
-	fmt.Println(rule)
+	err := r.List(ctx, rulesList)
+	if err != nil {
+		return ctrl.Result{}, err
+	}
+
+	oathkeeperRulesJSON, err := rulesList.ToOathkeeperRules()
+	if err != nil {
+		return ctrl.Result{}, err
+	}
+
+	err = r.updateRulesConfigmap(ctx, string(oathkeeperRulesJSON))
+	if err != nil {
+		return ctrl.Result{}, err
+	}
 
 	return ctrl.Result{}, nil
 }
@@ -49,5 +63,26 @@ func (r *RuleReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 func (r *RuleReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&oathkeeperv1alpha1.Rule{}).
+		Owns(&apiv1.ConfigMap{}).
 		Complete(r)
+}
+
+func (r *RuleReconciler) updateRulesConfigmap(ctx context.Context, data string) error {
+
+	var oathkeeperRulesConfigmap apiv1.ConfigMap
+
+	err := r.Get(ctx, r.RuleConfigmap, &oathkeeperRulesConfigmap)
+	if err != nil {
+		return err
+	}
+
+	oathkeeperRulesConfigmapCopy := oathkeeperRulesConfigmap.DeepCopy()
+	oathkeeperRulesConfigmapCopy.Data = map[string]string{"rules": data}
+
+	err = r.Update(ctx, oathkeeperRulesConfigmapCopy)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
