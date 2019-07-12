@@ -10,10 +10,10 @@ spec:
   match:
     url: "http://gh.ij"
     methods: ["GET", "POST"]
-  authenticators":
+  authenticators:
   - handler: anonymous
   authorizer:
     handler: allow
-  mutator":
+  mutator:
     handler: noop
     config: {}
