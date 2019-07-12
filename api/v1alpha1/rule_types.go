@@ -40,7 +40,6 @@ type RuleList struct {
 
 // RuleSpec defines the desired state of Rule
 type RuleSpec struct {
-	ID             string           `json:"id"`
 	Upstream       *Upstream        `json:"upstream"`
 	Match          *Match           `json:"match"`
 	Authenticators []*Authenticator `json:"authenticators,omitempty"`

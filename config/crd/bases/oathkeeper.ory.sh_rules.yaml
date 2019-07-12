@@ -405,8 +405,6 @@ spec:
               required:
               - handler
               type: object
-            id:
-              type: string
             match:
               properties:
                 methods:
@@ -440,7 +438,6 @@ spec:
               - url
               type: object
           required:
-          - id
           - upstream
           - match
           type: object
