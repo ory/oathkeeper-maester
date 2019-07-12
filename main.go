@@ -19,8 +19,8 @@ import (
 	"flag"
 	"os"
 
-	oathkeeperv1alpha1 "github.com/ory/oathkeeper-k8s-controller/api/v1alpha1"
-	"github.com/ory/oathkeeper-k8s-controller/controllers"
+	oathkeeperv1alpha1 "github.com/oathkeeper-k8s-controller/api/v1alpha1"
+	"github.com/oathkeeper-k8s-controller/controllers"
 	"k8s.io/apimachinery/pkg/runtime"
 	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
 	ctrl "sigs.k8s.io/controller-runtime"

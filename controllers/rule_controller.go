@@ -17,12 +17,13 @@ package controllers
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/go-logr/logr"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	oathkeeperv1alpha1 "github.com/ory/oathkeeper-k8s-controller/api/v1alpha1"
+	oathkeeperv1alpha1 "github.com/oathkeeper-k8s-controller/api/v1alpha1"
 )
 
 // RuleReconciler reconciles a Rule object
@@ -35,10 +36,12 @@ type RuleReconciler struct {
 // +kubebuilder:rbac:groups=oathkeeper.ory.sh,resources=rules/status,verbs=get;update;patch
 
 func (r *RuleReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
-	_ = context.Background()
+	ctx := context.Background()
 	_ = r.Log.WithValues("rule", req.NamespacedName)
 
-	// your logic here
+	rule := &oathkeeperv1alpha1.Rule{}
+	r.Get(ctx, req.NamespacedName, rule)
+	fmt.Println(rule)
 
 	return ctrl.Result{}, nil
 }

@@ -19,19 +19,18 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
-// NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
-
 // RuleSpec defines the desired state of Rule
 type RuleSpec struct {
-	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
+	ID             string           `json:"id"`
+	Upstream       *Upstream        `json:"upstream"`
+	Match          *Match           `json:"match"`
+	Authenticators []*Authenticator `json:"authenticators,omitempty"`
+	Authorizer     *Authorizer      `json:"autohrizer,omitempty"`
+	Mutator        *Mutator         `json:"mutator,omitempty"`
 }
 
 // RuleStatus defines the observed state of Rule
 type RuleStatus struct {
-	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
 }
 
 // +kubebuilder:object:root=true

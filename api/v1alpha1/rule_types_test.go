@@ -18,9 +18,9 @@ package v1alpha1
 import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-
 	"golang.org/x/net/context"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
 )
 
@@ -41,6 +41,30 @@ var _ = Describe("Rule", func() {
 		// Add any teardown steps that needs to be executed after each test
 	})
 
+	t := true
+
+	h := &Handler{
+		Name: "sample-handler",
+		Config: &runtime.RawExtension{
+			Raw: []byte("{}"),
+		},
+	}
+
+	rs := RuleSpec{
+		ID: "sample-rule1",
+		Upstream: &Upstream{
+			URL:          "https://url.com",
+			PreserveHost: &t,
+		},
+		Match: &Match{
+			URL:     "https://url2.com",
+			Methods: []string{"GET", "POST"},
+		},
+		Authenticators: []*Authenticator{&Authenticator{h}},
+		Authorizer:     &Authorizer{h},
+		Mutator:        &Mutator{h},
+	}
+
 	// Add Tests for OpenAPI validation (or additonal CRD features) specified in
 	// your API definition.
 	// Avoid adding tests for vanilla CRUD operations because they would
@@ -57,7 +81,10 @@ var _ = Describe("Rule", func() {
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "foo",
 					Namespace: "default",
-				}}
+				},
+				Spec:   rs,
+				Status: RuleStatus{},
+			}
 
 			By("creating an API obj")
 			Expect(k8sClient.Create(context.TODO(), created)).To(Succeed())

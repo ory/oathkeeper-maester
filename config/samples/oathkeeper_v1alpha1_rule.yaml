@@ -1,7 +1,21 @@
 apiVersion: oathkeeper.ory.sh/v1alpha1
 kind: Rule
 metadata:
-  name: rule-sample
+  name: sample-rule
+  namespace: default
 spec:
-  # Add fields here
-  foo: bar
+  id: myrule123
+  upstream:
+    url: "http://abc.ef"
+    preserveHost: false
+  match:
+    url: "http://gh.ij"
+    methods: ["GET", "POST"]
+  authenticator:
+    handler: "handler1"
+    config:
+      map1:
+        key1: value1
+        key2: ["value2", "value3", "value4"]
+      key3: false
+      key4: 100
