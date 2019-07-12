@@ -1,13 +1,14 @@
 # oathkeeper-k8s-controller
 
-This project contains a Kubernetes controller that allows users to manage Oathkeeper rules definitions.
+This project contains a Kubernetes controller that uses Custom Resources to manage Oathkeeper rules definitions.
+The project is based on [Kubebuilder](https://github.com/kubernetes-sigs/kubebuilder)
 
 ## Prerequisites
 
-- recent version of go with support for modules (e.g: 1.12.6)
+- recent version of Go language with support for modules (e.g: 1.12.6)
 - make
 - kubectl
-- access to running K8s cluster / minikube / KIND (https://github.com/kubernetes-sigs/kind)
+- access to K8s environment: minikube or KIND (https://github.com/kubernetes-sigs/kind), or a remote K8s cluster
 
 
 ## How to use it
@@ -15,12 +16,11 @@ This project contains a Kubernetes controller that allows users to manage Oathke
 - `make` to build the binary
 - `make test` to run tests
 
-Other targets require a working K8s environment: a remote cluster, a minikube or a local KIND.
+Other targets require a working K8s environment.
 Set `KUBECONFIG` environment variable to the proper value.
 
-- `make run` to run controller locally
 - `make install` to generate CRD file from go sources and install it in the cluster
+- `make run` to run controller locally
 
-
-Refer to the Makefile for details.
+Refer to the Makefile for the details.
 
