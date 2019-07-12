@@ -48,16 +48,6 @@ func (r *RuleReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 		return ctrl.Result{}, err
 	}
 
-	oathkeeperRulesJSON, err := rulesList.ToOathkeeperRules()
-	if err != nil {
-		return ctrl.Result{}, err
-	}
-
-	err = r.updateRulesConfigmap(ctx, string(oathkeeperRulesJSON))
-	if err != nil {
-		return ctrl.Result{}, err
-	}
-
 	return ctrl.Result{}, nil
 }
 
@@ -66,24 +56,4 @@ func (r *RuleReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		For(&oathkeeperv1alpha1.Rule{}).
 		Owns(&apiv1.ConfigMap{}).
 		Complete(r)
-}
-
-func (r *RuleReconciler) updateRulesConfigmap(ctx context.Context, data string) error {
-
-	var oathkeeperRulesConfigmap apiv1.ConfigMap
-
-	err := r.Get(ctx, r.RuleConfigmap, &oathkeeperRulesConfigmap)
-	if err != nil {
-		return err
-	}
-
-	oathkeeperRulesConfigmapCopy := oathkeeperRulesConfigmap.DeepCopy()
-	oathkeeperRulesConfigmapCopy.Data = map[string]string{"rules": data}
-
-	err = r.Update(ctx, oathkeeperRulesConfigmapCopy)
-	if err != nil {
-		return err
-	}
-
-	return nil
 }

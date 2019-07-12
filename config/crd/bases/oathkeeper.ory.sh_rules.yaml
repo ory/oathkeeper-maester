@@ -430,9 +430,9 @@ spec:
               type: object
             upstream:
               properties:
-                preserve_host:
+                preserveHost:
                   type: boolean
-                strip_path:
+                stripPath:
                   type: string
                 url:
                   type: string
