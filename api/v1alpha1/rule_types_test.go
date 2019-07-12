@@ -50,7 +50,7 @@ var _ = Describe("Rule", func() {
 		It("should create an object successfully", func() {
 
 			key = types.NamespacedName{
-				Name:      "foo",
+				Name:      "sample-rule1",
 				Namespace: "default",
 			}
 
@@ -64,7 +64,6 @@ var _ = Describe("Rule", func() {
 			}
 
 			rs := RuleSpec{
-				ID: "sample-rule1",
 				Upstream: &Upstream{
 					URL:          "https://url.com",
 					PreserveHost: &t,
@@ -80,7 +79,7 @@ var _ = Describe("Rule", func() {
 
 			created = &Rule{
 				ObjectMeta: metav1.ObjectMeta{
-					Name:      "foo",
+					Name:      "sample-rule1",
 					Namespace: "default",
 				},
 				Spec:   rs,

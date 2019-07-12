@@ -1,10 +1,9 @@
 apiVersion: oathkeeper.ory.sh/v1alpha1
 kind: Rule
 metadata:
-  name: sample-rule
+  name: sample-rule-1
   namespace: default
 spec:
-  id: myrule123
   upstream:
     url: "http://abc.ef"
     preserveHost: false
