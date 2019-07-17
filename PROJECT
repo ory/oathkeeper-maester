@@ -1,0 +1,7 @@
+version: "2"
+domain: ory.sh
+repo: github.com/ory/oathkeeper-k8s-controller
+resources:
+- group: oathkeeper
+  version: v1alpha1
+  kind: Rule
