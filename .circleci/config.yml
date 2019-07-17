@@ -25,10 +25,12 @@ jobs:
             sudo mv /tmp/kubebuilder_2.0.0-alpha.4_${os}_${arch} /usr/local/kubebuilder
             export PATH=$PATH:/usr/local/kubebuilder/bin
 
-      - run: make build
+      - run: make
   test:
     docker:
       - image: circleci/golang:1.12
+        environment:
+          - GO111MODULE=on
     working_directory: /go/src/github.com/ory/oathkeeper-k8s-controller
     steps:
       - checkout
