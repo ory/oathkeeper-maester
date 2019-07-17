@@ -12,6 +12,7 @@ jobs:
             source $BASH_ENV
       - checkout
       - run: make build
+
   test:
     docker:
       - image: circleci/golang:1.12
@@ -28,7 +29,12 @@ workflows:
   version: 2
   "test, build":
     jobs:
+      - build:
+          filters:
+            tags:
+              only: /.*/
       - test:
           filters:
             tags:
               only: /.*/
+
