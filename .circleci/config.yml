@@ -25,7 +25,7 @@ jobs:
             sudo mv /tmp/kubebuilder_2.0.0-alpha.4_${os}_${arch} /usr/local/kubebuilder
             export PATH=$PATH:/usr/local/kubebuilder/bin
 
-      - run: make build
+      - run: make test
 
 workflows:
   version: 2
