@@ -18,20 +18,15 @@ package v1alpha1
 import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"golang.org/x/net/context"
+	"github.com/ory/oathkeeper-k8s-controller/internal/validation"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/apimachinery/pkg/types"
 )
 
 // These tests are written in BDD-style using Ginkgo framework. Refer to
 // http://onsi.github.io/ginkgo to learn more.
 
 var _ = Describe("Rule", func() {
-	var (
-		key              types.NamespacedName
-		created, fetched *Rule
-	)
 
 	BeforeEach(func() {
 		// Add any setup steps that needs to be executed before each test
@@ -39,45 +34,6 @@ var _ = Describe("Rule", func() {
 
 	AfterEach(func() {
 		// Add any teardown steps that needs to be executed after each test
-	})
-
-	// Add Tests for OpenAPI validation (or additonal CRD features) specified in
-	// your API definition.
-	// Avoid adding tests for vanilla CRUD operations because they would
-	// test Kubernetes API server, which isn't the goal here.
-	Context("Create API", func() {
-
-		It("should create an object successfully", func() {
-
-			key = types.NamespacedName{
-				Name:      "sample-rule1",
-				Namespace: "default",
-			}
-
-			h := newHandler("sample-handler", "{}")
-
-			created = newRule(
-				"sample-rule1",
-				"default",
-				"https://url.com",
-				"https://url2.com",
-				nil,
-				newBoolPtr(true),
-				[]*Authenticator{&Authenticator{h}},
-				&Authorizer{h},
-				&Mutator{h})
-
-			By("creating an API obj")
-			Expect(k8sClient.Create(context.TODO(), created)).To(Succeed())
-
-			fetched = &Rule{}
-			Expect(k8sClient.Get(context.TODO(), key, fetched)).To(Succeed())
-			Expect(fetched).To(Equal(created))
-
-			By("deleting the created object")
-			Expect(k8sClient.Delete(context.TODO(), created)).To(Succeed())
-			Expect(k8sClient.Get(context.TODO(), key, created)).ToNot(Succeed())
-		})
 	})
 
 	var template = `[
@@ -308,6 +264,98 @@ var _ = Describe("Rule", func() {
 			Expect(actual.RuleSpec).To(Equal(testRule.Spec))
 		})
 	})
+
+	Context("ValidateWith", func() {
+
+		testHandler := newHandler("handler1", sampleConfig)
+
+		testAuthenticatorsAvailable := []string{testHandler.Name}
+		testAuthorizersAvailable := []string{testHandler.Name}
+		testMutatorsAvailable := []string{testHandler.Name}
+
+		validationConfig := validation.Config{
+			AuthenticatorsAvailable: testAuthenticatorsAvailable,
+			AuthorizersAvailable:    testAuthorizersAvailable,
+			MutatorsAvailable:       testMutatorsAvailable,
+		}
+
+		It("Should return no errors for a valid rule", func() {
+
+			rule := newRule(
+				"foo1",
+				"default",
+				"http://my-backend-service1",
+				"http://my-app/some-route1",
+				newStringPtr("/api/v1"),
+				newBoolPtr(true),
+				[]*Authenticator{&Authenticator{testHandler}},
+				&Authorizer{testHandler},
+				&Mutator{testHandler})
+
+			By("validating the rule with provided validation configuration")
+			validationError := rule.ValidateWith(validationConfig)
+
+			Expect(validationError).To(BeNil())
+		})
+
+		It("Should return no errors for a rule with default handlers", func() {
+
+			rule := newRule(
+				"foo1",
+				"default",
+				"http://my-backend-service1",
+				"http://my-app/some-route1",
+				newStringPtr("/api/v1"),
+				newBoolPtr(true),
+				nil,
+				nil,
+				nil)
+
+			By("validating the rule with provided validation configuration")
+			validationError := rule.ValidateWith(validationConfig)
+
+			Expect(validationError).To(BeNil())
+		})
+
+		It("Should return an error for a rule with an invalid handler", func() {
+
+			invalidHandler := newHandler("votValidHandlerName", sampleConfig)
+			rule := newRule(
+				"foo1",
+				"default",
+				"http://my-backend-service1",
+				"http://my-app/some-route1",
+				newStringPtr("/api/v1"),
+				newBoolPtr(true),
+				[]*Authenticator{&Authenticator{testHandler}},
+				&Authorizer{invalidHandler},
+				&Mutator{testHandler})
+
+			By("validating the rule with provided validation configuration")
+			validationError := rule.ValidateWith(validationConfig)
+
+			Expect(validationError).ToNot(BeNil())
+		})
+	})
+
+	Context("FilterNotValid", func() {
+		It("Should return only valid rules", func() {
+			sampleErrorMessage := "authenticator: sample is invalid"
+			rule1 := newRuleWithStatusOnly(false, &sampleErrorMessage)
+
+			rule2 := newRuleWithStatusOnly(false, nil)
+
+			rule3 := newRuleWithStatusOnly(true, nil)
+
+			list := &RuleList{Items: []Rule{rule1, rule2, rule3}}
+			expectedValidationResult := RuleList{Items: []Rule{rule3}}
+
+			By("filtering out rules that are no valid")
+			validationResult := list.FilterNotValid()
+
+			Expect(validationResult).To(Equal(expectedValidationResult))
+		})
+	})
 })
 
 func newRule(name, namespace, upstreamURL, matchURL string, stripURLPath *string, preserveURLHost *bool, authenticators []*Authenticator, authorizer *Authorizer, mutator *Mutator) *Rule {
@@ -336,8 +384,18 @@ func newRule(name, namespace, upstreamURL, matchURL string, stripURLPath *string
 	}
 }
 
-func newHandler(name string, config string) *Handler {
+func newRuleWithStatusOnly(valid bool, validationError *string) Rule {
+	return Rule{
+		Status: RuleStatus{
+			Validation: &Validation{
+				Valid: &valid,
+				Error: validationError,
+			},
+		},
+	}
+}
 
+func newHandler(name, config string) *Handler {
 	h := &Handler{
 		Name: name,
 	}
