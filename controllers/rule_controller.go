@@ -55,8 +55,9 @@ func (r *RuleReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	if err := r.Get(ctx, req.NamespacedName, &rule); err != nil {
 		if apierrs.IsNotFound(err) {
 			skipValidation = true
+		} else {
+			return ctrl.Result{}, err
 		}
-		return ctrl.Result{}, err
 	}
 
 	if !skipValidation {
