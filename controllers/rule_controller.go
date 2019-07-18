@@ -19,11 +19,9 @@ import (
 	"context"
 	"os"
 
-	"github.com/ory/oathkeeper-k8s-controller/internal/validation"
-	"github.com/prometheus/common/log"
-
 	"github.com/go-logr/logr"
 	oathkeeperv1alpha1 "github.com/ory/oathkeeper-k8s-controller/api/v1alpha1"
+	"github.com/ory/oathkeeper-k8s-controller/internal/validation"
 
 	"github.com/avast/retry-go"
 	apiv1 "k8s.io/api/core/v1"
@@ -65,9 +63,9 @@ func (r *RuleReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 		rule.Status.Validation.Valid = boolPtr(false)
 		e := err.Error()
 		rule.Status.Validation.Error = &e
-		log.Warnf("validation error in Rule %s/%s: \"%s\"", rule.Namespace, rule.Name, e)
+		r.Log.Info("validation error in Rule %s/%s: \"%s\"", rule.Namespace, rule.Name, e)
 		if err := r.Update(ctx, &rule); err != nil {
-			log.Error("unable to update Rule status")
+			r.Log.Error(err, "unable to update Rule status")
 			return ctrl.Result{}, err
 		}
 		// continue, as validation can't be fixed by requeuing request and we still have to update the configmap
@@ -76,7 +74,7 @@ func (r *RuleReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 		rule.Status.Validation = &oathkeeperv1alpha1.Validation{}
 		rule.Status.Validation.Valid = boolPtr(true)
 		if err := r.Update(ctx, &rule); err != nil {
-			log.Error("unable to update Rule status")
+			r.Log.Error(err, "unable to update Rule status")
 			return ctrl.Result{}, err
 		}
 	}
