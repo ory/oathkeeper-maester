@@ -461,6 +461,14 @@ spec:
           - match
           type: object
         status:
+          properties:
+            validation:
+              properties:
+                valid:
+                  type: boolean
+                validationError:
+                  type: string
+              type: object
           type: object
       type: object
   versions:

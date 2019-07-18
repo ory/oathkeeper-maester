@@ -17,6 +17,8 @@ package v1alpha1
 
 import (
 	"encoding/json"
+	"fmt"
+	"github.com/ory/oathkeeper-k8s-controller/internal/validation"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 )
@@ -59,8 +61,18 @@ type RuleSpec struct {
 	Mutator        *Mutator         `json:"mutator,omitempty"`
 }
 
+// Validation defines the validation state of Rule
+type Validation struct {
+	// +optional
+	Valid *bool `json:"valid,omitempty"`
+	// +optional
+	Error *string `json:"validationError,omitempty"`
+}
+
 // RuleStatus defines the observed state of Rule
 type RuleStatus struct {
+	// +optional
+	Validation *Validation `json:"validation,omitempty"`
 }
 
 // Upstream represents the location of a server where requests matching a rule should be forwarded to.
