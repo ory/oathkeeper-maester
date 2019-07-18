@@ -19,6 +19,9 @@ import (
 	"context"
 	"os"
 
+	"github.com/ory/oathkeeper-k8s-controller/internal/validation"
+	"github.com/prometheus/common/log"
+
 	"github.com/go-logr/logr"
 	oathkeeperv1alpha1 "github.com/ory/oathkeeper-k8s-controller/api/v1alpha1"
 
@@ -34,8 +37,9 @@ import (
 // RuleReconciler reconciles a Rule object
 type RuleReconciler struct {
 	client.Client
-	Log           logr.Logger
-	RuleConfigmap types.NamespacedName
+	Log              logr.Logger
+	RuleConfigmap    types.NamespacedName
+	ValidationConfig validation.Config
 }
 
 // +kubebuilder:rbac:groups=oathkeeper.ory.sh,resources=rules,verbs=get;list;watch;create;update;patch;delete
@@ -46,13 +50,44 @@ func (r *RuleReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 
 	ctx := context.Background()
 	_ = r.Log.WithValues("rule", req.NamespacedName)
+
+	var rule oathkeeperv1alpha1.Rule
+
+	if err := r.Get(ctx, req.NamespacedName, &rule); err != nil {
+		if apierrs.IsNotFound(err) {
+			return ctrl.Result{}, nil
+		}
+		return ctrl.Result{}, err
+	}
+
+	if err := rule.ValidateWith(r.ValidationConfig); err != nil {
+		rule.Status.Validation = &oathkeeperv1alpha1.Validation{}
+		rule.Status.Validation.Valid = boolPtr(false)
+		e := err.Error()
+		rule.Status.Validation.Error = &e
+		log.Warnf("validation error in Rule %s/%s: \"%s\"", rule.Namespace, rule.Name, e)
+		if err := r.Update(ctx, &rule); err != nil {
+			log.Error("unable to update Rule status")
+			return ctrl.Result{}, err
+		}
+		// continue, as validation can't be fixed by requeuing request and we still have to update the configmap
+	} else {
+		// rule valid - set the status
+		rule.Status.Validation = &oathkeeperv1alpha1.Validation{}
+		rule.Status.Validation.Valid = boolPtr(true)
+		if err := r.Update(ctx, &rule); err != nil {
+			log.Error("unable to update Rule status")
+			return ctrl.Result{}, err
+		}
+	}
+
 	var rulesList oathkeeperv1alpha1.RuleList
 
 	if err := r.List(ctx, &rulesList); err != nil {
 		return ctrl.Result{}, err
 	}
 
-	oathkeeperRulesJSON, err := rulesList.ToOathkeeperRules()
+	oathkeeperRulesJSON, err := rulesList.FilterNotValid().ToOathkeeperRules()
 	if err != nil {
 		return ctrl.Result{}, err
 	}
@@ -109,4 +144,8 @@ func (r *RuleReconciler) updateRulesConfigmap(ctx context.Context, data string) 
 	}
 
 	return nil
+}
+
+func boolPtr(b bool) *bool {
+	return &b
 }

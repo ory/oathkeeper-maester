@@ -119,7 +119,7 @@ type Handler struct {
 	Config *runtime.RawExtension `json:"config,omitempty"`
 }
 
-// ToOathkeeperRules transforms a RuleList object into a JSON object digestible by Oathkeeper
+// ToOathkeeperRules transforms a RuleList object into a JSON object digestible by Oathkeeper.
 func (rl RuleList) ToOathkeeperRules() ([]byte, error) {
 
 	var rules []*RuleJSON
@@ -129,6 +129,42 @@ func (rl RuleList) ToOathkeeperRules() ([]byte, error) {
 	}
 
 	return json.MarshalIndent(rules, "", "  ")
+}
+
+// FilterNotValid filters out Rules which doesn't pass validation due to being not processed yet or due to negative result of validation. It returns a list of Rules which passed validation successfully.
+func (rl RuleList) FilterNotValid() RuleList {
+	rlCopy := rl
+	validRules := []Rule{}
+	for _, rule := range rl.Items {
+		if rule.Status.Validation != nil && rule.Status.Validation.Valid != nil && *rule.Status.Validation.Valid {
+			validRules = append(validRules, rule)
+		}
+	}
+	rlCopy.Items = validRules
+	return rlCopy
+}
+
+// ValidateWith uses provided validation configuration to check whether the rule have proper handlers set.
+func (r Rule) ValidateWith(config validation.Config) error {
+	// if a handler is not provided in any of the following fields, a default one will be used, so there is no need to check if it is valid
+	if r.Spec.Authenticators != nil {
+		for _, authenticator := range r.Spec.Authenticators {
+			if valid := config.IsAuthenticatorValid(authenticator.Name); !valid {
+				return fmt.Errorf("authenticator: %s is invalid", authenticator.Name)
+			}
+		}
+	}
+	if r.Spec.Authorizer != nil {
+		if valid := config.IsAuthorizerValid(r.Spec.Authorizer.Name); !valid {
+			return fmt.Errorf("authorizer: %s is invalid", r.Spec.Authorizer.Name)
+		}
+	}
+	if r.Spec.Mutator != nil {
+		if valid := config.IsMutatorValid(r.Spec.Mutator.Name); !valid {
+			return fmt.Errorf("mutator: %s is invalid", r.Spec.Mutator.Name)
+		}
+	}
+	return nil
 }
 
 // ToRuleJSON transforms a Rule object into an intermediary RuleJSON object
