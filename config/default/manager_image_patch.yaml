@@ -8,5 +8,5 @@ spec:
     spec:
       containers:
       # Change the value of image field below to your controller image URL
-      - image: jakkab/oathkeeper-controller:0.3.5
+      - image: jakkab/oathkeeper-controller:0.3.6-test
         name: manager

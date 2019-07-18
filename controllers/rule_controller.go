@@ -94,6 +94,8 @@ func (r *RuleReconciler) updateRulesConfigmap(ctx context.Context, data string) 
 				r.Log.Error(err, "unable to create configmap")
 				os.Exit(1)
 			}
+
+			return nil
 		}
 
 		return err

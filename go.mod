@@ -3,6 +3,7 @@ module github.com/ory/oathkeeper-k8s-controller
 go 1.12
 
 require (
+	github.com/avast/retry-go v2.4.1+incompatible
 	github.com/go-logr/logr v0.1.0
 	github.com/onsi/ginkgo v1.8.0
 	github.com/onsi/gomega v1.5.0
