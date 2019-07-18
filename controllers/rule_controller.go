@@ -50,32 +50,35 @@ func (r *RuleReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	_ = r.Log.WithValues("rule", req.NamespacedName)
 
 	var rule oathkeeperv1alpha1.Rule
+	skipValidation := false
 
 	if err := r.Get(ctx, req.NamespacedName, &rule); err != nil {
 		if apierrs.IsNotFound(err) {
-			return ctrl.Result{}, nil
+			skipValidation = true
 		}
 		return ctrl.Result{}, err
 	}
 
-	if err := rule.ValidateWith(r.ValidationConfig); err != nil {
-		rule.Status.Validation = &oathkeeperv1alpha1.Validation{}
-		rule.Status.Validation.Valid = boolPtr(false)
-		e := err.Error()
-		rule.Status.Validation.Error = &e
-		r.Log.Info("validation error in Rule %s/%s: \"%s\"", rule.Namespace, rule.Name, e)
-		if err := r.Update(ctx, &rule); err != nil {
-			r.Log.Error(err, "unable to update Rule status")
-			return ctrl.Result{}, err
-		}
-		// continue, as validation can't be fixed by requeuing request and we still have to update the configmap
-	} else {
-		// rule valid - set the status
-		rule.Status.Validation = &oathkeeperv1alpha1.Validation{}
-		rule.Status.Validation.Valid = boolPtr(true)
-		if err := r.Update(ctx, &rule); err != nil {
-			r.Log.Error(err, "unable to update Rule status")
-			return ctrl.Result{}, err
+	if !skipValidation {
+		if err := rule.ValidateWith(r.ValidationConfig); err != nil {
+			rule.Status.Validation = &oathkeeperv1alpha1.Validation{}
+			rule.Status.Validation.Valid = boolPtr(false)
+			e := err.Error()
+			rule.Status.Validation.Error = &e
+			r.Log.Info("validation error in Rule %s/%s: \"%s\"", rule.Namespace, rule.Name, e)
+			if err := r.Update(ctx, &rule); err != nil {
+				r.Log.Error(err, "unable to update Rule status")
+				return ctrl.Result{}, err
+			}
+			// continue, as validation can't be fixed by requeuing request and we still have to update the configmap
+		} else {
+			// rule valid - set the status
+			rule.Status.Validation = &oathkeeperv1alpha1.Validation{}
+			rule.Status.Validation.Valid = boolPtr(true)
+			if err := r.Update(ctx, &rule); err != nil {
+				r.Log.Error(err, "unable to update Rule status")
+				return ctrl.Result{}, err
+			}
 		}
 	}
 
