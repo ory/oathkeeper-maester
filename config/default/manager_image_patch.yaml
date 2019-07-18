@@ -7,6 +7,6 @@ spec:
   template:
     spec:
       containers:
-      # Change the value of image field below to your controller image URL
-      - image: jakkab/oathkeeper-controller:0.3.6-test
-        name: manager
+        # Change the value of image field below to your controller image URL
+        - image: controller:latest
+          name: manager
