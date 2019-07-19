@@ -252,7 +252,7 @@ var _ = Describe("Rule", func() {
 				"https://match.this/url",
 				newStringPtr("/strip/me"),
 				newBoolPtr(true),
-				[]*Authenticator{&Authenticator{testHandler}},
+				[]*Authenticator{{testHandler}},
 				&Authorizer{testHandler},
 				&Mutator{testHandler})
 
@@ -288,7 +288,7 @@ var _ = Describe("Rule", func() {
 				"http://my-app/some-route1",
 				newStringPtr("/api/v1"),
 				newBoolPtr(true),
-				[]*Authenticator{&Authenticator{testHandler}},
+				[]*Authenticator{{testHandler}},
 				&Authorizer{testHandler},
 				&Mutator{testHandler})
 

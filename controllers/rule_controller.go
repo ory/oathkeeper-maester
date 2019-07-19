@@ -125,7 +125,9 @@ func (r *RuleReconciler) updateRulesConfigmap(ctx context.Context, data string) 
 
 			err := retry.Do(func() error {
 				return r.Create(ctx, &oathkeeperRulesConfigmap)
-			})
+			},
+				retry.Attempts(5),
+				retry.DelayType(retry.BackOffDelay))
 
 			if err != nil {
 				r.Log.Error(err, "unable to create configmap")

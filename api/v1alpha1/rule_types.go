@@ -122,10 +122,10 @@ type Handler struct {
 // ToOathkeeperRules transforms a RuleList object into a JSON object digestible by Oathkeeper.
 func (rl RuleList) ToOathkeeperRules() ([]byte, error) {
 
-	rules := make([]*RuleJSON, 0)
+	rules := make([]*RuleJSON, len(rl.Items))
 
-	for _, item := range rl.Items {
-		rules = append(rules, item.ToRuleJSON())
+	for i, _ := range rl.Items {
+		rules[i] = rl.Items[i].ToRuleJSON()
 	}
 
 	return json.MarshalIndent(rules, "", "  ")
