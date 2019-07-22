@@ -17,6 +17,7 @@ package controllers
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"time"
 
@@ -67,10 +68,11 @@ func (r *RuleReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 			rule.Status.Validation.Valid = boolPtr(false)
 			e := err.Error()
 			rule.Status.Validation.Error = &e
-			r.Log.Info("validation error in Rule %s/%s: \"%s\"", rule.Namespace, rule.Name, e)
+			r.Log.Info(fmt.Sprintf("validation error in Rule %s/%s: \"%s\"", rule.Namespace, rule.Name, e))
 			if err := r.Update(ctx, &rule); err != nil {
 				r.Log.Error(err, "unable to update Rule status")
-				return ctrl.Result{}, err
+				//Invoke requeue directly without logging error with whole stacktrace
+				return ctrl.Result{Requeue: true}, nil
 			}
 			// continue, as validation can't be fixed by requeuing request and we still have to update the configmap
 		} else {
@@ -79,7 +81,8 @@ func (r *RuleReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 			rule.Status.Validation.Valid = boolPtr(true)
 			if err := r.Update(ctx, &rule); err != nil {
 				r.Log.Error(err, "unable to update Rule status")
-				return ctrl.Result{}, err
+				//Invoke requeue directly without logging error with whole stacktrace
+				return ctrl.Result{Requeue: true}, nil
 			}
 		}
 	}
@@ -155,10 +158,9 @@ func (r *RuleReconciler) updateRulesConfigmap(ctx context.Context, data string) 
 		return err
 	}
 
-	oathkeeperRulesConfigmapCopy := oathkeeperRulesConfigmap.DeepCopy()
-	oathkeeperRulesConfigmapCopy.Data = map[string]string{"rules": data}
+	oathkeeperRulesConfigmap.Data = map[string]string{"rules": data}
 
-	if err := r.Update(ctx, oathkeeperRulesConfigmapCopy); err != nil {
+	if err := r.Update(ctx, &oathkeeperRulesConfigmap); err != nil {
 		return err
 	}
 
