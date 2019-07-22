@@ -18,6 +18,7 @@ package controllers
 import (
 	"context"
 	"os"
+	"time"
 
 	"github.com/go-logr/logr"
 	oathkeeperv1alpha1 "github.com/ory/oathkeeper-k8s-controller/api/v1alpha1"
@@ -101,6 +102,19 @@ func (r *RuleReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	return ctrl.Result{}, nil
 }
 
+func createConfigMap(data string, createMapFunc func(data string) error) error {
+
+	var worker func() error = func() error {
+		return createMapFunc(data)
+	}
+
+	return retry.Do(worker,
+		retry.Attempts(5),
+		retry.Delay(time.Second*2),
+		retry.DelayType(retry.FixedDelay),
+	)
+}
+
 func (r *RuleReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&oathkeeperv1alpha1.Rule{}).
@@ -115,19 +129,20 @@ func (r *RuleReconciler) updateRulesConfigmap(ctx context.Context, data string) 
 	if err := r.Get(ctx, r.RuleConfigmap, &oathkeeperRulesConfigmap); err != nil {
 		if apierrs.IsNotFound(err) {
 
-			oathkeeperRulesConfigmap = apiv1.ConfigMap{
-				ObjectMeta: metav1.ObjectMeta{
-					Name:      r.RuleConfigmap.Name,
-					Namespace: r.RuleConfigmap.Namespace,
-				},
-				Data: map[string]string{"rules": data},
+			createMapFunc := func(data string) error {
+
+				oathkeeperRulesConfigmap = apiv1.ConfigMap{
+					ObjectMeta: metav1.ObjectMeta{
+						Name:      r.RuleConfigmap.Name,
+						Namespace: r.RuleConfigmap.Namespace,
+					},
+					Data: map[string]string{"rules": data},
+				}
+
+				return r.Create(ctx, &oathkeeperRulesConfigmap)
 			}
 
-			err := retry.Do(func() error {
-				return r.Create(ctx, &oathkeeperRulesConfigmap)
-			},
-				retry.Attempts(5),
-				retry.DelayType(retry.BackOffDelay))
+			err := createConfigMap(data, createMapFunc)
 
 			if err != nil {
 				r.Log.Error(err, "unable to create configmap")
