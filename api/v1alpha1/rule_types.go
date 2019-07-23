@@ -80,6 +80,9 @@ type RuleStatus struct {
 // Upstream represents the location of a server where requests matching a rule should be forwarded to.
 type Upstream struct {
 	// URL defines the target URL for incoming requests
+	// +kubebuilder:validation:MinLength=3
+	// +kubebuilder:validation:MaxLength=256
+	// +kubebuilder:validation:Pattern=^(?:https?:\/\/)?(?:[^@\/\n]+@)?(?:www\.)?([^:\/\n]+)
 	URL string `json:"url"`
 	// StripPath replaces the provided path prefix when forwarding the requested URL to the upstream URL.
 	// +optional
