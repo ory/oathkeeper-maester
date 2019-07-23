@@ -24,13 +24,15 @@ import (
 )
 
 const (
-	allow = "allow"
-	noop  = "noop"
+	deny         = "deny"
+	noop         = "noop"
+	unauthorized = "unauthorized"
 )
 
 var (
+	denyHandler         = &Handler{Name: deny}
 	noopHandler         = &Handler{Name: noop}
-	allowHandler        = &Handler{Name: allow}
+	unauthorizedHandler = &Handler{Name: unauthorized}
 	preserveHostDefault = false
 )
 
@@ -183,10 +185,10 @@ func (r Rule) ToRuleJSON() *RuleJSON {
 	}
 
 	if ruleJSON.Authenticators == nil {
-		ruleJSON.Authenticators = []*Authenticator{{noopHandler}}
+		ruleJSON.Authenticators = []*Authenticator{{unauthorizedHandler}}
 	}
 	if ruleJSON.Authorizer == nil {
-		ruleJSON.Authorizer = &Authorizer{allowHandler}
+		ruleJSON.Authorizer = &Authorizer{denyHandler}
 	}
 	if ruleJSON.Mutator == nil {
 		ruleJSON.Mutator = &Mutator{noopHandler}

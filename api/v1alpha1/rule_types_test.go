@@ -49,7 +49,7 @@ var (
       }
     ],
     "authorizer": {
-      "handler": "allow"
+      "handler": "deny"
     },
     "mutator": {
       "handler": "handler2",
@@ -94,7 +94,7 @@ var (
       }
     ],
     "authorizer": {
-      "handler": "allow"
+      "handler": "deny"
     },
     "mutator": {
       "handler": "noop"
@@ -115,7 +115,7 @@ var (
     },
     "authenticators": [
       {
-        "handler": "noop"
+        "handler": "unauthorized"
       }
     ],
     "authorizer": {
@@ -243,7 +243,7 @@ func TestToRuleJson(t *testing.T) {
 			assertHasDefaultAuthenticator(t, actual)
 
 			require.NotNil(t, actual.RuleSpec.Authorizer)
-			assert.Equal(t, allowHandler, actual.RuleSpec.Authorizer.Handler)
+			assert.Equal(t, denyHandler, actual.RuleSpec.Authorizer.Handler)
 
 			require.NotNil(t, actual.RuleSpec.Mutator)
 			assert.Equal(t, noopHandler, actual.RuleSpec.Mutator.Handler)
@@ -265,7 +265,7 @@ func TestToRuleJson(t *testing.T) {
 			assertHasDefaultAuthenticator(t, actual)
 
 			require.NotNil(t, actual.RuleSpec.Authorizer)
-			assert.Equal(t, allowHandler, actual.RuleSpec.Authorizer.Handler)
+			assert.Equal(t, denyHandler, actual.RuleSpec.Authorizer.Handler)
 
 			require.NotNil(t, actual.RuleSpec.Mutator)
 			assert.Equal(t, testHandler, actual.RuleSpec.Mutator.Handler)
@@ -436,5 +436,5 @@ func assertHasDefaultAuthenticator(t *testing.T, actual *RuleJSON) {
 	require.NotNil(t, actual.RuleSpec.Authenticators)
 	require.NotEmpty(t, actual.RuleSpec.Authenticators)
 	require.Len(t, actual.RuleSpec.Authenticators, 1)
-	assert.Equal(t, noopHandler, actual.RuleSpec.Authenticators[0].Handler)
+	assert.Equal(t, unauthorizedHandler, actual.RuleSpec.Authenticators[0].Handler)
 }
