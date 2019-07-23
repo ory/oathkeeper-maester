@@ -144,16 +144,23 @@ func (rl RuleList) FilterNotValid() RuleList {
 	return rlCopy
 }
 
-// ValidateWith uses provided validation configuration to check whether the rule have proper handlers set.
+// ValidateWith uses provided validation configuration to check whether the rule have proper handlers set. Nil is a valid handler.
 func (r Rule) ValidateWith(config validation.Config) error {
-	// if a handler is not provided in any of the following fields, a default one will be used, so there is no need to check if it is valid
+
 	if r.Spec.Authenticators != nil {
+
+		var invalidAuthenticators []string
 		for _, authenticator := range r.Spec.Authenticators {
 			if valid := config.IsAuthenticatorValid(authenticator.Name); !valid {
-				return fmt.Errorf("authenticator: %s is invalid", authenticator.Name)
+				invalidAuthenticators = append(invalidAuthenticators, authenticator.Name)
 			}
 		}
+
+		if invalidAuthenticators != nil {
+			return fmt.Errorf("invalid authenticators: %s", invalidAuthenticators)
+		}
 	}
+
 	if r.Spec.Authorizer != nil {
 		if valid := config.IsAuthorizerValid(r.Spec.Authorizer.Name); !valid {
 			return fmt.Errorf("authorizer: %s is invalid", r.Spec.Authorizer.Name)

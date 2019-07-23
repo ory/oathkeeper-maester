@@ -66,9 +66,8 @@ func (r *RuleReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 		if err := rule.ValidateWith(r.ValidationConfig); err != nil {
 			rule.Status.Validation = &oathkeeperv1alpha1.Validation{}
 			rule.Status.Validation.Valid = boolPtr(false)
-			e := err.Error()
-			rule.Status.Validation.Error = &e
-			r.Log.Info(fmt.Sprintf("validation error in Rule %s/%s: \"%s\"", rule.Namespace, rule.Name, e))
+			rule.Status.Validation.Error = stringPtr(err.Error())
+			r.Log.Info(fmt.Sprintf("validation error in Rule %s/%s: \"%s\"", rule.Namespace, rule.Name, err.Error()))
 			if err := r.Update(ctx, &rule); err != nil {
 				r.Log.Error(err, "unable to update Rule status")
 				//Invoke requeue directly without logging error with whole stacktrace
@@ -169,4 +168,8 @@ func (r *RuleReconciler) updateRulesConfigmap(ctx context.Context, data string) 
 
 func boolPtr(b bool) *bool {
 	return &b
+}
+
+func stringPtr(s string) *string {
+	return &s
 }
