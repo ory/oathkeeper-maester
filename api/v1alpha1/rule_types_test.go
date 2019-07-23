@@ -16,27 +16,16 @@ limitations under the License.
 package v1alpha1
 
 import (
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
 	"github.com/ory/oathkeeper-k8s-controller/internal/validation"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"testing"
 )
 
-// These tests are written in BDD-style using Ginkgo framework. Refer to
-// http://onsi.github.io/ginkgo to learn more.
-
-var _ = Describe("Rule", func() {
-
-	BeforeEach(func() {
-		// Add any setup steps that needs to be executed before each test
-	})
-
-	AfterEach(func() {
-		// Add any teardown steps that needs to be executed after each test
-	})
-
-	var template = `[
+var (
+	template = `[
   {
     "upstream": {
       "url": "http://my-backend-service1",
@@ -141,12 +130,12 @@ var _ = Describe("Rule", func() {
   }
 ]`
 
-	var sampleConfig = `{
+	sampleConfig = `{
   "key1": "val1"
 }
 `
 
-	var sampleConfig2 = `{
+	sampleConfig2 = `{
   "key1": [
     "val1",
     "val2",
@@ -154,209 +143,233 @@ var _ = Describe("Rule", func() {
   ]
 }
 `
+)
 
-	Context("ToOathkeeperRules", func() {
+func TestToOathkeeperRules(t *testing.T) {
 
-		It("Should return a JSON array of raw Oathkeeper rules", func() {
+	t.Log("Should convert a RuleList object into a valid JSON array")
 
-			h1 := newHandler("handler1", sampleConfig)
-			h2 := newHandler("handler2", sampleConfig2)
+	var list = &RuleList{}
 
-			rule1 := newRule(
-				"foo1",
-				"default",
-				"http://my-backend-service1",
-				"http://my-app/some-route1",
-				newStringPtr("/api/v1"),
-				newBoolPtr(true),
-				[]*Authenticator{&Authenticator{h1}},
-				nil,
-				&Mutator{h2})
+	t.Run("containing no elements if the 'Item' field in the RuleList object is empty", func(t *testing.T) {
 
-			rule2 := newRule(
-				"foo2",
-				"default",
-				"http://my-backend-service2",
-				"http://my-app/some-route2",
-				nil,
-				newBoolPtr(false),
-				[]*Authenticator{&Authenticator{h1}, {h2}},
-				nil,
-				nil)
+		//given
+		list.Items = []Rule{}
 
-			rule3 := newRule(
-				"foo3",
-				"default",
-				"http://my-backend-service3",
-				"http://my-app/some-route3",
-				nil,
-				nil,
-				nil,
-				&Authorizer{h1},
-				nil)
+		//when
+		raw, err := list.ToOathkeeperRules()
 
-			list := &RuleList{Items: []Rule{*rule1, *rule2, *rule3}}
-
-			By("transforming the receiver into a slice of bytes")
-
-			raw, err := list.ToOathkeeperRules()
-
-			Expect(err).To(BeNil())
-			Expect(string(raw)).To(Equal(template))
-		})
+		//then
+		require.NoError(t, err)
+		assert.Equal(t, "[]", string(raw))
 	})
 
-	Context("ToRuleJSON", func() {
+	t.Run("containing raw Oathkeeper rule(s) if the 'Item' field in the RuleList object is not empty", func(t *testing.T) {
 
-		It("Should convert a Rule with no handlers to JSON Rule", func() {
+		//given
+		h1 := newHandler("handler1", sampleConfig)
+		h2 := newHandler("handler2", sampleConfig2)
 
-			testRule := newRule(
-				"r1",
-				"test",
-				"https://upstream.url",
-				"https://match.this/url",
-				newStringPtr("/strip/me"),
-				nil,
-				nil,
-				nil,
-				nil)
+		rule1 := newRule(
+			"foo1",
+			"default",
+			"http://my-backend-service1",
+			"http://my-app/some-route1",
+			newStringPtr("/api/v1"),
+			newBoolPtr(true),
+			[]*Authenticator{&Authenticator{h1}},
+			nil,
+			&Mutator{h2})
 
-			actual := testRule.ToRuleJSON()
+		rule2 := newRule(
+			"foo2",
+			"default",
+			"http://my-backend-service2",
+			"http://my-app/some-route2",
+			nil,
+			newBoolPtr(false),
+			[]*Authenticator{&Authenticator{h1}, {h2}},
+			nil,
+			nil)
 
-			By("copying its spec, adding default handlers and generating correct item ID")
+		rule3 := newRule(
+			"foo3",
+			"default",
+			"http://my-backend-service3",
+			"http://my-app/some-route3",
+			nil,
+			nil,
+			nil,
+			&Authorizer{h1},
+			nil)
 
-			Expect(actual.ID).To(Equal("r1.test"))
+		list.Items = []Rule{*rule1, *rule2, *rule3}
 
-			Expect(actual.RuleSpec.Authenticators).NotTo(BeNil())
-			Expect(actual.RuleSpec.Authenticators).NotTo(BeEmpty())
-			Expect(actual.RuleSpec.Authenticators).To(HaveLen(1))
-			Expect(actual.RuleSpec.Authenticators[0].Handler).To(Equal(noopHandler))
+		//when
+		raw, err := list.ToOathkeeperRules()
 
-			Expect(actual.RuleSpec.Authorizer).NotTo(BeNil())
-			Expect(actual.RuleSpec.Authorizer.Handler).To(Equal(allowHandler))
+		//then
+		require.NoError(t, err)
+		assert.Equal(t, template, string(raw))
+	})
+}
 
-			Expect(actual.RuleSpec.Mutator).NotTo(BeNil())
-			Expect(actual.RuleSpec.Mutator.Handler).To(Equal(noopHandler))
+func TestToRuleJson(t *testing.T) {
 
-			Expect(*actual.RuleSpec.Upstream.PreserveHost).To(BeFalse())
-		})
+	t.Log("Should convert a Rule to JSON Rule")
 
-		It("Should convert a Rule with specified handlers to JSON Rule", func() {
+	var actual *RuleJSON
+	var testHandler = newHandler("test-handler", "")
+	var testRule = newRule(
+		"r1",
+		"test",
+		"https://upstream.url",
+		"https://match.this/url",
+		newStringPtr("/strip/me"),
+		nil,
+		nil,
+		nil,
+		nil)
 
-			testHandler := newHandler("test-handler", "")
+	t.Run("If no handlers have been specified, it should generate an ID and add default values for missing handlers", func(t *testing.T) {
 
-			testRule := newRule(
-				"r1",
-				"test",
-				"https://upstream.url",
-				"https://match.this/url",
-				newStringPtr("/strip/me"),
-				newBoolPtr(true),
-				[]*Authenticator{{testHandler}},
-				&Authorizer{testHandler},
-				&Mutator{testHandler})
+		//when
+		actual = testRule.ToRuleJSON()
 
-			actual := testRule.ToRuleJSON()
+		//then
+		assert.Equal(t, "r1.test", actual.ID)
 
-			By("copying its spec and generating correct item ID")
+		assertHasDefaultAuthenticator(t, actual)
 
-			Expect(actual.ID).To(Equal("r1.test"))
-			Expect(actual.RuleSpec).To(Equal(testRule.Spec))
-		})
+		require.NotNil(t, actual.RuleSpec.Authorizer)
+		assert.Equal(t, allowHandler, actual.RuleSpec.Authorizer.Handler)
+
+		require.NotNil(t, actual.RuleSpec.Mutator)
+		assert.Equal(t, noopHandler, actual.RuleSpec.Mutator.Handler)
+
+		assert.False(t, *actual.RuleSpec.Upstream.PreserveHost)
 	})
 
-	Context("ValidateWith", func() {
+	t.Run("If one handler has been provided, it should generate an ID, rewrite the provided handler and add default values for missing handlers", func(t *testing.T) {
 
-		testHandler := newHandler("handler1", sampleConfig)
+		//given
+		testRule.Spec.Mutator = &Mutator{testHandler}
 
-		testAuthenticatorsAvailable := []string{testHandler.Name}
-		testAuthorizersAvailable := []string{testHandler.Name}
-		testMutatorsAvailable := []string{testHandler.Name}
+		//when
+		actual = testRule.ToRuleJSON()
 
-		validationConfig := validation.Config{
-			AuthenticatorsAvailable: testAuthenticatorsAvailable,
-			AuthorizersAvailable:    testAuthorizersAvailable,
-			MutatorsAvailable:       testMutatorsAvailable,
-		}
+		//then
+		assert.Equal(t, "r1.test", actual.ID)
 
-		It("Should return no errors for a valid rule", func() {
+		assertHasDefaultAuthenticator(t, actual)
 
-			rule := newRule(
-				"foo1",
-				"default",
-				"http://my-backend-service1",
-				"http://my-app/some-route1",
-				newStringPtr("/api/v1"),
-				newBoolPtr(true),
-				[]*Authenticator{{testHandler}},
-				&Authorizer{testHandler},
-				&Mutator{testHandler})
+		require.NotNil(t, actual.RuleSpec.Authorizer)
+		assert.Equal(t, allowHandler, actual.RuleSpec.Authorizer.Handler)
 
-			By("validating the rule with provided validation configuration")
-			validationError := rule.ValidateWith(validationConfig)
-
-			Expect(validationError).To(BeNil())
-		})
-
-		It("Should return no errors for a rule with default handlers", func() {
-
-			rule := newRule(
-				"foo1",
-				"default",
-				"http://my-backend-service1",
-				"http://my-app/some-route1",
-				newStringPtr("/api/v1"),
-				newBoolPtr(true),
-				nil,
-				nil,
-				nil)
-
-			By("validating the rule with provided validation configuration")
-			validationError := rule.ValidateWith(validationConfig)
-
-			Expect(validationError).To(BeNil())
-		})
-
-		It("Should return an error for a rule with an invalid handler", func() {
-
-			invalidHandler := newHandler("votValidHandlerName", sampleConfig)
-			rule := newRule(
-				"foo1",
-				"default",
-				"http://my-backend-service1",
-				"http://my-app/some-route1",
-				newStringPtr("/api/v1"),
-				newBoolPtr(true),
-				[]*Authenticator{&Authenticator{testHandler}},
-				&Authorizer{invalidHandler},
-				&Mutator{testHandler})
-
-			By("validating the rule with provided validation configuration")
-			validationError := rule.ValidateWith(validationConfig)
-
-			Expect(validationError).ToNot(BeNil())
-		})
+		require.NotNil(t, actual.RuleSpec.Mutator)
+		assert.Equal(t, testHandler, actual.RuleSpec.Mutator.Handler)
 	})
 
-	Context("FilterNotValid", func() {
-		It("Should return only valid rules", func() {
-			sampleErrorMessage := "authenticator: sample is invalid"
-			rule1 := newRuleWithStatusOnly(false, &sampleErrorMessage)
+	t.Run("If all handlers are defined, it should generate an ID and rewrite the entire spec", func(t *testing.T) {
 
-			rule2 := newRuleWithStatusOnly(false, nil)
+		//given
+		testRule.Spec.Authenticators = []*Authenticator{{testHandler}}
+		testRule.Spec.Authorizer = &Authorizer{testHandler}
 
-			rule3 := newRuleWithStatusOnly(true, nil)
+		//when
+		actual = testRule.ToRuleJSON()
 
-			list := &RuleList{Items: []Rule{rule1, rule2, rule3}}
-			expectedValidationResult := RuleList{Items: []Rule{rule3}}
-
-			By("filtering out rules that are no valid")
-			validationResult := list.FilterNotValid()
-
-			Expect(validationResult).To(Equal(expectedValidationResult))
-		})
+		//then
+		assert.Equal(t, "r1.test", actual.ID)
+		assert.Equal(t, testRule.Spec, actual.RuleSpec)
 	})
-})
+}
+
+func TestValidateWith(t *testing.T) {
+
+	var validationError error
+	var testHandler = newHandler("handler1", sampleConfig)
+	var rule = newRule(
+		"foo1",
+		"default",
+		"http://my-backend-service1",
+		"http://my-app/some-route1",
+		newStringPtr("/api/v1"),
+		newBoolPtr(true),
+		nil,
+		nil,
+		nil)
+
+	t.Log("Given a validation configuration")
+
+	var validationConfig = validation.Config{
+		AuthenticatorsAvailable: []string{testHandler.Name},
+		AuthorizersAvailable:    []string{testHandler.Name},
+		MutatorsAvailable:       []string{testHandler.Name},
+	}
+
+	t.Log("Should return no error for a valid rule with")
+
+	t.Run("no handlers", func(t *testing.T) {
+
+		//when
+		validationError = rule.ValidateWith(validationConfig)
+
+		//then
+		require.NoError(t, validationError)
+	})
+
+	t.Run("handlers specified", func(t *testing.T) {
+
+		//given
+		rule.Spec.Authenticators = []*Authenticator{{testHandler}}
+		rule.Spec.Authorizer = &Authorizer{testHandler}
+		rule.Spec.Mutator = &Mutator{testHandler}
+
+		//when
+		validationError = rule.ValidateWith(validationConfig)
+
+		//then
+		require.NoError(t, validationError)
+	})
+
+	t.Log("Should return an error for a rule with")
+
+	t.Run("an invalid handler", func(t *testing.T) {
+
+		//given
+		invalidHandler := newHandler("notValidHandlerName", sampleConfig)
+		rule.Spec.Authorizer = &Authorizer{invalidHandler}
+
+		//when
+		validationError = rule.ValidateWith(validationConfig)
+
+		//then
+		require.Error(t, validationError)
+	})
+}
+
+func TestFilterNotValid(t *testing.T) {
+
+	t.Run("Should return only valid rules", func(t *testing.T) {
+
+		//given
+		rule1 := newRuleWithStatusOnly(false, newStringPtr("authenticator: sample is invalid"))
+		rule2 := newRuleWithStatusOnly(false, nil)
+		rule3 := newRuleWithStatusOnly(true, nil)
+
+		list := &RuleList{Items: []Rule{rule1, rule2, rule3}}
+
+		//when
+		validationResult := list.FilterNotValid().Items
+
+		//then
+		require.NotEmpty(t, validationResult)
+		require.Len(t, validationResult, 1)
+
+		assert.Equal(t, rule3, validationResult[0])
+	})
+}
 
 func newRule(name, namespace, upstreamURL, matchURL string, stripURLPath *string, preserveURLHost *bool, authenticators []*Authenticator, authorizer *Authorizer, mutator *Mutator) *Rule {
 
@@ -415,4 +428,11 @@ func newBoolPtr(b bool) *bool {
 
 func newStringPtr(s string) *string {
 	return &s
+}
+
+func assertHasDefaultAuthenticator(t *testing.T, actual *RuleJSON) {
+	require.NotNil(t, actual.RuleSpec.Authenticators)
+	require.NotEmpty(t, actual.RuleSpec.Authenticators)
+	require.Len(t, actual.RuleSpec.Authenticators, 1)
+	assert.Equal(t, noopHandler, actual.RuleSpec.Authenticators[0].Handler)
 }
