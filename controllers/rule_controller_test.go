@@ -38,7 +38,8 @@ func TestRetryOnError(t *testing.T) {
 		retryOnError(createMapFunc, attempts, delay).or(dieFunc)
 
 		//then
-		assert.Less(t, cnt, attempts)
+		assert.NotEqual(t, attempts, cnt)
+		assert.Equal(t, 2, cnt)
 		assert.False(t, fallbackCalled)
 	})
 
