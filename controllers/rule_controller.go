@@ -34,6 +34,12 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
+const (
+	dataKey       = "rules"
+	retryAttempts = 5
+	retryDelay    = time.Second * 2
+)
+
 // RuleReconciler reconciles a Rule object
 type RuleReconciler struct {
 	client.Client
@@ -104,19 +110,6 @@ func (r *RuleReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	return ctrl.Result{}, nil
 }
 
-func createConfigMap(data string, createMapFunc func(data string) error) error {
-
-	var worker func() error = func() error {
-		return createMapFunc(data)
-	}
-
-	return retry.Do(worker,
-		retry.Attempts(5),
-		retry.Delay(time.Second*2),
-		retry.DelayType(retry.FixedDelay),
-	)
-}
-
 func (r *RuleReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&oathkeeperv1alpha1.Rule{}).
@@ -131,20 +124,20 @@ func (r *RuleReconciler) updateRulesConfigmap(ctx context.Context, data string) 
 	if err := r.Get(ctx, r.RuleConfigmap, &oathkeeperRulesConfigmap); err != nil {
 		if apierrs.IsNotFound(err) {
 
-			createMapFunc := func(data string) error {
+			createMapFunc := func() error {
 
 				oathkeeperRulesConfigmap = apiv1.ConfigMap{
 					ObjectMeta: metav1.ObjectMeta{
 						Name:      r.RuleConfigmap.Name,
 						Namespace: r.RuleConfigmap.Namespace,
 					},
-					Data: map[string]string{"rules": data},
+					Data: map[string]string{dataKey: data},
 				}
 
 				return r.Create(ctx, &oathkeeperRulesConfigmap)
 			}
 
-			err := createConfigMap(data, createMapFunc)
+			err := retryOnError(createMapFunc, retryAttempts, retryDelay)
 
 			if err != nil {
 				r.Log.Error(err, "unable to create configmap")
@@ -157,13 +150,21 @@ func (r *RuleReconciler) updateRulesConfigmap(ctx context.Context, data string) 
 		return err
 	}
 
-	oathkeeperRulesConfigmap.Data = map[string]string{"rules": data}
+	oathkeeperRulesConfigmap.Data = map[string]string{dataKey: data}
 
 	if err := r.Update(ctx, &oathkeeperRulesConfigmap); err != nil {
 		return err
 	}
 
 	return nil
+}
+
+func retryOnError(retryable func() error, attempts int, delay time.Duration) error {
+	return retry.Do(retryable,
+		retry.Attempts(uint(attempts)),
+		retry.Delay(delay),
+		retry.DelayType(retry.FixedDelay),
+	)
 }
 
 func boolPtr(b bool) *bool {
