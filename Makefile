@@ -15,7 +15,7 @@ test: generate fmt vet manifests
 # Start KIND pseudo-cluster
 kind-start:
 	GO111MODULE=on go get "sigs.k8s.io/kind@v0.4.0" && kind create cluster
-KUBECONFIG=$(shell kind get kubeconfig-path --name="kind")
+    KUBECONFIG=$(shell kind get kubeconfig-path --name="kind")
 
 # Stop KIND pseudo-cluster
 kind-stop:
@@ -25,6 +25,7 @@ kind-stop:
 # Ensures the controller image is built, deploys the image to KIND cluster along with necessary configuration
 kind-deploy: manager manifests docker-build-notest kind-start
 	kind load docker-image controller:latest
+	KUBECONFIG=$(KUBECONFIG) kubectl cluster-info
 	KUBECONFIG=$(KUBECONFIG) kubectl apply -f config/crd/bases
 	kustomize build config/default | KUBECONFIG=$(KUBECONFIG) kubectl apply -f -
 
