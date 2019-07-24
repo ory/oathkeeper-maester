@@ -389,8 +389,11 @@ spec:
               items:
                 properties:
                   config:
+                    description: Config configures the handler. Configuration keys
+                      vary per handler.
                     type: object
                   handler:
+                    description: Name is the name of a handler
                     type: string
                 required:
                 - handler
@@ -399,8 +402,11 @@ spec:
             authorizer:
               properties:
                 config:
+                  description: Config configures the handler. Configuration keys vary
+                    per handler.
                   type: object
                 handler:
+                  description: Name is the name of a handler
                   type: string
               required:
               - handler
@@ -408,10 +414,14 @@ spec:
             match:
               properties:
                 methods:
+                  description: Methods represent an array of HTTP methods (e.g. GET,
+                    POST, PUT, DELETE, ...)
                   items:
                     type: string
                   type: array
                 url:
+                  description: URL is the URL that should be matched. It supports
+                    regex templates.
                   type: string
               required:
               - url
@@ -420,8 +430,11 @@ spec:
             mutator:
               properties:
                 config:
+                  description: Config configures the handler. Configuration keys vary
+                    per handler.
                   type: object
                 handler:
+                  description: Name is the name of a handler
                   type: string
               required:
               - handler
@@ -429,10 +442,19 @@ spec:
             upstream:
               properties:
                 preserveHost:
+                  description: PreserveHost includes the host and port of the url
+                    value if set to false. If true, the host and port of the ORY Oathkeeper
+                    Proxy will be used instead.
                   type: boolean
                 stripPath:
+                  description: StripPath replaces the provided path prefix when forwarding
+                    the requested URL to the upstream URL.
                   type: string
                 url:
+                  description: URL defines the target URL for incoming requests
+                  maxLength: 256
+                  minLength: 3
+                  pattern: ^(?:https?:\/\/)?(?:[^@\/\n]+@)?(?:www\.)?([^:\/\n]+)
                   type: string
               required:
               - url
@@ -442,6 +464,14 @@ spec:
           - match
           type: object
         status:
+          properties:
+            validation:
+              properties:
+                valid:
+                  type: boolean
+                validationError:
+                  type: string
+              type: object
           type: object
       type: object
   versions:

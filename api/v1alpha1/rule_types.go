@@ -16,8 +16,24 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"encoding/json"
+	"fmt"
+	"github.com/ory/oathkeeper-k8s-controller/internal/validation"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+)
+
+const (
+	deny         = "deny"
+	noop         = "noop"
+	unauthorized = "unauthorized"
+)
+
+var (
+	denyHandler         = &Handler{Name: deny}
+	noopHandler         = &Handler{Name: noop}
+	unauthorizedHandler = &Handler{Name: unauthorized}
+	preserveHostDefault = false
 )
 
 // +kubebuilder:object:root=true
@@ -47,39 +63,145 @@ type RuleSpec struct {
 	Mutator        *Mutator         `json:"mutator,omitempty"`
 }
 
-// RuleStatus defines the observed state of Rule
-type RuleStatus struct {
+// Validation defines the validation state of Rule
+type Validation struct {
+	// +optional
+	Valid *bool `json:"valid,omitempty"`
+	// +optional
+	Error *string `json:"validationError,omitempty"`
 }
 
+// RuleStatus defines the observed state of Rule
+type RuleStatus struct {
+	// +optional
+	Validation *Validation `json:"validation,omitempty"`
+}
+
+// Upstream represents the location of a server where requests matching a rule should be forwarded to.
 type Upstream struct {
+	// URL defines the target URL for incoming requests
+	// +kubebuilder:validation:MinLength=3
+	// +kubebuilder:validation:MaxLength=256
+	// +kubebuilder:validation:Pattern=^(?:https?:\/\/)?(?:[^@\/\n]+@)?(?:www\.)?([^:\/\n]+)
 	URL string `json:"url"`
+	// StripPath replaces the provided path prefix when forwarding the requested URL to the upstream URL.
 	// +optional
 	StripPath *string `json:"stripPath,omitempty"`
+	// PreserveHost includes the host and port of the url value if set to false. If true, the host and port of the ORY Oathkeeper Proxy will be used instead.
 	// +optional
 	PreserveHost *bool `json:"preserveHost,omitempty"`
 }
 
+// Match defines the URL(s) that an access rule should match.
 type Match struct {
-	URL     string   `json:"url"`
+	// URL is the URL that should be matched. It supports regex templates.
+	URL string `json:"url"`
+	// Methods represent an array of HTTP methods (e.g. GET, POST, PUT, DELETE, ...)
 	Methods []string `json:"methods"`
 }
 
+// Authenticator represents a handler that authenticates provided credentials.
 type Authenticator struct {
 	*Handler `json:",inline"`
 }
 
+// Authorizer represents a handler that authorizes the subject ("user") from the previously validated credentials making the request.
 type Authorizer struct {
 	*Handler `json:",inline"`
 }
 
+// Mutator represents a handler that transforms the HTTP request before forwarding it.
 type Mutator struct {
 	*Handler `json:",inline"`
 }
 
+// Handler represents an Oathkeeper routine that operates on incoming requests. It is used to either validate a request (Authenticator, Authorizer) or modify it (Mutator).
 type Handler struct {
+	// Name is the name of a handler
 	Name string `json:"handler"`
+	// Config configures the handler. Configuration keys vary per handler.
 	// +kubebuilder:validation:Type=object
 	Config *runtime.RawExtension `json:"config,omitempty"`
+}
+
+// ToOathkeeperRules transforms a RuleList object into a JSON object digestible by Oathkeeper.
+func (rl RuleList) ToOathkeeperRules() ([]byte, error) {
+
+	rules := make([]*RuleJSON, len(rl.Items))
+
+	for i, _ := range rl.Items {
+		rules[i] = rl.Items[i].ToRuleJSON()
+	}
+
+	return json.MarshalIndent(rules, "", "  ")
+}
+
+// FilterNotValid filters out Rules which doesn't pass validation due to being not processed yet or due to negative result of validation. It returns a list of Rules which passed validation successfully.
+func (rl RuleList) FilterNotValid() RuleList {
+	rlCopy := rl
+	validRules := []Rule{}
+	for _, rule := range rl.Items {
+		if rule.Status.Validation != nil && rule.Status.Validation.Valid != nil && *rule.Status.Validation.Valid {
+			validRules = append(validRules, rule)
+		}
+	}
+	rlCopy.Items = validRules
+	return rlCopy
+}
+
+// ValidateWith uses provided validation configuration to check whether the rule have proper handlers set. Nil is a valid handler.
+func (r Rule) ValidateWith(config validation.Config) error {
+
+	if r.Spec.Authenticators != nil {
+
+		var invalidAuthenticators []string
+		for _, authenticator := range r.Spec.Authenticators {
+			if valid := config.IsAuthenticatorValid(authenticator.Name); !valid {
+				invalidAuthenticators = append(invalidAuthenticators, authenticator.Name)
+			}
+		}
+
+		if invalidAuthenticators != nil {
+			return fmt.Errorf("invalid authenticators: %s", invalidAuthenticators)
+		}
+	}
+
+	if r.Spec.Authorizer != nil {
+		if valid := config.IsAuthorizerValid(r.Spec.Authorizer.Name); !valid {
+			return fmt.Errorf("authorizer: %s is invalid", r.Spec.Authorizer.Name)
+		}
+	}
+	if r.Spec.Mutator != nil {
+		if valid := config.IsMutatorValid(r.Spec.Mutator.Name); !valid {
+			return fmt.Errorf("mutator: %s is invalid", r.Spec.Mutator.Name)
+		}
+	}
+	return nil
+}
+
+// ToRuleJSON transforms a Rule object into an intermediary RuleJSON object
+func (r Rule) ToRuleJSON() *RuleJSON {
+
+	ruleJSON := &RuleJSON{
+		ID:       r.Name + "." + r.Namespace,
+		RuleSpec: r.Spec,
+	}
+
+	if ruleJSON.Authenticators == nil {
+		ruleJSON.Authenticators = []*Authenticator{{unauthorizedHandler}}
+	}
+	if ruleJSON.Authorizer == nil {
+		ruleJSON.Authorizer = &Authorizer{denyHandler}
+	}
+	if ruleJSON.Mutator == nil {
+		ruleJSON.Mutator = &Mutator{noopHandler}
+	}
+
+	if ruleJSON.Upstream.PreserveHost == nil {
+		ruleJSON.Upstream.PreserveHost = &preserveHostDefault
+	}
+
+	return ruleJSON
 }
 
 func init() {

@@ -1,7 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: oathkeeper-rules
-  namespace: oathkeeper-k8s-controller-system
-  labels:
-    app: oathkeeper
