@@ -137,12 +137,12 @@ func (r *RuleReconciler) updateRulesConfigmap(ctx context.Context, data string) 
 				return r.Create(ctx, &oathkeeperRulesConfigmap)
 			}
 
-			err := retryOnError(createMapFunc, retryAttempts, retryDelay)
-
-			if err != nil {
-				r.Log.Error(err, "unable to create configmap")
+			dieFunc := func() {
+				r.Log.Info("unable to create configmap")
 				os.Exit(1)
 			}
+
+			retryOnError(createMapFunc, retryAttempts, retryDelay).or(dieFunc)
 
 			return nil
 		}
@@ -159,12 +159,22 @@ func (r *RuleReconciler) updateRulesConfigmap(ctx context.Context, data string) 
 	return nil
 }
 
-func retryOnError(retryable func() error, attempts int, delay time.Duration) error {
-	return retry.Do(retryable,
+func retryOnError(retryable func() error, attempts int, delay time.Duration) *retryResp {
+	return &retryResp{retry.Do(retryable,
 		retry.Attempts(uint(attempts)),
 		retry.Delay(delay),
 		retry.DelayType(retry.FixedDelay),
-	)
+	)}
+}
+
+type retryResp struct {
+	err error
+}
+
+func (e *retryResp) or(fallback func()) {
+	if e.err != nil {
+		fallback()
+	}
 }
 
 func boolPtr(b bool) *bool {
