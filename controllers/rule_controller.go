@@ -137,12 +137,7 @@ func (r *RuleReconciler) updateRulesConfigmap(ctx context.Context, data string) 
 				return r.Create(ctx, &oathkeeperRulesConfigmap)
 			}
 
-			dieFunc := func() {
-				r.Log.Info("unable to create configmap")
-				os.Exit(1)
-			}
-
-			retryOnError(createMapFunc, retryAttempts, retryDelay).or(dieFunc)
+			retryOnError(createMapFunc, retryAttempts, retryDelay).or(r.die("unable to create configmap"))
 
 			return nil
 		}
@@ -157,6 +152,13 @@ func (r *RuleReconciler) updateRulesConfigmap(ctx context.Context, data string) 
 	}
 
 	return nil
+}
+
+func (r *RuleReconciler) die(message string) func() {
+	return func() {
+		r.Log.Info(message)
+		os.Exit(1)
+	}
 }
 
 func retryOnError(retryable func() error, attempts int, delay time.Duration) *retryResp {
