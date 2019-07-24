@@ -20,10 +20,10 @@ func TestRetryOnError(t *testing.T) {
 
 	var createMapFunc func() error
 
-	t.Run("should retry on error", func(t *testing.T) {
+	t.Run("should retry on error and exit on first successful attempt", func(t *testing.T) {
 
 		//Given
-		cnt, attempts = 0, 2
+		cnt, attempts = 0, 3
 		fallbackCalled = false
 
 		createMapFunc = func() error {
@@ -38,11 +38,11 @@ func TestRetryOnError(t *testing.T) {
 		retryOnError(createMapFunc, attempts, delay).or(dieFunc)
 
 		//then
-		assert.Equal(t, attempts, cnt)
+		assert.Less(t, cnt, attempts)
 		assert.False(t, fallbackCalled)
 	})
 
-	t.Run("should not call a callback function if last attempt is successful", func(t *testing.T) {
+	t.Run("should not call the die function if the last attempt is successful", func(t *testing.T) {
 
 		//Given
 		cnt, attempts = 0, 5
@@ -63,7 +63,7 @@ func TestRetryOnError(t *testing.T) {
 		assert.False(t, fallbackCalled)
 	})
 
-	t.Run("should call a callback function after five failed attempts", func(t *testing.T) {
+	t.Run("should call the die function if all attempts fail", func(t *testing.T) {
 
 		//Given
 		cnt, attempts = 0, 2
