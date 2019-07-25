@@ -4,11 +4,37 @@ IMG ?= controller:latest
 # Produce CRDs that work back to Kubernetes 1.11 (no version conversion)
 CRD_OPTIONS ?= "crd:trivialVersions=true"
 
+run-with-cleanup = $(1) && $(2) || (ret=$$?; $(2) && exit $$ret)
+
 all: manager
 
 # Run tests
 test: generate fmt vet manifests
-	go test ./api/... ./controllers/... -coverprofile cover.out
+	go test ./api/... ./controllers/... ./internal/... -coverprofile cover.out
+
+# Start KIND pseudo-cluster
+kind-start:
+	GO111MODULE=on go get "sigs.k8s.io/kind@v0.4.0" && kind create cluster
+KUBECONFIG=$(shell kind get kubeconfig-path --name="kind")
+
+# Stop KIND pseudo-cluster
+kind-stop:
+	GO111MODULE=on go get "sigs.k8s.io/kind@v0.4.0" && kind delete cluster
+
+# Deploy on KIND
+# Ensures the controller image is built, deploys the image to KIND cluster along with necessary configuration
+kind-deploy: manager manifests docker-build-notest kind-start
+	kind load docker-image controller:latest
+	KUBECONFIG=$(KUBECONFIG) kubectl apply -f config/crd/bases
+	kustomize build config/default | KUBECONFIG=$(KUBECONFIG) kubectl apply -f -
+
+# private
+kind-test: kind-deploy
+	KUBECONFIG=$(KUBECONFIG) ginkgo -v ./tests/integration/...
+
+# Run integration tests on local KIND cluster
+test-integration:
+	$(call run-with-cleanup, $(MAKE) kind-test, $(MAKE) kind-stop)
 
 # Build manager binary
 manager: generate fmt vet
@@ -44,10 +70,12 @@ generate: controller-gen
 	$(CONTROLLER_GEN) object:headerFile=./hack/boilerplate.go.txt paths=./api/...
 
 # Build the docker image
-docker-build: test
+docker-build-notest:
 	docker build . -t ${IMG}
 	@echo "updating kustomize image patch file for manager resource"
 	sed -i'' -e 's@image: .*@image: '"${IMG}"'@' ./config/default/manager_image_patch.yaml
+
+docker-build: test docker-build-notest
 
 # Push the docker image
 docker-push:
