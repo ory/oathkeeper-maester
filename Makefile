@@ -15,7 +15,7 @@ test: generate fmt vet manifests
 # Start KIND pseudo-cluster
 kind-start:
 	GO111MODULE=on go get "sigs.k8s.io/kind@v0.4.0" && kind create cluster
-    KUBECONFIG=$(shell kind get kubeconfig-path --name="kind")
+	KUBECONFIG=$(shell kind get kubeconfig-path --name="kind")
 
 # Stop KIND pseudo-cluster
 kind-stop:
