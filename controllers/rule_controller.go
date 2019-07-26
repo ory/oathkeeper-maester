@@ -45,7 +45,7 @@ type RuleReconciler struct {
 	Log              logr.Logger
 	RuleConfigmap    types.NamespacedName
 	ValidationConfig validation.Config
-	RulesDataKey     string
+	RulesFileName    string
 }
 
 // +kubebuilder:rbac:groups=oathkeeper.ory.sh,resources=rules,verbs=get;list;watch;create;update;patch;delete
@@ -133,7 +133,7 @@ func (r *RuleReconciler) updateRulesConfigmap(ctx context.Context, data string) 
 						Name:      r.RuleConfigmap.Name,
 						Namespace: r.RuleConfigmap.Namespace,
 					},
-					Data: map[string]string{r.RulesDataKey: data},
+					Data: map[string]string{r.RulesFileName: data},
 				}
 
 				return r.Create(ctx, &oathkeeperRulesConfigmap)
@@ -147,7 +147,7 @@ func (r *RuleReconciler) updateRulesConfigmap(ctx context.Context, data string) 
 		return err
 	}
 
-	oathkeeperRulesConfigmap.Data = map[string]string{r.RulesDataKey: data}
+	oathkeeperRulesConfigmap.Data = map[string]string{r.RulesFileName: data}
 
 	if err := r.Update(ctx, &oathkeeperRulesConfigmap); err != nil {
 		return err
