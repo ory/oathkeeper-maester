@@ -22,12 +22,6 @@ builds:
       goos:
         - linux
 
-archives:
-  - replacements:
-      linux: Linux
-      386: 32-bit
-      amd64: 64-bit
-
 snapshot:
   name_template: "{{ .Tag }}-next"
 
