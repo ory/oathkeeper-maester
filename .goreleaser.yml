@@ -3,53 +3,46 @@
 project_name: oathkeeper-k8s-controller
 
 env:
- - GO111MODULE=on
+  - GO111MODULE=on
 
 before:
- hooks:
-  - "go mod download"
+  hooks:
+    - "go mod download"
 
 builds:
- - flags:
-    - -a
+  - flags:
+      - -a
 
-   binary: oathkeeper
-   env:
-    - CGO_ENABLED=0
-   goarch:
-    - amd64
-    - 386
-    - arm
-    - arm64
-   goarm:
-    - 5
-    - 6
-    - 7
-   goos:
-    - freebsd
-    - linux
+      binary: oathkeeper-k8s-controller
+      env:
+        - CGO_ENABLED=0
+      goarch:
+        - amd64
+        - 386
+      goos:
+        - linux
 
 archives:
- - replacements:
-    linux: Linux
-    386: 32-bit
-    amd64: 64-bit
+  - replacements:
+      linux: Linux
+      386: 32-bit
+      amd64: 64-bit
 
 snapshot:
- name_template: "{{ .Tag }}-next"
+  name_template: "{{ .Tag }}-next"
 
 changelog:
- sort: asc
+  sort: asc
 
 
 dockers:
- - image_templates:
-    - "oryd/oathkeeper-k8s-controller:v{{ .Major }}"
-    - "oryd/oathkeeper-k8s-controller:v{{ .Major }}.{{ .Minor }}"
-    - "oryd/oathkeeper-k8s-controller:v{{ .Major }}.{{ .Minor }}.{{ .Patch }}"
-    - "oryd/oathkeeper-k8s-controller:{{ .Env.DOCKER_SHORT_TAG }}"
-    - "oryd/oathkeeper-k8s-controller:latest"
+  - image_templates:
+      - "oryd/oathkeeper-k8s-controller:v{{ .Major }}"
+      - "oryd/oathkeeper-k8s-controller:v{{ .Major }}.{{ .Minor }}"
+      - "oryd/oathkeeper-k8s-controller:v{{ .Major }}.{{ .Minor }}.{{ .Patch }}"
+      - "oryd/oathkeeper-k8s-controller:{{ .Env.DOCKER_SHORT_TAG }}"
+      - "oryd/oathkeeper-k8s-controller:latest"
 
 release:
- prerelease: auto
- name_template: "{{.Env.RELEASE_NAME}}"
+  prerelease: auto
+  name_template: "{{.Env.RELEASE_NAME}}"
