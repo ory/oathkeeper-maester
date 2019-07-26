@@ -8,8 +8,6 @@ env:
 before:
  hooks:
   - "go mod download"
-  - "go install github.com/gobuffalo/packr/v2/packr2"
-  - packr2
 
 builds:
  - flags:
@@ -30,19 +28,12 @@ builds:
    goos:
     - freebsd
     - linux
-    - windows
-    - darwin
 
 archives:
  - replacements:
-    darwin: macOS
     linux: Linux
-    windows: Windows
     386: 32-bit
     amd64: 64-bit
-   format_overrides:
-    - goos: windows
-      format: zip
 
 snapshot:
  name_template: "{{ .Tag }}-next"
@@ -50,23 +41,6 @@ snapshot:
 changelog:
  sort: asc
 
-brew:
- github:
-  owner: ory
-  name: homebrew-oathkeeper-k8s-controller
- homepage:  https://www.ory.sh
- commit_author:
-  name: ory
-  email: hi@ory.sh
-
-scoop:
- bucket:
-  owner: ory
-  name: homebrew-oathkeeper-k8s-controller
- homepage:  https://www.ory.sh
- commit_author:
-  name: ory
-  email: hi@ory.sh
 
 dockers:
  - image_templates:
