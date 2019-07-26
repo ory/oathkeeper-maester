@@ -25,7 +25,6 @@ kind-stop:
 # Ensures the controller image is built, deploys the image to KIND cluster along with necessary configuration
 kind-deploy: manager manifests docker-build-notest kind-start
 	kind load docker-image controller:latest
-	KUBECONFIG=$(KUBECONFIG) kubectl cluster-info
 	KUBECONFIG=$(KUBECONFIG) kubectl apply -f config/crd/bases
 	kustomize build config/default | KUBECONFIG=$(KUBECONFIG) kubectl apply -f -
 
