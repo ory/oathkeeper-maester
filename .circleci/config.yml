@@ -54,6 +54,7 @@ jobs:
       - run:
           name: Update golang
           command: |
+            sudo rm -rf /usr/local/go/
             curl -LO https://dl.google.com/go/go1.12.7.linux-amd64.tar.gz
             sudo tar -C /usr/local -xzf go1.12.7.linux-amd64.tar.gz
             sudo echo "export PATH=$PATH:/usr/local/go/bin" >> $HOME/.profile
@@ -62,7 +63,7 @@ jobs:
           name: Install Ginkgo
           command: |
             go get github.com/onsi/ginkgo/ginkgo
-            go get github.com/onsi/gomega/...
+
       - run:
           name: Install Kind
           command: |
