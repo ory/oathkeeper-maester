@@ -48,6 +48,39 @@ jobs:
             sudo mv /tmp/kubebuilder_2.0.0-alpha.4_${os}_${arch} /usr/local/kubebuilder
             export PATH=$PATH:/usr/local/kubebuilder/bin
       - run: make test
+  test-integration:
+    machine: true
+    steps:
+      - run:
+          name: Update golang
+          command: |
+            curl -LO https://dl.google.com/go/go1.12.7.linux-amd64.tar.gz
+            sudo tar -C /usr/local -xzf go1.12.7.linux-amd64.tar.gz
+            sudo echo "export PATH=$PATH:/usr/local/go/bin" >> $HOME/.profile
+            go version
+      - run:
+          name: Install Ginkgo
+          command: |
+            go get github.com/onsi/ginkgo/ginkgo
+            go get github.com/onsi/gomega/...
+      - run:
+          name: Install Kind
+          command: |
+            curl -Lo ./kind https://github.com/kubernetes-sigs/kind/releases/download/v0.4.0/kind-linux-amd64
+            chmod +x ./kind
+            sudo mv ./kind /usr/local/bin/kind
+      - run:
+          name: Install kubectl
+          command: |
+            curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
+            chmod +x ./kubectl
+            sudo mv ./kubectl /usr/local/bin/kubectl
+            export KUBECONFIG=$(kind get kubeconfig-path)
+            kubectl version
+      - run:
+          name: Run integration tests
+          command: |
+            make test-integration
 
   release:
     docker:
@@ -92,6 +125,10 @@ workflows:
   "test, build and release":
     jobs:
       - build:
+          filters:
+            tags:
+              only: /.*/
+      - test-integration:
           filters:
             tags:
               only: /.*/
