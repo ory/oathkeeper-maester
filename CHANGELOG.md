@@ -3,11 +3,15 @@
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [Change Log](#change-log)
+  - [v0.0.1-beta.2 (2019-07-29)](#v001-beta2-2019-07-29)
   - [v0.0.1-beta.1 (2019-07-29)](#v001-beta1-2019-07-29)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 # Change Log
+
+## [v0.0.1-beta.2](https://github.com/ory/oathkeeper-k8s-controller/tree/v0.0.1-beta.2) (2019-07-29)
+[Full Changelog](https://github.com/ory/oathkeeper-k8s-controller/compare/v0.0.1-beta.1...v0.0.1-beta.2)
 
 ## [v0.0.1-beta.1](https://github.com/ory/oathkeeper-k8s-controller/tree/v0.0.1-beta.1) (2019-07-29)
 **Merged pull requests:**
