@@ -77,7 +77,6 @@ jobs:
             chmod +x ./kubectl
             sudo mv ./kubectl /usr/local/bin/kubectl
             export KUBECONFIG=$(kind get kubeconfig-path)
-            kubectl version
       - run:
           name: Run integration tests
           command: |
