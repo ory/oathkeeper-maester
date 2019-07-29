@@ -15,7 +15,7 @@ test: generate fmt vet manifests
 # Start KIND pseudo-cluster
 kind-start:
 	GO111MODULE=on go get "sigs.k8s.io/kind@v0.4.0" && kind create cluster
-	KUBECONFIG=$(shell kind get kubeconfig-path --name="kind")
+KUBECONFIG=$(shell kind get kubeconfig-path --name="kind")
 
 # Stop KIND pseudo-cluster
 kind-stop:
@@ -38,7 +38,8 @@ test-integration:
 
 # Build manager binary
 manager: generate fmt vet
-	go build -o bin/manager main.go
+	go mod download
+	CGO_ENABLED=0 GO111MODULE=on GOOS=linux GOARCH=amd64 go build -a -o bin/manager main.go
 
 # Run against the configured Kubernetes cluster in ~/.kube/config
 run: generate fmt vet
