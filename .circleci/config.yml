@@ -74,10 +74,18 @@ jobs:
             sudo mv /tmp/kubebuilder_2.0.0-alpha.4_${os}_${arch} /usr/local/kubebuilder
             sudo echo "export PATH=$PATH:/usr/local/kubebuilder/bin" >> $HOME/.profile
       - run:
-          name: Install Ginkgo
+          name: Install ginkgo,controller-gen, kustomize
           command: |
             go get github.com/onsi/ginkgo/ginkgo
             go get sigs.k8s.io/controller-tools/cmd/controller-gen@v0.2.0-beta.2
+            opsys=linux
+            curl -s https://api.github.com/repos/kubernetes-sigs/kustomize/releases/latest |\
+              grep browser_download |\
+              grep $opsys |\
+              cut -d '"' -f 4 |\
+              xargs curl -O -L
+            mv kustomize_*_${opsys}_amd64 kustomize
+            chmod u+x kustomize
 
       - run:
           name: Install Kind
