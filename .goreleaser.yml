@@ -12,15 +12,14 @@ before:
 builds:
   - flags:
       - -a
-
-      binary: oathkeeper-k8s-controller
-      env:
-        - CGO_ENABLED=0
-      goarch:
-        - amd64
-        - 386
-      goos:
-        - linux
+    binary: oathkeeper-k8s-controller
+    env:
+      - CGO_ENABLED=0
+    goarch:
+      - amd64
+      - 386
+    goos:
+      - linux
 
 snapshot:
   name_template: "{{ .Tag }}-next"
