@@ -61,7 +61,7 @@ jobs:
             sudo echo "export PATH=$PATH:/usr/local/go/bin" >> $HOME/.profile
             go version
       - run:
-          name: Fetch kube-builder
+          name: Download kube-builder
           command: |
             os=$(go env GOOS)
             arch=$(go env GOARCH)
@@ -72,7 +72,7 @@ jobs:
             # move to a long-term location and put it on your path
             # (you'll need to set the KUBEBUILDER_ASSETS env var if you put it somewhere else)
             sudo mv /tmp/kubebuilder_2.0.0-alpha.4_${os}_${arch} /usr/local/kubebuilder
-            export PATH=$PATH:/usr/local/kubebuilder/bin
+            sudo echo "export PATH=$PATH:/usr/local/kubebuilder/bin" >> $HOME/.profile
       - run:
           name: Install Ginkgo
           command: |
