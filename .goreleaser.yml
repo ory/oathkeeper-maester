@@ -1,0 +1,41 @@
+# This is an example goreleaser.yaml file with some sane defaults.
+# Make sure to check the documentation at http://goreleaser.com
+project_name: oathkeeper-k8s-controller
+
+env:
+  - GO111MODULE=on
+
+before:
+  hooks:
+    - "go mod download"
+
+builds:
+  - flags:
+      - -a
+    binary: manager
+    env:
+      - CGO_ENABLED=0
+    goarch:
+      - amd64
+      - 386
+    goos:
+      - linux
+
+snapshot:
+  name_template: "{{ .Tag }}-next"
+
+changelog:
+  sort: asc
+
+
+dockers:
+  - image_templates:
+      - "oryd/oathkeeper-k8s-controller:v{{ .Major }}"
+      - "oryd/oathkeeper-k8s-controller:v{{ .Major }}.{{ .Minor }}"
+      - "oryd/oathkeeper-k8s-controller:v{{ .Major }}.{{ .Minor }}.{{ .Patch }}"
+      - "oryd/oathkeeper-k8s-controller:{{ .Env.DOCKER_SHORT_TAG }}"
+      - "oryd/oathkeeper-k8s-controller:latest"
+
+release:
+  prerelease: auto
+  name_template: "{{.Env.RELEASE_NAME}}"
