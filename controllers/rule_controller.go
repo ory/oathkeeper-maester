@@ -103,8 +103,9 @@ func (r *RuleReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 		return ctrl.Result{}, err
 	}
 
-	if err := r.updateRulesConfigmap(ctx, string(oathkeeperRulesJSON)); err != nil {
-		r.die("Unable to process rules Configmap", err)
+	if err := r.updateOrCreateRulesConfigmap(ctx, string(oathkeeperRulesJSON)); err != nil {
+		r.Log.Error(err, "unable to process rules Configmap")
+		os.Exit(1)
 	}
 
 	return ctrl.Result{}, nil
@@ -117,9 +118,10 @@ func (r *RuleReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		Complete(r)
 }
 
-func (r *RuleReconciler) updateRulesConfigmap(ctx context.Context, data string) error {
+func (r *RuleReconciler) updateOrCreateRulesConfigmap(ctx context.Context, data string) error {
 
 	var oathkeeperRulesConfigmap apiv1.ConfigMap
+	var exists = false
 
 	fetchMapFunc := func() error {
 
@@ -136,6 +138,7 @@ func (r *RuleReconciler) updateRulesConfigmap(ctx context.Context, data string) 
 			return err
 		}
 
+		exists = true
 		return nil
 	}
 
@@ -150,7 +153,7 @@ func (r *RuleReconciler) updateRulesConfigmap(ctx context.Context, data string) 
 		return r.Create(ctx, &oathkeeperRulesConfigmap)
 	}
 
-	updateConfigMap := func() error {
+	updateMapFunc := func() error {
 		oathkeeperRulesConfigmap.Data = map[string]string{dataKey: data}
 		return r.Update(ctx, &oathkeeperRulesConfigmap)
 	}
@@ -159,16 +162,11 @@ func (r *RuleReconciler) updateRulesConfigmap(ctx context.Context, data string) 
 		return err
 	}
 
-	if oathkeeperRulesConfigmap.Name != "" {
-		return retryOnError(updateConfigMap)
-	} else {
-		return retryOnError(createMapFunc)
+	if exists {
+		return retryOnError(updateMapFunc)
 	}
-}
 
-func (r *RuleReconciler) die(message string, err error) {
-	r.Log.Error(err, message)
-	os.Exit(1)
+	return retryOnError(createMapFunc)
 }
 
 func retryOnError(retryable func() error) error {

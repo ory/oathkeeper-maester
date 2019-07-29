@@ -13,6 +13,8 @@ const delay = time.Millisecond
 
 func TestRetryOnErrorWith(t *testing.T) {
 
+	assert := assert.New(t)
+
 	var cnt, attempts int
 	var createMapFunc func() error
 
@@ -33,9 +35,9 @@ func TestRetryOnErrorWith(t *testing.T) {
 		err := retryOnErrorWith(createMapFunc, attempts, delay)
 
 		//then
-		assert.Nil(t, err)
-		assert.NotEqual(t, attempts, cnt)
-		assert.Equal(t, 2, cnt)
+		assert.Nil(err)
+		assert.NotEqual(attempts, cnt)
+		assert.Equal(2, cnt)
 	})
 
 	t.Run("should return no error if the last attempt is successful", func(t *testing.T) {
@@ -55,8 +57,8 @@ func TestRetryOnErrorWith(t *testing.T) {
 		err := retryOnErrorWith(createMapFunc, attempts, delay)
 
 		//then
-		assert.Nil(t, err)
-		assert.Equal(t, attempts, cnt)
+		assert.Nil(err)
+		assert.Equal(attempts, cnt)
 	})
 
 	t.Run("should return an error if all attempts fail", func(t *testing.T) {
@@ -73,7 +75,7 @@ func TestRetryOnErrorWith(t *testing.T) {
 		err := retryOnErrorWith(createMapFunc, attempts, delay)
 
 		//then
-		assert.NotNil(t, err)
-		assert.Equal(t, attempts, cnt)
+		assert.NotNil(err)
+		assert.Equal(attempts, cnt)
 	})
 }
