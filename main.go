@@ -19,6 +19,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"regexp"
 	"strings"
 
 	"github.com/ory/oathkeeper-k8s-controller/internal/validation"
@@ -46,6 +47,7 @@ const (
 	authenticatorsAvailableEnv = "authenticatorsAvailable"
 	authorizersAvailableEnv    = "authorizersAvailable"
 	mutatorsAvailableEnv       = "mutatorsAvailable"
+	rulesFileNameRegexp        = "\\A[-._a-zA-Z0-9]+\\z"
 )
 
 func init() {
@@ -80,6 +82,11 @@ func main() {
 	})
 	if err != nil {
 		setupLog.Error(err, "unable to start manager")
+		os.Exit(1)
+	}
+
+	if err := validateRulesFileName(rulesFileName); err != nil {
+		setupLog.Error(err, "Validation error")
 		os.Exit(1)
 	}
 
@@ -138,4 +145,12 @@ func initValidationConfig() validation.Config {
 		AuthorizersAvailable:    parseListOrDefault(authorizersAvailable, defaultAuthorizersAvailable[:], authorizersAvailableEnv),
 		MutatorsAvailable:       parseListOrDefault(mutatorsAvailable, defaultMutatorsAvailable[:], mutatorsAvailableEnv),
 	}
+}
+
+func validateRulesFileName(rfn string) error {
+	match, _ := regexp.MatchString(rulesFileNameRegexp, rfn)
+	if match {
+		return nil
+	}
+	return fmt.Errorf("rulesFileName: %s is not a valid name", rfn)
 }
