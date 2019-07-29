@@ -33,7 +33,7 @@ dockers:
       - "oryd/oathkeeper-k8s-controller:v{{ .Major }}"
       - "oryd/oathkeeper-k8s-controller:v{{ .Major }}.{{ .Minor }}"
       - "oryd/oathkeeper-k8s-controller:v{{ .Major }}.{{ .Minor }}.{{ .Patch }}"
-#      - "oryd/oathkeeper-k8s-controller:{{ .Env.DOCKER_SHORT_TAG }}"
+      - "oryd/oathkeeper-k8s-controller:{{ .Env.DOCKER_SHORT_TAG }}"
       - "oryd/oathkeeper-k8s-controller:latest"
 
 release:
