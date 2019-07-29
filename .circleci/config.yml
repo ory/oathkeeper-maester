@@ -79,8 +79,7 @@ jobs:
             export KUBECONFIG=$(kind get kubeconfig-path)
       - run:
           name: Run integration tests
-          command: |
-            make test-integration
+          command: make test-integration
 
   release:
     docker:
