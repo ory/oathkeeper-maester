@@ -79,16 +79,6 @@ jobs:
             go get github.com/onsi/ginkgo/ginkgo
             go get sigs.k8s.io/controller-tools/cmd/controller-gen@v0.2.0-beta.2
             go install sigs.k8s.io/kustomize/v3/cmd/kustomize
-#            opsys=linux
-#            curl -s https://api.github.com/repos/kubernetes-sigs/kustomize/releases/latest |\
-#              grep browser_download |\
-#              grep $opsys |\
-#              cut -d '"' -f 4 |\
-#              xargs curl -O -L
-#            mv kustomize_*_${opsys}_amd64 kustomize
-#            chmod u+x kustomize
-#            sudo mv ./kustomize /usr/local/bin/kustomize
-
       - run:
           name: Install Kind
           command: |

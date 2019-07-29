@@ -26,6 +26,7 @@ kind-stop:
 kind-deploy: manager manifests docker-build-notest kind-start
 	kind load docker-image controller:latest
 	KUBECONFIG=$(KUBECONFIG) kubectl apply -f config/crd/bases
+	kustomize build config/default
 	kustomize build config/default | KUBECONFIG=$(KUBECONFIG) kubectl apply -f -
 
 # private
