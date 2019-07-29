@@ -51,6 +51,7 @@ jobs:
   test-integration:
     machine: true
     steps:
+      - checkout
       - run:
           name: Update golang
           command: |
