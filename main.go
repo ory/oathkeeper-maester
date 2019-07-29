@@ -18,9 +18,11 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/ory/oathkeeper-k8s-controller/internal/validation"
 	"os"
+	"regexp"
 	"strings"
+
+	"github.com/ory/oathkeeper-k8s-controller/internal/validation"
 
 	oathkeeperv1alpha1 "github.com/ory/oathkeeper-k8s-controller/api/v1alpha1"
 	"github.com/ory/oathkeeper-k8s-controller/controllers"
@@ -45,6 +47,7 @@ const (
 	authenticatorsAvailableEnv = "authenticatorsAvailable"
 	authorizersAvailableEnv    = "authorizersAvailable"
 	mutatorsAvailableEnv       = "mutatorsAvailable"
+	rulesFileNameRegexp        = "\\A[-._a-zA-Z0-9]+\\z"
 )
 
 func init() {
@@ -59,12 +62,14 @@ func main() {
 	var enableLeaderElection bool
 	var rulesConfigmapName string
 	var rulesConfigmapNamespace string
+	var rulesFileName string
 
 	flag.StringVar(&metricsAddr, "metrics-addr", ":8080", "The address the metric endpoint binds to.")
 	flag.BoolVar(&enableLeaderElection, "enable-leader-election", false,
 		"Enable leader election for controller manager. Enabling this will ensure there is only one active controller manager.")
 	flag.StringVar(&rulesConfigmapName, "rulesConfigmapName", "oathkeeper-rules", "Name of the Configmap that stores Oathkeeper rules.")
 	flag.StringVar(&rulesConfigmapNamespace, "rulesConfigmapNamespace", "oathkeeper-k8s-controller-system", "Namespace of the Configmap that stores Oathkeeper rules.")
+	flag.StringVar(&rulesFileName, "rulesFileName", "access_rules.json", "Name of the file with converted Oathkeeper rules")
 
 	flag.Parse()
 
@@ -80,6 +85,11 @@ func main() {
 		os.Exit(1)
 	}
 
+	if err := validateRulesFileName(rulesFileName); err != nil {
+		setupLog.Error(err, "Validation error")
+		os.Exit(1)
+	}
+
 	validationConfig := initValidationConfig()
 
 	err = (&controllers.RuleReconciler{
@@ -87,6 +97,7 @@ func main() {
 		Log:              ctrl.Log.WithName("controllers").WithName("Rule"),
 		RuleConfigmap:    types.NamespacedName{Name: rulesConfigmapName, Namespace: rulesConfigmapNamespace},
 		ValidationConfig: validationConfig,
+		RulesFileName:    rulesFileName,
 	}).SetupWithManager(mgr)
 	if err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "Rule")
@@ -134,4 +145,12 @@ func initValidationConfig() validation.Config {
 		AuthorizersAvailable:    parseListOrDefault(authorizersAvailable, defaultAuthorizersAvailable[:], authorizersAvailableEnv),
 		MutatorsAvailable:       parseListOrDefault(mutatorsAvailable, defaultMutatorsAvailable[:], mutatorsAvailableEnv),
 	}
+}
+
+func validateRulesFileName(rfn string) error {
+	match, _ := regexp.MatchString(rulesFileNameRegexp, rfn)
+	if match {
+		return nil
+	}
+	return fmt.Errorf("rulesFileName: %s is not a valid name", rfn)
 }
