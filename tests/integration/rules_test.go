@@ -26,7 +26,7 @@ const (
 	defaultTargetMapName          = "oathkeeper-rules"
 	maxRetriesWaitingForConfigMap = 35 //Twice as max registered on my machine.
 	maxRetriesWaitingForRule      = 10
-	rulesFileName                 = "access_rules.json"
+	rulesFileName                 = "access-rules.json"
 )
 
 var (
