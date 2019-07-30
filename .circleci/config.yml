@@ -60,6 +60,7 @@ jobs:
             sudo tar -C /usr/local -xzf go1.12.7.linux-amd64.tar.gz
             sudo echo "export PATH=$PATH:/usr/local/go/bin" >> $HOME/.profile
             go version
+
       - run:
           name: Download kube-builder
           command: |
@@ -73,37 +74,30 @@ jobs:
             # (you'll need to set the KUBEBUILDER_ASSETS env var if you put it somewhere else)
             sudo mv /tmp/kubebuilder_2.0.0-alpha.4_${os}_${arch} /usr/local/kubebuilder
             sudo echo "export PATH=$PATH:/usr/local/kubebuilder/bin" >> $HOME/.profile
+
       - run:
           name: Install ginkgo,controller-gen, kustomize
           command: |
             go get github.com/onsi/ginkgo/ginkgo
             go get sigs.k8s.io/controller-tools/cmd/controller-gen@v0.2.0-beta.2
-            opsys=linux
-            curl -s https://api.github.com/repos/kubernetes-sigs/kustomize/releases/latest |\
-              grep browser_download |\
-              grep $opsys |\
-              cut -d '"' -f 4 |\
-              xargs curl -O -L
-            mv kustomize_*_${opsys}_amd64 kustomize
-            chmod u+x kustomize
-            sudo mv ./kustomize /usr/local/bin/kustomize
-            kustomize build config/default
-#      - run:
-#          name: Install Kind
-#          command: |
-#            curl -Lo ./kind https://github.com/kubernetes-sigs/kind/releases/download/v0.4.0/kind-linux-amd64
-#            chmod +x ./kind
-#            sudo mv ./kind /usr/local/bin/kind
-#      - run:
-#          name: Install kubectl
-#          command: |
-#            curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
-#            chmod +x ./kubectl
-#            sudo mv ./kubectl /usr/local/bin/kubectl
-#            export KUBECONFIG=$(kind get kubeconfig-path)
-#      - run:
-#          name: Run integration tests
-#          command: make test-integration
+            go install sigs.k8s.io/kustomize/v3/cmd/kustomize
+
+      - run:
+          name: Install Kind
+          command: |
+            curl -Lo ./kind https://github.com/kubernetes-sigs/kind/releases/download/v0.4.0/kind-linux-amd64
+            chmod +x ./kind
+            sudo mv ./kind /usr/local/bin/kind
+      - run:
+          name: Install kubectl
+          command: |
+            curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
+            chmod +x ./kubectl
+            sudo mv ./kubectl /usr/local/bin/kubectl
+            export KUBECONFIG=$(kind get kubeconfig-path)
+      - run:
+          name: Run integration tests
+          command: make test-integration
 
   release:
     docker:
