@@ -48,6 +48,56 @@ jobs:
             sudo mv /tmp/kubebuilder_2.0.0-alpha.4_${os}_${arch} /usr/local/kubebuilder
             export PATH=$PATH:/usr/local/kubebuilder/bin
       - run: make test
+  test-integration:
+    machine: true
+    steps:
+      - checkout
+      - run:
+          name: Update golang
+          command: |
+            sudo rm -rf /usr/local/go/
+            curl -LO https://dl.google.com/go/go1.12.7.linux-amd64.tar.gz
+            sudo tar -C /usr/local -xzf go1.12.7.linux-amd64.tar.gz
+            sudo echo "export PATH=$PATH:/usr/local/go/bin" >> $HOME/.profile
+            go version
+
+      - run:
+          name: Download kube-builder
+          command: |
+            os=$(go env GOOS)
+            arch=$(go env GOARCH)
+
+            # download kubebuilder and extract it to tmp
+            curl -sL https://go.kubebuilder.io/dl/2.0.0-alpha.4/${os}/${arch} | tar -xz -C /tmp/
+
+            # move to a long-term location and put it on your path
+            # (you'll need to set the KUBEBUILDER_ASSETS env var if you put it somewhere else)
+            sudo mv /tmp/kubebuilder_2.0.0-alpha.4_${os}_${arch} /usr/local/kubebuilder
+            sudo echo "export PATH=$PATH:/usr/local/kubebuilder/bin" >> $HOME/.profile
+
+      - run:
+          name: Install ginkgo,controller-gen, kustomize
+          command: |
+            go get github.com/onsi/ginkgo/ginkgo
+            go get sigs.k8s.io/controller-tools/cmd/controller-gen@v0.2.0-beta.2
+            go install sigs.k8s.io/kustomize/v3/cmd/kustomize
+
+      - run:
+          name: Install Kind
+          command: |
+            curl -Lo ./kind https://github.com/kubernetes-sigs/kind/releases/download/v0.4.0/kind-linux-amd64
+            chmod +x ./kind
+            sudo mv ./kind /usr/local/bin/kind
+      - run:
+          name: Install kubectl
+          command: |
+            curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
+            chmod +x ./kubectl
+            sudo mv ./kubectl /usr/local/bin/kubectl
+            export KUBECONFIG=$(kind get kubeconfig-path)
+      - run:
+          name: Run integration tests
+          command: make test-integration
 
   release:
     docker:
@@ -92,6 +142,10 @@ workflows:
   "test, build and release":
     jobs:
       - build:
+          filters:
+            tags:
+              only: /.*/
+      - test-integration:
           filters:
             tags:
               only: /.*/

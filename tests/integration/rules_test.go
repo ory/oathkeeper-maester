@@ -26,6 +26,7 @@ const (
 	defaultTargetMapName          = "oathkeeper-rules"
 	maxRetriesWaitingForConfigMap = 35 //Twice as max registered on my machine.
 	maxRetriesWaitingForRule      = 10
+	rulesFileName                 = "access_rules.json"
 )
 
 var (
@@ -126,7 +127,7 @@ var _ = Describe("Oathkeeper controller", func() {
 			//Then
 			emptyMap, err := getTargetMap()
 			Expect(err).To(BeNil())
-			Expect(emptyMap.Data["rules"]).To(Equal("[]"))
+			Expect(emptyMap.Data[rulesFileName]).To(Equal("[]"))
 		})
 	})
 })
@@ -270,7 +271,7 @@ func validateConfigMapContains(sourceRule *unstructured.Unstructured) (*json.Jso
 		}
 
 		//Parse data from ConfigMap
-		jsonString := targetMap.Data["rules"]
+		jsonString := targetMap.Data[rulesFileName]
 		if jsonString == "" || jsonString == "null" {
 			return nil, errors.New("No rules in ConfigMap")
 		}
