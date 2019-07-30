@@ -35,7 +35,6 @@ import (
 )
 
 const (
-	dataKey       = "rules"
 	retryAttempts = 5
 	retryDelay    = time.Second * 2
 )
@@ -46,12 +45,14 @@ type RuleReconciler struct {
 	Log              logr.Logger
 	RuleConfigmap    types.NamespacedName
 	ValidationConfig validation.Config
+	RulesFileName    string
 }
 
 // +kubebuilder:rbac:groups=oathkeeper.ory.sh,resources=rules,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=oathkeeper.ory.sh,resources=rules/status,verbs=get;update;patch
 // +kubebuilder:rbac:groups="",resources=configmaps,verbs=get;list;watch;create;update;patch;delete
 
+//Reconcile ??
 func (r *RuleReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 
 	ctx := context.Background()
@@ -111,6 +112,7 @@ func (r *RuleReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	return ctrl.Result{}, nil
 }
 
+//SetupWithManager ??
 func (r *RuleReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&oathkeeperv1alpha1.Rule{}).

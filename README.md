@@ -1,3 +1,13 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [oathkeeper-k8s-controller](#oathkeeper-k8s-controller)
+  - [Prerequisites](#prerequisites)
+  - [How to use it](#how-to-use-it)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # oathkeeper-k8s-controller
 
 This project contains a Kubernetes controller that uses Custom Resources to manage Oathkeeper rules definitions.
