@@ -87,22 +87,23 @@ jobs:
             mv kustomize_*_${opsys}_amd64 kustomize
             chmod u+x kustomize
             sudo mv ./kustomize /usr/local/bin/kustomize
-      - run:
-          name: Install Kind
-          command: |
-            curl -Lo ./kind https://github.com/kubernetes-sigs/kind/releases/download/v0.4.0/kind-linux-amd64
-            chmod +x ./kind
-            sudo mv ./kind /usr/local/bin/kind
-      - run:
-          name: Install kubectl
-          command: |
-            curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
-            chmod +x ./kubectl
-            sudo mv ./kubectl /usr/local/bin/kubectl
-            export KUBECONFIG=$(kind get kubeconfig-path)
-      - run:
-          name: Run integration tests
-          command: make test-integration
+            kustomize build config/default
+#      - run:
+#          name: Install Kind
+#          command: |
+#            curl -Lo ./kind https://github.com/kubernetes-sigs/kind/releases/download/v0.4.0/kind-linux-amd64
+#            chmod +x ./kind
+#            sudo mv ./kind /usr/local/bin/kind
+#      - run:
+#          name: Install kubectl
+#          command: |
+#            curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
+#            chmod +x ./kubectl
+#            sudo mv ./kubectl /usr/local/bin/kubectl
+#            export KUBECONFIG=$(kind get kubeconfig-path)
+#      - run:
+#          name: Run integration tests
+#          command: make test-integration
 
   release:
     docker:
