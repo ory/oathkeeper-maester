@@ -8,7 +8,7 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# oathkeeper-k8s-controller
+# oathkeeper-maester
 
 This project contains a Kubernetes controller that uses Custom Resources to manage Oathkeeper rules definitions.
 The project is based on [Kubebuilder](https://github.com/kubernetes-sigs/kubebuilder)

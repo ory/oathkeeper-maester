@@ -1,6 +1,6 @@
-# oathkeeper-k8s-controller integration tests.
+# oathkeeper-maester integration tests.
 
-This directory contains integration tests for oathkeeper-k8s-controller
+This directory contains integration tests for oathkeeper-maester
 The tests execute against a cluster. For local testing use either minikube or KIND environment.
 
 

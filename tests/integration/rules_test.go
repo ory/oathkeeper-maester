@@ -9,7 +9,7 @@ import (
 	json "github.com/bitly/go-simplejson"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	oathkeeperv1alpha1 "github.com/ory/oathkeeper-k8s-controller/api/v1alpha1"
+	oathkeeperv1alpha1 "github.com/ory/oathkeeper-maester/api/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -22,7 +22,7 @@ import (
 
 const (
 	namespaceName                 = "test-namespace" //TODO: Randomize?
-	defaultTargetMapNamespace     = "oathkeeper-k8s-controller-system"
+	defaultTargetMapNamespace     = "oathkeeper-maester-system"
 	defaultTargetMapName          = "oathkeeper-rules"
 	maxRetriesWaitingForConfigMap = 35 //Twice as max registered on my machine.
 	maxRetriesWaitingForRule      = 10
