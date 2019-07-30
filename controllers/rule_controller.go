@@ -150,13 +150,13 @@ func (r *RuleReconciler) updateOrCreateRulesConfigmap(ctx context.Context, data 
 				Name:      r.RuleConfigmap.Name,
 				Namespace: r.RuleConfigmap.Namespace,
 			},
-			Data: map[string]string{dataKey: data},
+			Data: map[string]string{r.RulesFileName: data},
 		}
 		return r.Create(ctx, &oathkeeperRulesConfigmap)
 	}
 
 	updateMapFunc := func() error {
-		oathkeeperRulesConfigmap.Data = map[string]string{dataKey: data}
+		oathkeeperRulesConfigmap.Data = map[string]string{r.RulesFileName: data}
 		return r.Update(ctx, &oathkeeperRulesConfigmap)
 	}
 
