@@ -16,7 +16,7 @@ limitations under the License.
 package v1alpha1
 
 import (
-	"github.com/ory/oathkeeper-k8s-controller/internal/validation"
+	"github.com/ory/oathkeeper-maester/internal/validation"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"

@@ -18,14 +18,13 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/ory/oathkeeper-maester/internal/validation"
 	"os"
 	"regexp"
 	"strings"
 
-	"github.com/ory/oathkeeper-k8s-controller/internal/validation"
-
-	oathkeeperv1alpha1 "github.com/ory/oathkeeper-k8s-controller/api/v1alpha1"
-	"github.com/ory/oathkeeper-k8s-controller/controllers"
+	oathkeeperv1alpha1 "github.com/ory/oathkeeper-maester/api/v1alpha1"
+	"github.com/ory/oathkeeper-maester/controllers"
 	apiv1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
@@ -68,7 +67,7 @@ func main() {
 	flag.BoolVar(&enableLeaderElection, "enable-leader-election", false,
 		"Enable leader election for controller manager. Enabling this will ensure there is only one active controller manager.")
 	flag.StringVar(&rulesConfigmapName, "rulesConfigmapName", "oathkeeper-rules", "Name of the Configmap that stores Oathkeeper rules.")
-	flag.StringVar(&rulesConfigmapNamespace, "rulesConfigmapNamespace", "oathkeeper-k8s-controller-system", "Namespace of the Configmap that stores Oathkeeper rules.")
+	flag.StringVar(&rulesConfigmapNamespace, "rulesConfigmapNamespace", "oathkeeper-maester-system", "Namespace of the Configmap that stores Oathkeeper rules.")
 	flag.StringVar(&rulesFileName, "rulesFileName", "access-rules.json", "Name of the file with converted Oathkeeper rules")
 
 	flag.Parse()

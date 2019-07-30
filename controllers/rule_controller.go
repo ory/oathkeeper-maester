@@ -22,8 +22,8 @@ import (
 	"time"
 
 	"github.com/go-logr/logr"
-	oathkeeperv1alpha1 "github.com/ory/oathkeeper-k8s-controller/api/v1alpha1"
-	"github.com/ory/oathkeeper-k8s-controller/internal/validation"
+	oathkeeperv1alpha1 "github.com/ory/oathkeeper-maester/api/v1alpha1"
+	"github.com/ory/oathkeeper-maester/internal/validation"
 
 	"github.com/avast/retry-go"
 	apiv1 "k8s.io/api/core/v1"

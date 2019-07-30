@@ -18,7 +18,7 @@ package v1alpha1
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/ory/oathkeeper-k8s-controller/internal/validation"
+	"github.com/ory/oathkeeper-maester/internal/validation"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 )

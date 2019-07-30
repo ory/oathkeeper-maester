@@ -1,12 +1,12 @@
 # Adds namespace to all resources.
-namespace: oathkeeper-k8s-controller-system
+namespace: oathkeeper-maester-system
 
 # Value of this field is prepended to the
 # names of all resources, e.g. a deployment named
 # "wordpress" becomes "alices-wordpress".
 # Note that it should also match with the prefix (text before '-') of the namespace
 # field above.
-namePrefix: oathkeeper-k8s-controller-
+namePrefix: oathkeeper-maester-
 
 # Labels to add to all resources and selectors.
 #commonLabels:
