@@ -69,7 +69,7 @@ func main() {
 		"Enable leader election for controller manager. Enabling this will ensure there is only one active controller manager.")
 	flag.StringVar(&rulesConfigmapName, "rulesConfigmapName", "oathkeeper-rules", "Name of the Configmap that stores Oathkeeper rules.")
 	flag.StringVar(&rulesConfigmapNamespace, "rulesConfigmapNamespace", "oathkeeper-k8s-controller-system", "Namespace of the Configmap that stores Oathkeeper rules.")
-	flag.StringVar(&rulesFileName, "rulesFileName", "access_rules.json", "Name of the file with converted Oathkeeper rules")
+	flag.StringVar(&rulesFileName, "rulesFileName", "access-rules.json", "Name of the file with converted Oathkeeper rules")
 
 	flag.Parse()
 
