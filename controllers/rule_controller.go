@@ -104,8 +104,9 @@ func (r *RuleReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 		return ctrl.Result{}, err
 	}
 
-	if err = r.updateRulesConfigmap(ctx, string(oathkeeperRulesJSON)); err != nil {
-		return ctrl.Result{}, err
+	if err := r.updateOrCreateRulesConfigmap(ctx, string(oathkeeperRulesJSON)); err != nil {
+		r.Log.Error(err, "unable to process rules Configmap")
+		os.Exit(1)
 	}
 
 	return ctrl.Result{}, nil
@@ -119,66 +120,66 @@ func (r *RuleReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		Complete(r)
 }
 
-func (r *RuleReconciler) updateRulesConfigmap(ctx context.Context, data string) error {
+func (r *RuleReconciler) updateOrCreateRulesConfigmap(ctx context.Context, data string) error {
 
 	var oathkeeperRulesConfigmap apiv1.ConfigMap
+	var exists = false
 
-	if err := r.Get(ctx, r.RuleConfigmap, &oathkeeperRulesConfigmap); err != nil {
-		if apierrs.IsNotFound(err) {
+	fetchMapFunc := func() error {
 
-			createMapFunc := func() error {
+		if err := r.Get(ctx, r.RuleConfigmap, &oathkeeperRulesConfigmap); err != nil {
 
-				oathkeeperRulesConfigmap = apiv1.ConfigMap{
-					ObjectMeta: metav1.ObjectMeta{
-						Name:      r.RuleConfigmap.Name,
-						Namespace: r.RuleConfigmap.Namespace,
-					},
-					Data: map[string]string{r.RulesFileName: data},
-				}
-
-				return r.Create(ctx, &oathkeeperRulesConfigmap)
+			if apierrs.IsForbidden(err) {
+				return retry.Unrecoverable(err)
 			}
 
-			retryOnError(createMapFunc, retryAttempts, retryDelay).or(r.die("unable to create configmap"))
+			if apierrs.IsNotFound(err) {
+				return nil
+			}
 
-			return nil
+			return err
 		}
 
+		exists = true
+		return nil
+	}
+
+	createMapFunc := func() error {
+		oathkeeperRulesConfigmap = apiv1.ConfigMap{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      r.RuleConfigmap.Name,
+				Namespace: r.RuleConfigmap.Namespace,
+			},
+			Data: map[string]string{r.RulesFileName: data},
+		}
+		return r.Create(ctx, &oathkeeperRulesConfigmap)
+	}
+
+	updateMapFunc := func() error {
+		oathkeeperRulesConfigmap.Data = map[string]string{r.RulesFileName: data}
+		return r.Update(ctx, &oathkeeperRulesConfigmap)
+	}
+
+	if err := retryOnError(fetchMapFunc); err != nil {
 		return err
 	}
 
-	oathkeeperRulesConfigmap.Data = map[string]string{r.RulesFileName: data}
-
-	if err := r.Update(ctx, &oathkeeperRulesConfigmap); err != nil {
-		return err
+	if exists {
+		return retryOnError(updateMapFunc)
 	}
 
-	return nil
+	return retryOnError(createMapFunc)
 }
 
-func (r *RuleReconciler) die(message string) func() {
-	return func() {
-		r.Log.Info(message)
-		os.Exit(1)
-	}
+func retryOnError(retryable func() error) error {
+	return retryOnErrorWith(retryable, retryAttempts, retryDelay)
 }
 
-func retryOnError(retryable func() error, attempts int, delay time.Duration) *retryResp {
-	return &retryResp{retry.Do(retryable,
+func retryOnErrorWith(retryable func() error, attempts int, delay time.Duration) error {
+	return retry.Do(retryable,
 		retry.Attempts(uint(attempts)),
 		retry.Delay(delay),
-		retry.DelayType(retry.FixedDelay),
-	)}
-}
-
-type retryResp struct {
-	err error
-}
-
-func (e *retryResp) or(fallback func()) {
-	if e.err != nil {
-		fallback()
-	}
+		retry.DelayType(retry.FixedDelay))
 }
 
 func boolPtr(b bool) *bool {

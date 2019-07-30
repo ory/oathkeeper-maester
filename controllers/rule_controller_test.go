@@ -11,20 +11,17 @@ import (
 
 const delay = time.Millisecond
 
-func TestRetryOnError(t *testing.T) {
+func TestRetryOnErrorWith(t *testing.T) {
+
+	assert := assert.New(t)
 
 	var cnt, attempts int
-
-	var fallbackCalled bool
-	var dieFunc = func() { fallbackCalled = true }
-
 	var createMapFunc func() error
 
-	t.Run("should retry on error and exit on first successful attempt", func(t *testing.T) {
+	t.Run("should retry on error and exit on first successful attempt with no error", func(t *testing.T) {
 
 		//Given
 		cnt, attempts = 0, 3
-		fallbackCalled = false
 
 		createMapFunc = func() error {
 			cnt++
@@ -35,15 +32,15 @@ func TestRetryOnError(t *testing.T) {
 		}
 
 		//when
-		retryOnError(createMapFunc, attempts, delay).or(dieFunc)
+		err := retryOnErrorWith(createMapFunc, attempts, delay)
 
 		//then
-		assert.NotEqual(t, attempts, cnt)
-		assert.Equal(t, 2, cnt)
-		assert.False(t, fallbackCalled)
+		assert.Nil(err)
+		assert.NotEqual(attempts, cnt)
+		assert.Equal(2, cnt)
 	})
 
-	t.Run("should not call the die function if the last attempt is successful", func(t *testing.T) {
+	t.Run("should return no error if the last attempt is successful", func(t *testing.T) {
 
 		//Given
 		cnt, attempts = 0, 5
@@ -57,14 +54,14 @@ func TestRetryOnError(t *testing.T) {
 		}
 
 		//when
-		retryOnError(createMapFunc, attempts, delay).or(dieFunc)
+		err := retryOnErrorWith(createMapFunc, attempts, delay)
 
 		//then
-		assert.Equal(t, attempts, cnt)
-		assert.False(t, fallbackCalled)
+		assert.Nil(err)
+		assert.Equal(attempts, cnt)
 	})
 
-	t.Run("should call the die function if all attempts fail", func(t *testing.T) {
+	t.Run("should return an error if all attempts fail", func(t *testing.T) {
 
 		//Given
 		cnt, attempts = 0, 2
@@ -75,10 +72,10 @@ func TestRetryOnError(t *testing.T) {
 		}
 
 		//when
-		retryOnError(createMapFunc, attempts, delay).or(dieFunc)
+		err := retryOnErrorWith(createMapFunc, attempts, delay)
 
 		//then
-		assert.Equal(t, attempts, cnt)
-		assert.True(t, fallbackCalled)
+		assert.NotNil(err)
+		assert.Equal(attempts, cnt)
 	})
 }
