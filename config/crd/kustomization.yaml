@@ -5,7 +5,7 @@ resources:
 - bases/oathkeeper.ory.sh_rules.yaml
 # +kubebuilder:scaffold:crdkustomizeresource
 
-patches:
+patchesStrategicMerge:
 # [WEBHOOK] patches here are for enabling the conversion webhook for each CRD
 #- patches/webhook_in_rules.yaml
 # +kubebuilder:scaffold:crdkustomizewebhookpatch
