@@ -3,6 +3,7 @@
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [Change Log](#change-log)
+  - [v0.0.1-beta.3 (2019-07-30)](#v001-beta3-2019-07-30)
   - [v0.0.1-beta.2 (2019-07-29)](#v001-beta2-2019-07-29)
   - [v0.0.1-beta.1 (2019-07-29)](#v001-beta1-2019-07-29)
 
@@ -10,18 +11,36 @@
 
 # Change Log
 
-## [v0.0.1-beta.2](https://github.com/ory/oathkeeper-k8s-controller/tree/v0.0.1-beta.2) (2019-07-29)
-[Full Changelog](https://github.com/ory/oathkeeper-k8s-controller/compare/v0.0.1-beta.1...v0.0.1-beta.2)
+## [v0.0.1-beta.3](https://github.com/ory/oathkeeper-maester/tree/v0.0.1-beta.3) (2019-07-30)
+[Full Changelog](https://github.com/ory/oathkeeper-maester/compare/v0.0.1-beta.2...v0.0.1-beta.3)
 
-## [v0.0.1-beta.1](https://github.com/ory/oathkeeper-k8s-controller/tree/v0.0.1-beta.1) (2019-07-29)
+**Closed issues:**
+
+- Run integration tests on CI [\#14](https://github.com/ory/oathkeeper-maester/issues/14)
+- Setup CI/CD [\#3](https://github.com/ory/oathkeeper-maester/issues/3)
+- Create controller skeleton  [\#2](https://github.com/ory/oathkeeper-maester/issues/2)
+- Define CRD representing access rule [\#1](https://github.com/ory/oathkeeper-maester/issues/1)
+
 **Merged pull requests:**
 
-- Move dataKey to cmd parameters [\#12](https://github.com/ory/oathkeeper-k8s-controller/pull/12) ([Demonsthere](https://github.com/Demonsthere))
-- Release step in the CI [\#11](https://github.com/ory/oathkeeper-k8s-controller/pull/11) ([piotrmsc](https://github.com/piotrmsc))
-- Rule controller tests [\#8](https://github.com/ory/oathkeeper-k8s-controller/pull/8) ([Tomasz-Smelcerz-SAP](https://github.com/Tomasz-Smelcerz-SAP))
-- Add basic controller logic and rule validation [\#7](https://github.com/ory/oathkeeper-k8s-controller/pull/7) ([jakkab](https://github.com/jakkab))
-- Initial changes to circleci config [\#6](https://github.com/ory/oathkeeper-k8s-controller/pull/6) ([piotrmsc](https://github.com/piotrmsc))
-- Add controller scaffold [\#5](https://github.com/ory/oathkeeper-k8s-controller/pull/5) ([kubadz](https://github.com/kubadz))
+- Project renaming [\#18](https://github.com/ory/oathkeeper-maester/pull/18) ([piotrmsc](https://github.com/piotrmsc))
+- Rename docker image to `oathkeeper-maester` [\#17](https://github.com/ory/oathkeeper-maester/pull/17) ([aeneasr](https://github.com/aeneasr))
+- Fix default value for rulesFileName [\#16](https://github.com/ory/oathkeeper-maester/pull/16) ([Demonsthere](https://github.com/Demonsthere))
+- Enable integration tests in the CI [\#15](https://github.com/ory/oathkeeper-maester/pull/15) ([piotrmsc](https://github.com/piotrmsc))
+- Bugfix: retry on get and update ops [\#13](https://github.com/ory/oathkeeper-maester/pull/13) ([jakkab](https://github.com/jakkab))
+
+## [v0.0.1-beta.2](https://github.com/ory/oathkeeper-maester/tree/v0.0.1-beta.2) (2019-07-29)
+[Full Changelog](https://github.com/ory/oathkeeper-maester/compare/v0.0.1-beta.1...v0.0.1-beta.2)
+
+## [v0.0.1-beta.1](https://github.com/ory/oathkeeper-maester/tree/v0.0.1-beta.1) (2019-07-29)
+**Merged pull requests:**
+
+- Move dataKey to cmd parameters [\#12](https://github.com/ory/oathkeeper-maester/pull/12) ([Demonsthere](https://github.com/Demonsthere))
+- Release step in the CI [\#11](https://github.com/ory/oathkeeper-maester/pull/11) ([piotrmsc](https://github.com/piotrmsc))
+- Rule controller tests [\#8](https://github.com/ory/oathkeeper-maester/pull/8) ([Tomasz-Smelcerz-SAP](https://github.com/Tomasz-Smelcerz-SAP))
+- Add basic controller logic and rule validation [\#7](https://github.com/ory/oathkeeper-maester/pull/7) ([jakkab](https://github.com/jakkab))
+- Initial changes to circleci config [\#6](https://github.com/ory/oathkeeper-maester/pull/6) ([piotrmsc](https://github.com/piotrmsc))
+- Add controller scaffold [\#5](https://github.com/ory/oathkeeper-maester/pull/5) ([kubadz](https://github.com/kubadz))
 
 
 

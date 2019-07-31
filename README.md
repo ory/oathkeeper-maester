@@ -2,7 +2,7 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
-- [oathkeeper-k8s-controller](#oathkeeper-k8s-controller)
+- [oathkeeper-maester](#oathkeeper-maester)
   - [Prerequisites](#prerequisites)
   - [How to use it](#how-to-use-it)
 
