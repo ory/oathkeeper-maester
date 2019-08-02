@@ -10,7 +10,8 @@
 
 # oathkeeper-maester
 
-This project contains a Kubernetes controller that uses Custom Resources to manage Oathkeeper rules definitions.
+ORY Maester is a Kubernetes controller that watches for instances of `rules.oathkeeper.ory.sh/v1alpha1` custom resource (CR) and creates or updates the Oathkeeper ConfigMap with Access Rules found in the CRs. The controller passes the Access Rules as an array in a format recognized by the Oathkeeper.
+
 The project is based on [Kubebuilder](https://github.com/kubernetes-sigs/kubebuilder)
 
 ## Prerequisites
