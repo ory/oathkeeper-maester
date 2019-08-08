@@ -16,6 +16,7 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"fmt"
 	"github.com/ory/oathkeeper-maester/internal/validation"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -51,16 +52,24 @@ var (
     "authorizer": {
       "handler": "deny"
     },
-    "mutator": {
-      "handler": "handler2",
-      "config": {
-        "key1": [
-          "val1",
-          "val2",
-          "val3"
-        ]
+    "mutators": [
+      {
+        "handler": "handler1",
+        "config": {
+          "key1": "val1"
+        }
+      },
+      {
+        "handler": "handler2",
+        "config": {
+          "key1": [
+            "val1",
+            "val2",
+            "val3"
+          ]
+        }
       }
-    }
+    ]
   },
   {
     "upstream": {
@@ -96,9 +105,11 @@ var (
     "authorizer": {
       "handler": "deny"
     },
-    "mutator": {
-      "handler": "noop"
-    }
+    "mutators": [
+      {
+        "handler": "noop"
+      }
+    ]
   },
   {
     "upstream": {
@@ -124,9 +135,11 @@ var (
         "key1": "val1"
       }
     },
-    "mutator": {
-      "handler": "noop"
-    }
+    "mutators": [
+      {
+        "handler": "noop"
+      }
+    ]
   }
 ]`
 
@@ -179,7 +192,7 @@ func TestToOathkeeperRules(t *testing.T) {
 				newBoolPtr(true),
 				[]*Authenticator{&Authenticator{h1}},
 				nil,
-				&Mutator{h2})
+				[]*Mutator{{h1}, {h2}})
 
 			rule2 := newRule(
 				"foo2",
@@ -217,74 +230,77 @@ func TestToOathkeeperRules(t *testing.T) {
 
 func TestToRuleJson(t *testing.T) {
 
-	t.Run("Should convert a Rule to JSON Rule", func(t *testing.T) {
+	assert := assert.New(t)
 
-		var actual *RuleJSON
-		var testHandler = newHandler("test-handler", "")
-		var testRule = newRule(
-			"r1",
-			"test",
-			"https://upstream.url",
-			"https://match.this/url",
-			newStringPtr("/strip/me"),
-			nil,
-			nil,
-			nil,
-			nil)
+	var actual *RuleJSON
+	var testHandler = newHandler("test-handler", "")
+	var testHandler2 = newHandler("test-handler2", "")
 
-		t.Run("If no handlers have been specified, it should generate an ID and add default values for missing handlers", func(t *testing.T) {
+	for k, tc := range []struct {
+		desc  string
+		r     *Rule
+		extra func(json *RuleJSON)
+	}{
+
+		{
+			"If no handlers have been specified, it should generate an ID and add default values for missing handlers",
+			newStaticRule(nil, nil, nil),
+			func(r *RuleJSON) {
+				assert.Equal(unauthorizedHandler, r.Authenticators[0].Handler)
+				assert.Equal(denyHandler, r.Authorizer.Handler)
+				assert.Equal(noopHandler, r.Mutators[0].Handler)
+			},
+		},
+		{
+			"If one handler type has been provided, it should generate an ID, rewrite the provided handler and add default values for missing handlers",
+			newStaticRule(nil, nil, []*Mutator{{testHandler}}),
+			func(r *RuleJSON) {
+				assert.Equal(unauthorizedHandler, r.Authenticators[0].Handler)
+				assert.Equal(denyHandler, r.Authorizer.Handler)
+				assert.Equal(testHandler, r.Mutators[0].Handler)
+			},
+		},
+		{
+			"If all handler types are defined, it should generate an ID and rewrite the handlers",
+			newStaticRule([]*Authenticator{{testHandler}}, &Authorizer{testHandler}, []*Mutator{{testHandler}}),
+			func(r *RuleJSON) {
+				assert.Equal(testHandler, r.Authenticators[0].Handler)
+				assert.Equal(testHandler, r.Authorizer.Handler)
+				assert.Equal(testHandler, r.Mutators[0].Handler)
+			},
+		},
+		{
+			"if multiple authentication and/or mutation handlers have been provided, it should rewrite all of them",
+			newStaticRule([]*Authenticator{{testHandler}, {testHandler2}}, nil, []*Mutator{{testHandler}, {testHandler2}}),
+			func(r *RuleJSON) {
+				assert.Equal(testHandler, r.Authenticators[0].Handler)
+				assert.Equal(testHandler2, r.Authenticators[1].Handler)
+				assert.Equal(testHandler, r.Mutators[0].Handler)
+				assert.Equal(testHandler2, r.Mutators[1].Handler)
+				assert.Equal(denyHandler, r.Authorizer.Handler)
+			},
+		},
+	} {
+		t.Run(fmt.Sprintf("case %d: %s", k, tc.desc), func(t *testing.T) {
 
 			//when
-			actual = testRule.ToRuleJSON()
+			actual = tc.r.ToRuleJSON()
 
 			//then
-			assert.Equal(t, "r1.test", actual.ID)
+			assert.Equal("r1.test", actual.ID)
 
-			assertHasDefaultAuthenticator(t, actual)
-
+			require.NotNil(t, actual.RuleSpec.Authenticators)
 			require.NotNil(t, actual.RuleSpec.Authorizer)
-			assert.Equal(t, denyHandler, actual.RuleSpec.Authorizer.Handler)
+			require.NotNil(t, actual.RuleSpec.Mutators)
 
-			require.NotNil(t, actual.RuleSpec.Mutator)
-			assert.Equal(t, noopHandler, actual.RuleSpec.Mutator.Handler)
+			require.NotEmpty(t, actual.RuleSpec.Authenticators)
+			require.NotEmpty(t, actual.RuleSpec.Mutators)
 
-			assert.False(t, *actual.RuleSpec.Upstream.PreserveHost)
+			//testcase-specific assertions
+			tc.extra(actual)
+
 		})
-
-		t.Run("If one handler has been provided, it should generate an ID, rewrite the provided handler and add default values for missing handlers", func(t *testing.T) {
-
-			//given
-			testRule.Spec.Mutator = &Mutator{testHandler}
-
-			//when
-			actual = testRule.ToRuleJSON()
-
-			//then
-			assert.Equal(t, "r1.test", actual.ID)
-
-			assertHasDefaultAuthenticator(t, actual)
-
-			require.NotNil(t, actual.RuleSpec.Authorizer)
-			assert.Equal(t, denyHandler, actual.RuleSpec.Authorizer.Handler)
-
-			require.NotNil(t, actual.RuleSpec.Mutator)
-			assert.Equal(t, testHandler, actual.RuleSpec.Mutator.Handler)
-		})
-
-		t.Run("If all handlers are defined, it should generate an ID and rewrite the entire spec", func(t *testing.T) {
-
-			//given
-			testRule.Spec.Authenticators = []*Authenticator{{testHandler}}
-			testRule.Spec.Authorizer = &Authorizer{testHandler}
-
-			//when
-			actual = testRule.ToRuleJSON()
-
-			//then
-			assert.Equal(t, "r1.test", actual.ID)
-			assert.Equal(t, testRule.Spec, actual.RuleSpec)
-		})
-	})
+	}
 }
 
 func TestValidateWith(t *testing.T) {
@@ -324,7 +340,7 @@ func TestValidateWith(t *testing.T) {
 			//given
 			rule.Spec.Authenticators = []*Authenticator{{testHandler}}
 			rule.Spec.Authorizer = &Authorizer{testHandler}
-			rule.Spec.Mutator = &Mutator{testHandler}
+			rule.Spec.Mutators = []*Mutator{{testHandler}}
 
 			//when
 			validationError = rule.ValidateWith(validationConfig)
@@ -373,7 +389,11 @@ func TestFilterNotValid(t *testing.T) {
 	})
 }
 
-func newRule(name, namespace, upstreamURL, matchURL string, stripURLPath *string, preserveURLHost *bool, authenticators []*Authenticator, authorizer *Authorizer, mutator *Mutator) *Rule {
+func newStaticRule(authenticators []*Authenticator, authorizer *Authorizer, mutators []*Mutator) *Rule {
+	return newRule("r1", "test", "", "", newStringPtr(""), newBoolPtr(false), authenticators, authorizer, mutators)
+}
+
+func newRule(name, namespace, upstreamURL, matchURL string, stripURLPath *string, preserveURLHost *bool, authenticators []*Authenticator, authorizer *Authorizer, mutators []*Mutator) *Rule {
 
 	spec := RuleSpec{
 		Upstream: &Upstream{
@@ -387,7 +407,7 @@ func newRule(name, namespace, upstreamURL, matchURL string, stripURLPath *string
 		},
 		Authenticators: authenticators,
 		Authorizer:     authorizer,
-		Mutator:        mutator,
+		Mutators:       mutators,
 	}
 
 	return &Rule{
@@ -430,11 +450,4 @@ func newBoolPtr(b bool) *bool {
 
 func newStringPtr(s string) *string {
 	return &s
-}
-
-func assertHasDefaultAuthenticator(t *testing.T, actual *RuleJSON) {
-	require.NotNil(t, actual.RuleSpec.Authenticators)
-	require.NotEmpty(t, actual.RuleSpec.Authenticators)
-	require.Len(t, actual.RuleSpec.Authenticators, 1)
-	assert.Equal(t, unauthorizedHandler, actual.RuleSpec.Authenticators[0].Handler)
 }

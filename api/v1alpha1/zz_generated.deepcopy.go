@@ -227,10 +227,16 @@ func (in *RuleSpec) DeepCopyInto(out *RuleSpec) {
 		*out = new(Authorizer)
 		(*in).DeepCopyInto(*out)
 	}
-	if in.Mutator != nil {
-		in, out := &in.Mutator, &out.Mutator
-		*out = new(Mutator)
-		(*in).DeepCopyInto(*out)
+	if in.Mutators != nil {
+		in, out := &in.Mutators, &out.Mutators
+		*out = make([]*Mutator, len(*in))
+		for i := range *in {
+			if (*in)[i] != nil {
+				in, out := &(*in)[i], &(*out)[i]
+				*out = new(Mutator)
+				(*in).DeepCopyInto(*out)
+			}
+		}
 	}
 }
 

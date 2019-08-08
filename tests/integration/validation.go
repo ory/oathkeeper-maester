@@ -12,14 +12,14 @@ import (
 //`actual` is a representation of an entry from the ConfigMap handled by the Controller
 func validateRuleEquals(actual *json.Json, expected *json.Json) {
 	Expect(actual).To(Equal(expected))
-	expectOnlyKeys(actual, "id", "upstream", "match", "authenticators", "authorizer", "mutator")
+	expectOnlyKeys(actual, "id", "upstream", "match", "authenticators", "authorizer", "mutators")
 
 	expectString(actual, "id")
 	compareUpstreams(actual.Get("upstream"), expected.Get("upstream"))
 	compareMatches(actual.Get("match"), expected.Get("match"))
-	compareAuthenticators(actual.Get("authenticators"), expected.Get("authenticators"))
+	compareHandlerArrays(actual.Get("authenticators"), expected.Get("authenticators"))
 	compareHandlers(actual.Get("authorizer"), expected.Get("authorizer"))
-	compareHandlers(actual.Get("mutator"), expected.Get("mutator"))
+	compareHandlerArrays(actual.Get("mutators"), expected.Get("mutators"))
 }
 
 func compareUpstreams(actual *json.Json, expected *json.Json) {
@@ -36,7 +36,7 @@ func compareMatches(actual *json.Json, expected *json.Json) {
 	expectStringArray(actual, "methods")
 }
 
-func compareAuthenticators(actual *json.Json, expected *json.Json) {
+func compareHandlerArrays(actual *json.Json, expected *json.Json) {
 	//both are equal
 	Expect(actual).To(Equal(expected))
 

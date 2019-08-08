@@ -427,18 +427,20 @@ spec:
               - url
               - methods
               type: object
-            mutator:
-              properties:
-                config:
-                  description: Config configures the handler. Configuration keys vary
-                    per handler.
-                  type: object
-                handler:
-                  description: Name is the name of a handler
-                  type: string
-              required:
-              - handler
-              type: object
+            mutators:
+              items:
+                properties:
+                  config:
+                    description: Config configures the handler. Configuration keys
+                      vary per handler.
+                    type: object
+                  handler:
+                    description: Name is the name of a handler
+                    type: string
+                required:
+                - handler
+                type: object
+              type: array
             upstream:
               properties:
                 preserveHost:
