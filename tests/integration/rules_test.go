@@ -10,8 +10,8 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	oathkeeperv1alpha1 "github.com/ory/oathkeeper-maester/api/v1alpha1"
+	"k8s.io/api/core/v1"
 	corev1 "k8s.io/api/core/v1"
-	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -398,15 +398,17 @@ func getRule1Json() string {
 			"authorizer": {
 				"handler": "allow"
 			},
-			"mutator": {
-				"handler": "header",
-				"config": {
-				    "headers": {
-						"X-User": "{{ print .Subject }}",
-						"X-Some-Arbitrary-Data": "{{ print .Extra.some.arbitrary.data }}"
+			"mutators": [
+                {
+				    "handler": "header",
+				    "config": {
+				        "headers": {
+						    "X-User": "{{ print .Subject }}",
+						    "X-Some-Arbitrary-Data": "{{ print .Extra.some.arbitrary.data }}"
+				        }
 				    }
-				}
-			}
+			    }
+            ]
 		}
 	}
 	`
@@ -443,12 +445,14 @@ func getRule2Json() string {
 					"required_resource": "my:resource:foobar:foo:1234"
 				}
 			},
-			"mutator": {
-			    "handler": "id_token",
-			    "config": {
-				    "aud": ["audience1", "audience2"]
+			"mutators": [
+                {
+			        "handler": "id_token",
+			        "config": {
+				        "aud": ["audience1", "audience2"]
+			        }
 			    }
-			}
+            ]
 		}
 	}
 	`

@@ -60,7 +60,7 @@ type RuleSpec struct {
 	Match          *Match           `json:"match"`
 	Authenticators []*Authenticator `json:"authenticators,omitempty"`
 	Authorizer     *Authorizer      `json:"authorizer,omitempty"`
-	Mutator        *Mutator         `json:"mutator,omitempty"`
+	Mutators       []*Mutator       `json:"mutators,omitempty"`
 }
 
 // Validation defines the validation state of Rule
@@ -152,30 +152,34 @@ func (rl RuleList) FilterNotValid() RuleList {
 // ValidateWith uses provided validation configuration to check whether the rule have proper handlers set. Nil is a valid handler.
 func (r Rule) ValidateWith(config validation.Config) error {
 
-	if r.Spec.Authenticators != nil {
+	var invalidHandlers []string
 
-		var invalidAuthenticators []string
+	if r.Spec.Authenticators != nil {
 		for _, authenticator := range r.Spec.Authenticators {
 			if valid := config.IsAuthenticatorValid(authenticator.Name); !valid {
-				invalidAuthenticators = append(invalidAuthenticators, authenticator.Name)
+				invalidHandlers = append(invalidHandlers, fmt.Sprintf("authenticator/%s", authenticator.Name))
 			}
-		}
-
-		if invalidAuthenticators != nil {
-			return fmt.Errorf("invalid authenticators: %s", invalidAuthenticators)
 		}
 	}
 
 	if r.Spec.Authorizer != nil {
 		if valid := config.IsAuthorizerValid(r.Spec.Authorizer.Name); !valid {
-			return fmt.Errorf("authorizer: %s is invalid", r.Spec.Authorizer.Name)
+			invalidHandlers = append(invalidHandlers, fmt.Sprintf("authorizer/%s", r.Spec.Authorizer.Name))
 		}
 	}
-	if r.Spec.Mutator != nil {
-		if valid := config.IsMutatorValid(r.Spec.Mutator.Name); !valid {
-			return fmt.Errorf("mutator: %s is invalid", r.Spec.Mutator.Name)
+
+	if r.Spec.Mutators != nil {
+		for _, m := range r.Spec.Mutators {
+			if valid := config.IsMutatorValid(m.Name); !valid {
+				invalidHandlers = append(invalidHandlers, m.Name)
+			}
 		}
 	}
+
+	if len(invalidHandlers) != 0 {
+		return fmt.Errorf("invalid handlers: %s, please check the configuration", invalidHandlers)
+	}
+
 	return nil
 }
 
@@ -193,8 +197,8 @@ func (r Rule) ToRuleJSON() *RuleJSON {
 	if ruleJSON.Authorizer == nil {
 		ruleJSON.Authorizer = &Authorizer{denyHandler}
 	}
-	if ruleJSON.Mutator == nil {
-		ruleJSON.Mutator = &Mutator{noopHandler}
+	if ruleJSON.Mutators == nil {
+		ruleJSON.Mutators = []*Mutator{{noopHandler}}
 	}
 
 	if ruleJSON.Upstream.PreserveHost == nil {
