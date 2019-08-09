@@ -3,6 +3,7 @@
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [Change Log](#change-log)
+  - [v0.0.1-beta.4+oryOS.12 (2019-08-09)](#v001-beta4oryos12-2019-08-09)
   - [v0.0.1-beta.3 (2019-07-30)](#v001-beta3-2019-07-30)
   - [v0.0.1-beta.2 (2019-07-29)](#v001-beta2-2019-07-29)
   - [v0.0.1-beta.1 (2019-07-29)](#v001-beta1-2019-07-29)
@@ -10,6 +11,14 @@
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 # Change Log
+
+## [v0.0.1-beta.4+oryOS.12](https://github.com/ory/oathkeeper-maester/tree/v0.0.1-beta.4+oryOS.12) (2019-08-09)
+[Full Changelog](https://github.com/ory/oathkeeper-maester/compare/v0.0.1-beta.3...v0.0.1-beta.4+oryOS.12)
+
+**Merged pull requests:**
+
+- Support multiple mutators [\#20](https://github.com/ory/oathkeeper-maester/pull/20) ([jakkab](https://github.com/jakkab))
+- Update Measter readme [\#19](https://github.com/ory/oathkeeper-maester/pull/19) ([tomekpapiernik](https://github.com/tomekpapiernik))
 
 ## [v0.0.1-beta.3](https://github.com/ory/oathkeeper-maester/tree/v0.0.1-beta.3) (2019-07-30)
 [Full Changelog](https://github.com/ory/oathkeeper-maester/compare/v0.0.1-beta.2...v0.0.1-beta.3)
