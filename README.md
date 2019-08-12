@@ -39,3 +39,4 @@ Set `KUBECONFIG` environment variable to the proper value.
 
 Refer to the Makefile for the details.
 
+
