@@ -185,6 +185,7 @@ func (r *RuleReconciler) updateOrCreateRulesConfigmap(ctx context.Context, data 
 	})
 }
 
+//Temporary check for specific update problem: "looks like optimistic locking". But there's only one thread, AFAWK. What's up, then?
 func isObjectHasBeenModified(err error) bool {
 	return apierrs.IsConflict(err) && strings.Contains(err.Error(), "the object has been modified; please apply your changes to the latest version")
 }
