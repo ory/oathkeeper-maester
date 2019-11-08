@@ -34,6 +34,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
+//DO NOT MERGE THIS PR!
 const (
 	retryAttempts = 5
 	retryDelay    = time.Second * 2
