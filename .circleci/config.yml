@@ -107,10 +107,10 @@ jobs:
 
   release-changelog:
     docker:
-      - image: circleci/ruby:2.4-node
+      - image: circleci/ruby:2.5-node
     steps:
       - checkout
-      - run: gem install github_changelog_generator
+      - run: gem install github_changelog_generator -v 1.14.3
       - run: sudo npm i -g doctoc
       - run: github_changelog_generator -u ory -p oathkeeper-maester -o CHANGELOG.md --token $GITHUB_TOKEN
       - run: doctoc CHANGELOG.md
@@ -143,7 +143,9 @@ workflows:
               only: /.*/
       - release:
           requires:
+            - build
             - test
+            - test-integration 
           filters:
             tags:
               only: /.*/
