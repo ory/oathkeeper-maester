@@ -19,6 +19,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/go-logr/logr"
@@ -145,6 +146,7 @@ func (r *RuleReconciler) updateOrCreateRulesConfigmap(ctx context.Context, data 
 	}
 
 	createMapFunc := func() error {
+		r.Log.Info("creating ConfigMap")
 		oathkeeperRulesConfigmap = apiv1.ConfigMap{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      r.RuleConfigmap.Name,
@@ -156,19 +158,35 @@ func (r *RuleReconciler) updateOrCreateRulesConfigmap(ctx context.Context, data 
 	}
 
 	updateMapFunc := func() error {
+		r.Log.Info("updating ConfigMap")
 		oathkeeperRulesConfigmap.Data = map[string]string{r.RulesFileName: data}
-		return r.Update(ctx, &oathkeeperRulesConfigmap)
-	}
-
-	if err := retryOnError(fetchMapFunc); err != nil {
+		err := r.Update(ctx, &oathkeeperRulesConfigmap)
 		return err
 	}
 
-	if exists {
-		return retryOnError(updateMapFunc)
-	}
+	return retryOnError(func() error {
+		exists = false
 
-	return retryOnError(createMapFunc)
+		if err := fetchMapFunc(); err != nil {
+			return err
+		}
+
+		if exists {
+			err := updateMapFunc()
+			if err != nil {
+				if isObjectHasBeenModified(err) {
+					r.Log.Error(err, "incorrect object version during ConfigMap update")
+				}
+			}
+			return err
+		}
+
+		return createMapFunc()
+	})
+}
+
+func isObjectHasBeenModified(err error) bool {
+	return apierrs.IsConflict(err) && strings.Contains(err.Error(), "the object has been modified; please apply your changes to the latest version")
 }
 
 func retryOnError(retryable func() error) error {
