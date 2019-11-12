@@ -85,10 +85,11 @@ docker-push:
 # find or download controller-gen
 # download controller-gen if necessary
 controller-gen:
+	@echo "go env GOPATH ====>"
+	@echo $(shell go env GOPATH)
+	@echo "go env GOPATH <===="
 ifeq (, $(shell which controller-gen))
 	go get sigs.k8s.io/controller-tools/cmd/controller-gen@v0.2.0-beta.2
-	@echo "go env GOPATH"
-	$(shell go env GOPATH)
 CONTROLLER_GEN=$(shell which controller-gen)
 else
 CONTROLLER_GEN=$(shell which controller-gen)
