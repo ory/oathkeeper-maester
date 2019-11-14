@@ -411,6 +411,13 @@ spec:
               required:
               - handler
               type: object
+            configMapName:
+              description: ConfigMapName points to the K8s ConfigMap that contains
+                these rules
+              maxLength: 253
+              minLength: 1
+              pattern: '[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*'
+              type: string
             match:
               properties:
                 methods:

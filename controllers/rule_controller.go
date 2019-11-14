@@ -96,16 +96,25 @@ func (r *RuleReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 
 	var rulesList oathkeeperv1alpha1.RuleList
 
-	if err := r.List(ctx, &rulesList); err != nil {
+	if err := r.List(ctx, &rulesList, client.InNamespace(req.NamespacedName.Namespace)); err != nil {
 		return ctrl.Result{}, err
 	}
 
-	oathkeeperRulesJSON, err := rulesList.FilterNotValid().ToOathkeeperRules()
+	oathkeeperRulesJSON, err := rulesList.FilterNotValid().
+		FilterConfigMapName(rule.Spec.ConfigMapName).
+		ToOathkeeperRules()
 	if err != nil {
 		return ctrl.Result{}, err
 	}
 
-	if err := r.updateOrCreateRulesConfigmap(ctx, string(oathkeeperRulesJSON)); err != nil {
+	configMap := r.RuleConfigmap
+	if rule.Spec.ConfigMapName != nil {
+		configMap = types.NamespacedName{
+			Name:      *rule.Spec.ConfigMapName,
+			Namespace: req.NamespacedName.Namespace,
+		}
+	}
+	if err := r.updateOrCreateRulesConfigmap(ctx, configMap, string(oathkeeperRulesJSON)); err != nil {
 		r.Log.Error(err, "unable to process rules Configmap")
 		os.Exit(1)
 	}
@@ -121,14 +130,14 @@ func (r *RuleReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		Complete(r)
 }
 
-func (r *RuleReconciler) updateOrCreateRulesConfigmap(ctx context.Context, data string) error {
+func (r *RuleReconciler) updateOrCreateRulesConfigmap(ctx context.Context, configMap types.NamespacedName, data string) error {
 
 	var oathkeeperRulesConfigmap apiv1.ConfigMap
 	var exists = false
 
 	fetchMapFunc := func() error {
 
-		if err := r.Get(ctx, r.RuleConfigmap, &oathkeeperRulesConfigmap); err != nil {
+		if err := r.Get(ctx, configMap, &oathkeeperRulesConfigmap); err != nil {
 
 			if apierrs.IsForbidden(err) {
 				return retry.Unrecoverable(err)
@@ -149,8 +158,8 @@ func (r *RuleReconciler) updateOrCreateRulesConfigmap(ctx context.Context, data 
 		r.Log.Info("creating ConfigMap")
 		oathkeeperRulesConfigmap = apiv1.ConfigMap{
 			ObjectMeta: metav1.ObjectMeta{
-				Name:      r.RuleConfigmap.Name,
-				Namespace: r.RuleConfigmap.Namespace,
+				Name:      configMap.Name,
+				Namespace: configMap.Namespace,
 			},
 			Data: map[string]string{r.RulesFileName: data},
 		}

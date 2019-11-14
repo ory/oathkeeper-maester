@@ -189,6 +189,7 @@ func TestToOathkeeperRules(t *testing.T) {
 				"http://my-backend-service1",
 				"http://my-app/some-route1",
 				newStringPtr("/api/v1"),
+				nil,
 				newBoolPtr(true),
 				[]*Authenticator{&Authenticator{h1}},
 				nil,
@@ -200,6 +201,7 @@ func TestToOathkeeperRules(t *testing.T) {
 				"http://my-backend-service2",
 				"http://my-app/some-route2",
 				nil,
+				nil,
 				newBoolPtr(false),
 				[]*Authenticator{&Authenticator{h1}, {h2}},
 				nil,
@@ -210,6 +212,7 @@ func TestToOathkeeperRules(t *testing.T) {
 				"default",
 				"http://my-backend-service3",
 				"http://my-app/some-route3",
+				nil,
 				nil,
 				nil,
 				nil,
@@ -313,6 +316,7 @@ func TestValidateWith(t *testing.T) {
 		"http://my-backend-service1",
 		"http://my-app/some-route1",
 		newStringPtr("/api/v1"),
+		nil,
 		newBoolPtr(true),
 		nil,
 		nil,
@@ -390,10 +394,10 @@ func TestFilterNotValid(t *testing.T) {
 }
 
 func newStaticRule(authenticators []*Authenticator, authorizer *Authorizer, mutators []*Mutator) *Rule {
-	return newRule("r1", "test", "", "", newStringPtr(""), newBoolPtr(false), authenticators, authorizer, mutators)
+	return newRule("r1", "test", "", "", newStringPtr(""), nil, newBoolPtr(false), authenticators, authorizer, mutators)
 }
 
-func newRule(name, namespace, upstreamURL, matchURL string, stripURLPath *string, preserveURLHost *bool, authenticators []*Authenticator, authorizer *Authorizer, mutators []*Mutator) *Rule {
+func newRule(name, namespace, upstreamURL, matchURL string, stripURLPath, configMapName *string, preserveURLHost *bool, authenticators []*Authenticator, authorizer *Authorizer, mutators []*Mutator) *Rule {
 
 	spec := RuleSpec{
 		Upstream: &Upstream{
@@ -408,6 +412,7 @@ func newRule(name, namespace, upstreamURL, matchURL string, stripURLPath *string
 		Authenticators: authenticators,
 		Authorizer:     authorizer,
 		Mutators:       mutators,
+		ConfigMapName:  configMapName,
 	}
 
 	return &Rule{
