@@ -37,7 +37,7 @@ import (
 var (
 	scheme                         = runtime.NewScheme()
 	setupLog                       = ctrl.Log.WithName("setup")
-	defaultAuthenticatorsAvailable = [...]string{"noop", "unauthorized", "anonymous", "oauth2_client_credentials", "oauth2_introspection", "jwt"}
+	defaultAuthenticatorsAvailable = [...]string{"noop", "unauthorized", "anonymous", "cookie_session", "oauth2_client_credentials", "oauth2_introspection", "jwt"}
 	defaultAuthorizersAvailable    = [...]string{"allow", "deny", "keto_engine_acp_ory"}
 	defaultMutatorsAvailable       = [...]string{"noop", "id_token", "header", "cookie", "hydrator"}
 )
