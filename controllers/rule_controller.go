@@ -38,6 +38,7 @@ import (
 const (
 	retryAttempts = 5
 	retryDelay    = time.Second * 2
+	FinalizerName = "finalizer.ory.oathkeeper.sh"
 )
 
 // RuleReconciler reconciles a Rule object
@@ -64,10 +65,10 @@ func (r *RuleReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 
 	if err := r.Get(ctx, req.NamespacedName, &rule); err != nil {
 		if apierrs.IsNotFound(err) {
-			skipValidation = true
-		} else {
-			return ctrl.Result{}, err
+			// just return here, the finalizers have already run
+			return ctrl.Result{}, nil
 		}
+		return ctrl.Result{}, err
 	}
 
 	if !skipValidation {
@@ -98,6 +99,31 @@ func (r *RuleReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 
 	if err := r.List(ctx, &rulesList, client.InNamespace(req.NamespacedName.Namespace)); err != nil {
 		return ctrl.Result{}, err
+	}
+
+	// examine DeletionTimestamp to determine if object is under deletion
+	if rule.ObjectMeta.DeletionTimestamp.IsZero() {
+		// The object is not being deleted, so if it does not have our finalizer,
+		// then lets add the finalizer and update the object. This is equivalent
+		// registering our finalizer.
+		if !containsString(rule.ObjectMeta.Finalizers, FinalizerName) {
+			rule.ObjectMeta.Finalizers = append(rule.ObjectMeta.Finalizers, FinalizerName)
+			if err := r.Update(ctx, &rule); err != nil {
+				return ctrl.Result{}, err
+			}
+		}
+	} else {
+		// The object is being deleted
+		if containsString(rule.ObjectMeta.Finalizers, FinalizerName) {
+			// our finalizer is present, so lets handle any external dependency
+			rulesList = rulesList.FilterOutRule(rule)
+
+			// remove our finalizer from the list and update it.
+			rule.ObjectMeta.Finalizers = removeString(rule.ObjectMeta.Finalizers, FinalizerName)
+			if err := r.Update(ctx, &rule); err != nil {
+				return ctrl.Result{}, err
+			}
+		}
 	}
 
 	oathkeeperRulesJSON, err := rulesList.FilterNotValid().
@@ -215,4 +241,24 @@ func boolPtr(b bool) *bool {
 
 func stringPtr(s string) *string {
 	return &s
+}
+
+// Helper functions to check and remove string from a slice of strings.
+func containsString(slice []string, s string) bool {
+	for _, item := range slice {
+		if item == s {
+			return true
+		}
+	}
+	return false
+}
+
+func removeString(slice []string, s string) (result []string) {
+	for _, item := range slice {
+		if item == s {
+			continue
+		}
+		result = append(result, item)
+	}
+	return
 }

@@ -172,6 +172,19 @@ func (rl RuleList) FilterConfigMapName(name *string) RuleList {
 	return rlCopy
 }
 
+// FilterOutRule filters out the provided rule from the rule list, for re-generating the rules when a rule is deleted
+func (rl RuleList) FilterOutRule(r Rule) RuleList {
+	rlCopy := rl
+	validRules := []Rule{}
+	for _, rule := range rl.Items {
+		if rule.ObjectMeta.SelfLink != r.ObjectMeta.SelfLink {
+			validRules = append(validRules, rule)
+		}
+	}
+	rlCopy.Items = validRules
+	return rlCopy
+}
+
 // ValidateWith uses provided validation configuration to check whether the rule have proper handlers set. Nil is a valid handler.
 func (r Rule) ValidateWith(config validation.Config) error {
 
