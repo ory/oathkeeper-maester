@@ -61,6 +61,12 @@ type RuleSpec struct {
 	Authenticators []*Authenticator `json:"authenticators,omitempty"`
 	Authorizer     *Authorizer      `json:"authorizer,omitempty"`
 	Mutators       []*Mutator       `json:"mutators,omitempty"`
+	// +kubebuilder:validation:MinLength=1
+	// +kubebuilder:validation:MaxLength=253
+	// +kubebuilder:validation:Pattern=[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*
+	//
+	// ConfigMapName points to the K8s ConfigMap that contains these rules
+	ConfigMapName *string `json:"configMapName,omitempty"`
 }
 
 // Validation defines the validation state of Rule
@@ -129,7 +135,7 @@ func (rl RuleList) ToOathkeeperRules() ([]byte, error) {
 
 	rules := make([]*RuleJSON, len(rl.Items))
 
-	for i, _ := range rl.Items {
+	for i := range rl.Items {
 		rules[i] = rl.Items[i].ToRuleJSON()
 	}
 
@@ -142,6 +148,36 @@ func (rl RuleList) FilterNotValid() RuleList {
 	validRules := []Rule{}
 	for _, rule := range rl.Items {
 		if rule.Status.Validation != nil && rule.Status.Validation.Valid != nil && *rule.Status.Validation.Valid {
+			validRules = append(validRules, rule)
+		}
+	}
+	rlCopy.Items = validRules
+	return rlCopy
+}
+
+// FilterConfigMapName filters out Rules that don't effect the given ConfigMap
+func (rl RuleList) FilterConfigMapName(name *string) RuleList {
+	rlCopy := rl
+	validRules := []Rule{}
+	for _, rule := range rl.Items {
+		if rule.Spec.ConfigMapName == nil {
+			if name == nil {
+				validRules = append(validRules, rule)
+			}
+		} else if *rule.Spec.ConfigMapName == *name {
+			validRules = append(validRules, rule)
+		}
+	}
+	rlCopy.Items = validRules
+	return rlCopy
+}
+
+// FilterOutRule filters out the provided rule from the rule list, for re-generating the rules when a rule is deleted
+func (rl RuleList) FilterOutRule(r Rule) RuleList {
+	rlCopy := rl
+	validRules := []Rule{}
+	for _, rule := range rl.Items {
+		if rule.ObjectMeta.SelfLink != r.ObjectMeta.SelfLink {
 			validRules = append(validRules, rule)
 		}
 	}

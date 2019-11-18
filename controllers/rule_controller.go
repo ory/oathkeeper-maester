@@ -38,6 +38,7 @@ import (
 const (
 	retryAttempts = 5
 	retryDelay    = time.Second * 2
+	FinalizerName = "finalizer.ory.oathkeeper.sh"
 )
 
 // RuleReconciler reconciles a Rule object
@@ -64,10 +65,10 @@ func (r *RuleReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 
 	if err := r.Get(ctx, req.NamespacedName, &rule); err != nil {
 		if apierrs.IsNotFound(err) {
-			skipValidation = true
-		} else {
-			return ctrl.Result{}, err
+			// just return here, the finalizers have already run
+			return ctrl.Result{}, nil
 		}
+		return ctrl.Result{}, err
 	}
 
 	if !skipValidation {
@@ -96,16 +97,50 @@ func (r *RuleReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 
 	var rulesList oathkeeperv1alpha1.RuleList
 
-	if err := r.List(ctx, &rulesList); err != nil {
+	if err := r.List(ctx, &rulesList, client.InNamespace(req.NamespacedName.Namespace)); err != nil {
 		return ctrl.Result{}, err
 	}
 
-	oathkeeperRulesJSON, err := rulesList.FilterNotValid().ToOathkeeperRules()
+	// examine DeletionTimestamp to determine if object is under deletion
+	if rule.ObjectMeta.DeletionTimestamp.IsZero() {
+		// The object is not being deleted, so if it does not have our finalizer,
+		// then lets add the finalizer and update the object. This is equivalent
+		// registering our finalizer.
+		if !containsString(rule.ObjectMeta.Finalizers, FinalizerName) {
+			rule.ObjectMeta.Finalizers = append(rule.ObjectMeta.Finalizers, FinalizerName)
+			if err := r.Update(ctx, &rule); err != nil {
+				return ctrl.Result{}, err
+			}
+		}
+	} else {
+		// The object is being deleted
+		if containsString(rule.ObjectMeta.Finalizers, FinalizerName) {
+			// our finalizer is present, so lets handle any external dependency
+			rulesList = rulesList.FilterOutRule(rule)
+
+			// remove our finalizer from the list and update it.
+			rule.ObjectMeta.Finalizers = removeString(rule.ObjectMeta.Finalizers, FinalizerName)
+			if err := r.Update(ctx, &rule); err != nil {
+				return ctrl.Result{}, err
+			}
+		}
+	}
+
+	oathkeeperRulesJSON, err := rulesList.FilterNotValid().
+		FilterConfigMapName(rule.Spec.ConfigMapName).
+		ToOathkeeperRules()
 	if err != nil {
 		return ctrl.Result{}, err
 	}
 
-	if err := r.updateOrCreateRulesConfigmap(ctx, string(oathkeeperRulesJSON)); err != nil {
+	configMap := r.RuleConfigmap
+	if rule.Spec.ConfigMapName != nil {
+		configMap = types.NamespacedName{
+			Name:      *rule.Spec.ConfigMapName,
+			Namespace: req.NamespacedName.Namespace,
+		}
+	}
+	if err := r.updateOrCreateRulesConfigmap(ctx, configMap, string(oathkeeperRulesJSON)); err != nil {
 		r.Log.Error(err, "unable to process rules Configmap")
 		os.Exit(1)
 	}
@@ -121,14 +156,14 @@ func (r *RuleReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		Complete(r)
 }
 
-func (r *RuleReconciler) updateOrCreateRulesConfigmap(ctx context.Context, data string) error {
+func (r *RuleReconciler) updateOrCreateRulesConfigmap(ctx context.Context, configMap types.NamespacedName, data string) error {
 
 	var oathkeeperRulesConfigmap apiv1.ConfigMap
 	var exists = false
 
 	fetchMapFunc := func() error {
 
-		if err := r.Get(ctx, r.RuleConfigmap, &oathkeeperRulesConfigmap); err != nil {
+		if err := r.Get(ctx, configMap, &oathkeeperRulesConfigmap); err != nil {
 
 			if apierrs.IsForbidden(err) {
 				return retry.Unrecoverable(err)
@@ -149,8 +184,8 @@ func (r *RuleReconciler) updateOrCreateRulesConfigmap(ctx context.Context, data 
 		r.Log.Info("creating ConfigMap")
 		oathkeeperRulesConfigmap = apiv1.ConfigMap{
 			ObjectMeta: metav1.ObjectMeta{
-				Name:      r.RuleConfigmap.Name,
-				Namespace: r.RuleConfigmap.Namespace,
+				Name:      configMap.Name,
+				Namespace: configMap.Namespace,
 			},
 			Data: map[string]string{r.RulesFileName: data},
 		}
@@ -206,4 +241,24 @@ func boolPtr(b bool) *bool {
 
 func stringPtr(s string) *string {
 	return &s
+}
+
+// Helper functions to check and remove string from a slice of strings.
+func containsString(slice []string, s string) bool {
+	for _, item := range slice {
+		if item == s {
+			return true
+		}
+	}
+	return false
+}
+
+func removeString(slice []string, s string) (result []string) {
+	for _, item := range slice {
+		if item == s {
+			continue
+		}
+		result = append(result, item)
+	}
+	return
 }
