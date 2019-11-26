@@ -3,6 +3,8 @@
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [Change Log](#change-log)
+  - [v0.0.3 (2019-11-18)](#v003-2019-11-18)
+  - [v0.0.2-beta-2 (2019-11-12)](#v002-beta-2-2019-11-12)
   - [v0.0.2-beta.1 (2019-08-12)](#v002-beta1-2019-08-12)
   - [v0.0.1-beta.3 (2019-07-30)](#v001-beta3-2019-07-30)
   - [v0.0.1-beta.2 (2019-07-29)](#v001-beta2-2019-07-29)
@@ -11,6 +13,29 @@
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 # Change Log
+
+## [v0.0.3](https://github.com/ory/oathkeeper-maester/tree/v0.0.3) (2019-11-18)
+[Full Changelog](https://github.com/ory/oathkeeper-maester/compare/v0.0.2-beta-2...v0.0.3)
+
+**Closed issues:**
+
+- oathkeeper-maester crashes on updating configmap w/ rules [\#25](https://github.com/ory/oathkeeper-maester/issues/25)
+
+**Merged pull requests:**
+
+- Feature: configurable configmap [\#30](https://github.com/ory/oathkeeper-maester/pull/30) ([paulbdavis](https://github.com/paulbdavis))
+- Update CI config [\#29](https://github.com/ory/oathkeeper-maester/pull/29) ([piotrmsc](https://github.com/piotrmsc))
+
+## [v0.0.2-beta-2](https://github.com/ory/oathkeeper-maester/tree/v0.0.2-beta-2) (2019-11-12)
+[Full Changelog](https://github.com/ory/oathkeeper-maester/compare/v0.0.2-beta.1...v0.0.2-beta-2)
+
+**Closed issues:**
+
+- Update to latest changes in oathkeeper access rule config [\#24](https://github.com/ory/oathkeeper-maester/issues/24)
+
+**Merged pull requests:**
+
+- Add 'hydrator' mutator to the list of default mutators [\#23](https://github.com/ory/oathkeeper-maester/pull/23) ([kubadz](https://github.com/kubadz))
 
 ## [v0.0.2-beta.1](https://github.com/ory/oathkeeper-maester/tree/v0.0.2-beta.1) (2019-08-12)
 [Full Changelog](https://github.com/ory/oathkeeper-maester/compare/v0.0.1-beta.3...v0.0.2-beta.1)
@@ -49,6 +74,7 @@
 ## [v0.0.1-beta.1](https://github.com/ory/oathkeeper-maester/tree/v0.0.1-beta.1) (2019-07-29)
 **Merged pull requests:**
 
+- Refactor retry logic to handle conflict on updates. [\#26](https://github.com/ory/oathkeeper-maester/pull/26) ([Tomasz-Smelcerz-SAP](https://github.com/Tomasz-Smelcerz-SAP))
 - Move dataKey to cmd parameters [\#12](https://github.com/ory/oathkeeper-maester/pull/12) ([Demonsthere](https://github.com/Demonsthere))
 - Release step in the CI [\#11](https://github.com/ory/oathkeeper-maester/pull/11) ([piotrmsc](https://github.com/piotrmsc))
 - Rule controller tests [\#8](https://github.com/ory/oathkeeper-maester/pull/8) ([Tomasz-Smelcerz-SAP](https://github.com/Tomasz-Smelcerz-SAP))
