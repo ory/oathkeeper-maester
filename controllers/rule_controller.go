@@ -16,6 +16,7 @@ limitations under the License.
 package controllers
 
 import (
+	"bufio"
 	"context"
 	"fmt"
 	"os"
@@ -38,6 +39,7 @@ import (
 const (
 	retryAttempts = 5
 	retryDelay    = time.Second * 2
+	// FinalizerName name of the finalier
 	FinalizerName = "finalizer.ory.oathkeeper.sh"
 )
 
@@ -127,14 +129,15 @@ func (r *RuleReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 			}
 		}
 	}
-	if !r.IsSideCar {
-		oathkeeperRulesJSON, err := rulesList.FilterNotValid().
-			FilterConfigMapName(rule.Spec.ConfigMapName).
-			ToOathkeeperRules()
-		if err != nil {
-			return ctrl.Result{}, err
-		}
 
+	oathkeeperRulesJSON, err := rulesList.FilterNotValid().
+		FilterConfigMapName(rule.Spec.ConfigMapName).
+		ToOathkeeperRules()
+	if err != nil {
+		return ctrl.Result{}, err
+	}
+
+	if !r.IsSideCar {
 		configMap := r.RuleConfigmap
 		if rule.Spec.ConfigMapName != nil {
 			configMap = types.NamespacedName{
@@ -143,6 +146,12 @@ func (r *RuleReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 			}
 		}
 		if err := r.updateOrCreateRulesConfigmap(ctx, configMap, string(oathkeeperRulesJSON)); err != nil {
+			r.Log.Error(err, "unable to process rules Configmap")
+			os.Exit(1)
+		}
+	} else {
+		err := r.updateOrCreateRulesFile(ctx, string(oathkeeperRulesJSON))
+		if err != nil {
 			r.Log.Error(err, "unable to process rules Configmap")
 			os.Exit(1)
 		}
@@ -221,6 +230,25 @@ func (r *RuleReconciler) updateOrCreateRulesConfigmap(ctx context.Context, confi
 
 		return createMapFunc()
 	})
+}
+
+func (r *RuleReconciler) updateOrCreateRulesFile(ctx context.Context, data string) error {
+	var f *os.File
+	f, err := os.Create(r.RulesFilePath)
+	if err != nil {
+		r.Log.Error(err, "error while creating config file")
+		return err
+	}
+	defer f.Close()
+	w := bufio.NewWriter(f)
+	byteCount, err := w.WriteString(data)
+	r.Log.Info(fmt.Sprintf("wiriting %d bytes of data into %s", byteCount, r.RulesFilePath))
+	w.Flush()
+	if err != nil {
+		r.Log.Error(err, "error while writing to file")
+		return err
+	}
+	return nil
 }
 
 func isObjectHasBeenModified(err error) bool {
