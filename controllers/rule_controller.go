@@ -48,6 +48,8 @@ type RuleReconciler struct {
 	RuleConfigmap    types.NamespacedName
 	ValidationConfig validation.Config
 	RulesFileName    string
+	IsSideCar        bool
+	RulesFilePath    string
 }
 
 // +kubebuilder:rbac:groups=oathkeeper.ory.sh,resources=rules,verbs=get;list;watch;create;update;patch;delete
@@ -125,24 +127,25 @@ func (r *RuleReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 			}
 		}
 	}
-
-	oathkeeperRulesJSON, err := rulesList.FilterNotValid().
-		FilterConfigMapName(rule.Spec.ConfigMapName).
-		ToOathkeeperRules()
-	if err != nil {
-		return ctrl.Result{}, err
-	}
-
-	configMap := r.RuleConfigmap
-	if rule.Spec.ConfigMapName != nil {
-		configMap = types.NamespacedName{
-			Name:      *rule.Spec.ConfigMapName,
-			Namespace: req.NamespacedName.Namespace,
+	if !r.IsSideCar {
+		oathkeeperRulesJSON, err := rulesList.FilterNotValid().
+			FilterConfigMapName(rule.Spec.ConfigMapName).
+			ToOathkeeperRules()
+		if err != nil {
+			return ctrl.Result{}, err
 		}
-	}
-	if err := r.updateOrCreateRulesConfigmap(ctx, configMap, string(oathkeeperRulesJSON)); err != nil {
-		r.Log.Error(err, "unable to process rules Configmap")
-		os.Exit(1)
+
+		configMap := r.RuleConfigmap
+		if rule.Spec.ConfigMapName != nil {
+			configMap = types.NamespacedName{
+				Name:      *rule.Spec.ConfigMapName,
+				Namespace: req.NamespacedName.Namespace,
+			}
+		}
+		if err := r.updateOrCreateRulesConfigmap(ctx, configMap, string(oathkeeperRulesJSON)); err != nil {
+			r.Log.Error(err, "unable to process rules Configmap")
+			os.Exit(1)
+		}
 	}
 
 	return ctrl.Result{}, nil

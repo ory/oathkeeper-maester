@@ -18,10 +18,11 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/ory/oathkeeper-maester/internal/validation"
 	"os"
 	"regexp"
 	"strings"
+
+	"github.com/ory/oathkeeper-maester/internal/validation"
 
 	oathkeeperv1alpha1 "github.com/ory/oathkeeper-maester/api/v1alpha1"
 	"github.com/ory/oathkeeper-maester/controllers"
@@ -62,6 +63,8 @@ func main() {
 	var rulesConfigmapName string
 	var rulesConfigmapNamespace string
 	var rulesFileName string
+	var sideCarMode bool
+	var rulesFilePath string
 
 	flag.StringVar(&metricsAddr, "metrics-addr", ":8080", "The address the metric endpoint binds to.")
 	flag.BoolVar(&enableLeaderElection, "enable-leader-election", false,
@@ -69,6 +72,8 @@ func main() {
 	flag.StringVar(&rulesConfigmapName, "rulesConfigmapName", "oathkeeper-rules", "Name of the Configmap that stores Oathkeeper rules.")
 	flag.StringVar(&rulesConfigmapNamespace, "rulesConfigmapNamespace", "oathkeeper-maester-system", "Namespace of the Configmap that stores Oathkeeper rules.")
 	flag.StringVar(&rulesFileName, "rulesFileName", "access-rules.json", "Name of the file with converted Oathkeeper rules")
+	flag.BoolVar(&sideCarMode, "sidecar-mode", false, "Operate on local files")
+	flag.StringVar(&rulesFilePath, "rulesFilePath", "/etc/config/access-rules.json", "Path to the file with converted Oathkeeper rules")
 
 	flag.Parse()
 
@@ -97,6 +102,8 @@ func main() {
 		RuleConfigmap:    types.NamespacedName{Name: rulesConfigmapName, Namespace: rulesConfigmapNamespace},
 		ValidationConfig: validationConfig,
 		RulesFileName:    rulesFileName,
+		IsSideCar:        sideCarMode,
+		RulesFilePath:    rulesFilePath,
 	}).SetupWithManager(mgr)
 	if err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "Rule")
