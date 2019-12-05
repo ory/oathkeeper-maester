@@ -16,6 +16,7 @@ limitations under the License.
 package main
 
 import (
+	"errors"
 	"flag"
 	"fmt"
 	"os"
@@ -63,21 +64,30 @@ func main() {
 	var rulesConfigmapName string
 	var rulesConfigmapNamespace string
 	var rulesFileName string
-	var sideCarMode bool
 	var rulesFilePath string
+
+	controllerCommand := flag.NewFlagSet("controller", flag.ExitOnError)
+	sidecarCommand := flag.NewFlagSet("sidecar", flag.ExitOnError)
 
 	flag.StringVar(&metricsAddr, "metrics-addr", ":8080", "The address the metric endpoint binds to.")
 	flag.BoolVar(&enableLeaderElection, "enable-leader-election", false,
 		"Enable leader election for controller manager. Enabling this will ensure there is only one active controller manager.")
-	flag.StringVar(&rulesConfigmapName, "rulesConfigmapName", "oathkeeper-rules", "Name of the Configmap that stores Oathkeeper rules.")
-	flag.StringVar(&rulesConfigmapNamespace, "rulesConfigmapNamespace", "oathkeeper-maester-system", "Namespace of the Configmap that stores Oathkeeper rules.")
 	flag.StringVar(&rulesFileName, "rulesFileName", "access-rules.json", "Name of the file with converted Oathkeeper rules")
-	flag.BoolVar(&sideCarMode, "sidecar-mode", false, "Operate on local files")
-	flag.StringVar(&rulesFilePath, "rulesFilePath", "/etc/config/access-rules.json", "Path to the file with converted Oathkeeper rules")
+
+	controllerCommand.StringVar(&rulesConfigmapName, "rulesConfigmapName", "oathkeeper-rules", "Name of the Configmap that stores Oathkeeper rules.")
+	controllerCommand.StringVar(&rulesConfigmapNamespace, "rulesConfigmapNamespace", "oathkeeper-maester-system", "Namespace of the Configmap that stores Oathkeeper rules.")
+
+	sidecarCommand.StringVar(&rulesFilePath, "rulesFilePath", "/etc/config/access-rules.json", "Path to the file with converted Oathkeeper rules")
 
 	flag.Parse()
 
 	ctrl.SetLogger(zap.Logger(true))
+
+	sideCarMode, err := selectMode(flag.Args(), controllerCommand, sidecarCommand)
+	if err != nil {
+		setupLog.Error(err, "problem parsing flags")
+		os.Exit(1)
+	}
 
 	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
 		Scheme:             scheme,
@@ -96,15 +106,21 @@ func main() {
 
 	validationConfig := initValidationConfig()
 
-	err = (&controllers.RuleReconciler{
+	ruleReconciler := &controllers.RuleReconciler{
 		Client:           mgr.GetClient(),
 		Log:              ctrl.Log.WithName("controllers").WithName("Rule"),
-		RuleConfigmap:    types.NamespacedName{Name: rulesConfigmapName, Namespace: rulesConfigmapNamespace},
 		ValidationConfig: validationConfig,
 		RulesFileName:    rulesFileName,
 		IsSideCar:        sideCarMode,
-		RulesFilePath:    rulesFilePath,
-	}).SetupWithManager(mgr)
+	}
+
+	if sideCarMode {
+		ruleReconciler.RulesFilePath = rulesFilePath
+	} else {
+		ruleReconciler.RuleConfigmap = types.NamespacedName{Name: rulesConfigmapName, Namespace: rulesConfigmapNamespace}
+	}
+
+	err = (ruleReconciler).SetupWithManager(mgr)
 	if err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "Rule")
 		os.Exit(1)
@@ -159,4 +175,31 @@ func validateRulesFileName(rfn string) error {
 		return nil
 	}
 	return fmt.Errorf("rulesFileName: %s is not a valid name", rfn)
+}
+
+func selectMode(args []string, controllerCommand *flag.FlagSet, sidecarCommand *flag.FlagSet) (bool, error) {
+	sidecar := true
+	controller := false
+
+	if len(args) < 1 {
+		setupLog.Info("running in controller mode")
+		return controller, nil
+	}
+
+	switch args[0] {
+	case "controller":
+		if err := controllerCommand.Parse(args[1:]); err != nil {
+			return false, err
+		}
+		setupLog.Info("running in controller mode")
+		return controller, nil
+	case "sidecar":
+		if err := sidecarCommand.Parse(args[1:]); err != nil {
+			return false, err
+		}
+		setupLog.Info("running in sidecar mode")
+		return sidecar, nil
+	default:
+		return false, errors.New("wrong mode provided")
+	}
 }
