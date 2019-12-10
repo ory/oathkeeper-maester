@@ -132,8 +132,7 @@ func main() {
 		OperatorMode:     operator,
 	}
 
-	err = ruleReconciler.SetupWithManager(mgr)
-	if err != nil {
+	if err := ruleReconciler.SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "Rule")
 		os.Exit(1)
 	}
@@ -212,6 +211,6 @@ func selectMode(args []string, controllerCommand *flag.FlagSet, sidecarCommand *
 		setupLog.Info("running in sidecar mode")
 		return sidecar, nil
 	default:
-		return false, errors.New("wrong mode provided")
+		return false, fmt.Errorf(`modes "controller" and "sidecar" are supported but got: %s`, args[0])
 	}
 }

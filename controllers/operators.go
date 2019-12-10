@@ -17,9 +17,9 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
-//OperatorMode is an interface that provides runtime strategy for operating mode (standalone controller|sidecar)
+// OperatorMode is an interface that provides runtime strategy for operating mode ("controller" or "sidecar").
 type OperatorMode interface {
-	//Creates or updates Oathkeeper rule list using implementation-specific means.
+	// CreateOrUpdate ORY Oathkeeper Access Rule list using implementation-specific means.
 	// oathkeeperRulesJSON - serialized JSON with an array of objects that conform to Oathkeeper Rule syntax
 	// triggeredBy - the recently created/update rule that triggered the operation
 	CreateOrUpdate(ctx context.Context, oathkeeperRulesJSON []byte, triggeredBy *oathkeeperv1alpha1.Rule)
@@ -136,7 +136,7 @@ func (fo *FilesOperator) updateOrCreateRulesFile(ctx context.Context, data strin
 	defer f.Close()
 	w := bufio.NewWriter(f)
 	byteCount, err := w.WriteString(data)
-	fo.Log.Info(fmt.Sprintf("wiriting %d bytes of data into %s", byteCount, fo.RulesFilePath))
+	fo.Log.Info(fmt.Sprintf("writing %d bytes of data into %s", byteCount, fo.RulesFilePath))
 	w.Flush()
 	if err != nil {
 		fo.Log.Error(err, "error while writing to file")
