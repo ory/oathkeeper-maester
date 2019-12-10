@@ -28,7 +28,6 @@ import (
 	"github.com/avast/retry-go"
 	apiv1 "k8s.io/api/core/v1"
 	apierrs "k8s.io/apimachinery/pkg/api/errors"
-	"k8s.io/apimachinery/pkg/types"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
@@ -131,17 +130,7 @@ func (r *RuleReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 		return ctrl.Result{}, err
 	}
 
-	nameFunc := func() types.NamespacedName {
-		configMap := r.OperatorMode.GetConfigLocation()
-		if rule.Spec.ConfigMapName != nil {
-			configMap = types.NamespacedName{
-				Name:      *rule.Spec.ConfigMapName,
-				Namespace: req.NamespacedName.Namespace,
-			}
-		}
-		return configMap
-	}
-	r.OperatorMode.CreateOrUpdate(ctx, oathkeeperRulesJSON, nameFunc)
+	r.OperatorMode.CreateOrUpdate(ctx, oathkeeperRulesJSON, &rule)
 
 	return ctrl.Result{}, nil
 }

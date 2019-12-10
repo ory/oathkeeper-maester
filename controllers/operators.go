@@ -8,6 +8,7 @@ import (
 
 	"github.com/avast/retry-go"
 	"github.com/go-logr/logr"
+	oathkeeperv1alpha1 "github.com/ory/oathkeeper-maester/api/v1alpha1"
 	apiv1 "k8s.io/api/core/v1"
 	apierrs "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -16,16 +17,17 @@ import (
 )
 
 // OperatorMode interface for operating mode (controller|sidecar)
+// oathkeeperRulesJSON - serialized JSON with an array of objects that conform to Oathkeeper Rule syntax
+// triggeredBy - the rule that triggered the operation
 type OperatorMode interface {
-	CreateOrUpdate(ctx context.Context, oathkeeperRulesJSON []byte, nameFunc func() types.NamespacedName)
-	GetConfigLocation() types.NamespacedName
+	CreateOrUpdate(ctx context.Context, oathkeeperRulesJSON []byte, triggeredBy *oathkeeperv1alpha1.Rule)
 }
 
 type ConfigMapOperator struct {
 	client.Client
-	Log           logr.Logger
-	RuleConfigmap types.NamespacedName
-	RulesFileName string
+	Log              logr.Logger
+	DefaultConfigMap types.NamespacedName
+	RulesFileName    string
 }
 
 type FilesOperator struct {
@@ -97,13 +99,17 @@ func (cmo *ConfigMapOperator) updateOrCreateRulesConfigmap(ctx context.Context, 
 	})
 }
 
-func (cmo *ConfigMapOperator) GetConfigLocation() types.NamespacedName {
-	return cmo.RuleConfigmap
-}
+func (cmo *ConfigMapOperator) CreateOrUpdate(ctx context.Context, oathkeeperRulesJSON []byte, triggeredBy *oathkeeperv1alpha1.Rule) {
 
-func (cmo *ConfigMapOperator) CreateOrUpdate(ctx context.Context, oathkeeperRulesJSON []byte, nameFunc func() types.NamespacedName) {
-	configMap := nameFunc()
-	if err := cmo.updateOrCreateRulesConfigmap(ctx, configMap, string(oathkeeperRulesJSON)); err != nil {
+	configMapRef := cmo.DefaultConfigMap
+	if triggeredBy != nil && triggeredBy.Spec.ConfigMapName != nil && len(*triggeredBy.Spec.ConfigMapName) > 0 {
+		configMapRef = types.NamespacedName{
+			Name:      *triggeredBy.Spec.ConfigMapName,
+			Namespace: triggeredBy.ObjectMeta.Namespace,
+		}
+	}
+
+	if err := cmo.updateOrCreateRulesConfigmap(ctx, configMapRef, string(oathkeeperRulesJSON)); err != nil {
 		cmo.Log.Error(err, "unable to process rules Configmap")
 		os.Exit(1)
 	}
@@ -128,17 +134,14 @@ func (fo *FilesOperator) updateOrCreateRulesFile(ctx context.Context, data strin
 	return nil
 }
 
-func (fo *FilesOperator) CreateOrUpdate(ctx context.Context, oathkeeperRulesJSON []byte, nameFunc func() types.NamespacedName) {
+func (fo *FilesOperator) CreateOrUpdate(ctx context.Context, oathkeeperRulesJSON []byte, triggeredBy *oathkeeperv1alpha1.Rule) {
+	if triggeredBy != nil && triggeredBy.Spec.ConfigMapName != nil && len(*triggeredBy.Spec.ConfigMapName) > 0 {
+		fo.Log.Info("Ignoring Spec.ConfigMapName value - sidecar mode enabled")
+	}
+
 	err := fo.updateOrCreateRulesFile(ctx, string(oathkeeperRulesJSON))
 	if err != nil {
 		fo.Log.Error(err, "unable to process rules Configmap")
 		os.Exit(1)
-	}
-}
-
-func (cmo *FilesOperator) GetConfigLocation() types.NamespacedName {
-	return types.NamespacedName{
-		Name:      cmo.RulesFilePath,
-		Namespace: "local_file",
 	}
 }

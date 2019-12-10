@@ -117,7 +117,7 @@ func main() {
 		operator = &controllers.ConfigMapOperator{
 			Client: mgr.GetClient(),
 			Log:    ctrl.Log.WithName("controllers").WithName("Rule"),
-			RuleConfigmap: types.NamespacedName{
+			DefaultConfigMap: types.NamespacedName{
 				Name:      rulesConfigmapName,
 				Namespace: rulesConfigmapNamespace,
 			},
