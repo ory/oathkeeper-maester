@@ -26,7 +26,6 @@ import (
 	"github.com/ory/oathkeeper-maester/internal/validation"
 
 	"github.com/avast/retry-go"
-	apiv1 "k8s.io/api/core/v1"
 	apierrs "k8s.io/apimachinery/pkg/api/errors"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -50,7 +49,6 @@ type RuleReconciler struct {
 // +kubebuilder:rbac:groups=oathkeeper.ory.sh,resources=rules,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=oathkeeper.ory.sh,resources=rules/status,verbs=get;update;patch
 // +kubebuilder:rbac:groups="",resources=configmaps,verbs=get;list;watch;create;update;patch;delete
-
 //Reconcile ??
 func (r *RuleReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 
@@ -137,10 +135,9 @@ func (r *RuleReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 
 //SetupWithManager ??
 func (r *RuleReconciler) SetupWithManager(mgr ctrl.Manager) error {
-	return ctrl.NewControllerManagedBy(mgr).
-		For(&oathkeeperv1alpha1.Rule{}).
-		Owns(&apiv1.ConfigMap{}).
-		Complete(r)
+	bldr := ctrl.NewControllerManagedBy(mgr).
+		For(&oathkeeperv1alpha1.Rule{})
+	return r.OperatorMode.Owns(bldr).Complete(r)
 }
 
 func isObjectHasBeenModified(err error) bool {

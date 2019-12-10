@@ -132,7 +132,7 @@ func main() {
 		OperatorMode:     operator,
 	}
 
-	err = (ruleReconciler).SetupWithManager(mgr)
+	err = ruleReconciler.SetupWithManager(mgr)
 	if err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "Rule")
 		os.Exit(1)

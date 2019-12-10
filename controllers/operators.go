@@ -13,16 +13,22 @@ import (
 	apierrs "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
+	"sigs.k8s.io/controller-runtime/pkg/builder"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
-// OperatorMode interface for operating mode (controller|sidecar)
-// oathkeeperRulesJSON - serialized JSON with an array of objects that conform to Oathkeeper Rule syntax
-// triggeredBy - the rule that triggered the operation
+//OperatorMode is an interface that provides runtime strategy for operating mode (standalone controller|sidecar)
 type OperatorMode interface {
+	//Creates or updates Oathkeeper rule list using implementation-specific means.
+	// oathkeeperRulesJSON - serialized JSON with an array of objects that conform to Oathkeeper Rule syntax
+	// triggeredBy - the recently created/update rule that triggered the operation
 	CreateOrUpdate(ctx context.Context, oathkeeperRulesJSON []byte, triggeredBy *oathkeeperv1alpha1.Rule)
+
+	//Registers additional K8s types necessary for the specific mode to work
+	Owns(*builder.Builder) *builder.Builder
 }
 
+//OperatorMode that maintains Oathkeeper rules as an json-formatted entry in a ConfigMap
 type ConfigMapOperator struct {
 	client.Client
 	Log              logr.Logger
@@ -30,6 +36,7 @@ type ConfigMapOperator struct {
 	RulesFileName    string
 }
 
+//OperatorMode that maintains Oathkeeper rules as a flat json file in a local filesystem
 type FilesOperator struct {
 	Log           logr.Logger
 	RulesFilePath string
@@ -115,6 +122,10 @@ func (cmo *ConfigMapOperator) CreateOrUpdate(ctx context.Context, oathkeeperRule
 	}
 }
 
+func (cmo *ConfigMapOperator) Owns(bldr *builder.Builder) *builder.Builder {
+	return bldr.Owns(&apiv1.ConfigMap{})
+}
+
 func (fo *FilesOperator) updateOrCreateRulesFile(ctx context.Context, data string) error {
 	var f *os.File
 	f, err := os.Create(fo.RulesFilePath)
@@ -144,4 +155,9 @@ func (fo *FilesOperator) CreateOrUpdate(ctx context.Context, oathkeeperRulesJSON
 		fo.Log.Error(err, "unable to process rules Configmap")
 		os.Exit(1)
 	}
+}
+
+func (fo *FilesOperator) Owns(bldr *builder.Builder) *builder.Builder {
+	//NO-OP
+	return bldr
 }
