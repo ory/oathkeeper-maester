@@ -35,7 +35,7 @@ const (
 	retryAttempts = 5
 	retryDelay    = time.Second * 2
 	// FinalizerName name of the finalier
-	FinalizerName = "finalizer.ory.oathkeeper.sh"
+	FinalizerName = "finalizer.oathkeeper.ory.sh"
 )
 
 // RuleReconciler reconciles a Rule object
@@ -49,7 +49,8 @@ type RuleReconciler struct {
 // +kubebuilder:rbac:groups=oathkeeper.ory.sh,resources=rules,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=oathkeeper.ory.sh,resources=rules/status,verbs=get;update;patch
 // +kubebuilder:rbac:groups="",resources=configmaps,verbs=get;list;watch;create;update;patch;delete
-//Reconcile ??
+
+// Reconcile main reconcile loop
 func (r *RuleReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 
 	ctx := context.Background()

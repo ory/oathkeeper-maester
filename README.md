@@ -46,8 +46,8 @@ Usage example: `./manager [--global-flags] mode [--mode-flags]`
 
 | Name | Description | 
 | :--- | :--- | 
-| **controller** | Start in controller mode, use api-server and configmaps for communication | 
-| **sidecar** | Start in sidecar mode, use local files for communication |
+| **controller** | This is the **default** mode of operation, in which `oathkeeper-maester` is expected to be deployed as a separate deployment. It uses the kubernetes api-server and ConfigMaps to store data. | 
+| **sidecar** | Alternative mode of operation, in which the `oathkeeper-maester` is expected to be deployed as a sidecar container to the main application. It uses local filesystem to create the access rules file. |
 
 ### Global flags
 
