@@ -66,6 +66,8 @@ func main() {
 	var rulesFileName string
 	var rulesFilePath string
 
+	var operator controllers.OperatorMode
+
 	controllerCommand := flag.NewFlagSet("controller", flag.ExitOnError)
 	sidecarCommand := flag.NewFlagSet("sidecar", flag.ExitOnError)
 
@@ -106,18 +108,28 @@ func main() {
 
 	validationConfig := initValidationConfig()
 
+	if sideCarMode {
+		operator = &controllers.FilesOperator{
+			Log:           ctrl.Log.WithName("controllers").WithName("Rule"),
+			RulesFilePath: rulesFilePath,
+		}
+	} else {
+		operator = &controllers.ConfigMapOperator{
+			Client: mgr.GetClient(),
+			Log:    ctrl.Log.WithName("controllers").WithName("Rule"),
+			RuleConfigmap: types.NamespacedName{
+				Name:      rulesConfigmapName,
+				Namespace: rulesConfigmapNamespace,
+			},
+			RulesFileName: rulesFileName,
+		}
+	}
+
 	ruleReconciler := &controllers.RuleReconciler{
 		Client:           mgr.GetClient(),
 		Log:              ctrl.Log.WithName("controllers").WithName("Rule"),
 		ValidationConfig: validationConfig,
-		RulesFileName:    rulesFileName,
-		IsSideCar:        sideCarMode,
-	}
-
-	if sideCarMode {
-		ruleReconciler.RulesFilePath = rulesFilePath
-	} else {
-		ruleReconciler.RuleConfigmap = types.NamespacedName{Name: rulesConfigmapName, Namespace: rulesConfigmapNamespace}
+		OperatorMode:     operator,
 	}
 
 	err = (ruleReconciler).SetupWithManager(mgr)
