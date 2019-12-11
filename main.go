@@ -73,10 +73,10 @@ func main() {
 	flag.StringVar(&metricsAddr, "metrics-addr", ":8080", "The address the metric endpoint binds to.")
 	flag.BoolVar(&enableLeaderElection, "enable-leader-election", false,
 		"Enable leader election for controller manager. Enabling this will ensure there is only one active controller manager.")
-	flag.StringVar(&rulesFileName, "rulesFileName", "access-rules.json", "Name of the file with converted Oathkeeper rules")
 
 	controllerCommand.StringVar(&rulesConfigmapName, "rulesConfigmapName", "oathkeeper-rules", "Name of the Configmap that stores Oathkeeper rules.")
 	controllerCommand.StringVar(&rulesConfigmapNamespace, "rulesConfigmapNamespace", "oathkeeper-maester-system", "Namespace of the Configmap that stores Oathkeeper rules.")
+	controllerCommand.StringVar(&rulesFileName, "rulesFileName", "access-rules.json", "Name of the key in ConfigMap containing the rules.json")
 
 	sidecarCommand.StringVar(&rulesFilePath, "rulesFilePath", "/etc/config/access-rules.json", "Path to the file with converted Oathkeeper rules")
 

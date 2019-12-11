@@ -55,7 +55,6 @@ Usage example: `./manager [--global-flags] mode [--mode-flags]`
 | :--- | :--- | :---: |
 | **metrics-addr** | The address the metric endpoint binds to | `8080` |
 | **enable-leader-election** | Enable leader election for controller manager. Enabling this will ensure there is only one active controller manager. | `false` | 
-| **rulesFileName** | Name of the file with converted Oathkeeper rules | `access-rules.json` |
 | **kubeconfig** | Paths to a kubeconfig. Only required if out-of-cluster. | `$KUBECONFIG` | 
 
 ### Controller mode flags
@@ -64,6 +63,7 @@ Usage example: `./manager [--global-flags] mode [--mode-flags]`
 | :--- | :--- | :---: |
 | **rulesConfigmapName** | Name of the Configmap that stores Oathkeeper rules. | `oathkeeper-rules` |
 | **rulesConfigmapNamespace** | Namespace of the Configmap that stores Oathkeeper rules. | `oathkeeper-maester-system` | 
+| **rulesFileName** | Name of the key in ConfigMap containing the rules.json | `access-rules.json` |
 
 ### Sidecar mode flags
 
