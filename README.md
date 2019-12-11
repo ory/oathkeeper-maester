@@ -39,4 +39,35 @@ Set `KUBECONFIG` environment variable to the proper value.
 
 Refer to the Makefile for the details.
 
+## Command-line parameters
+Usage example: `./manager [--global-flags] mode [--mode-flags]`
+
+### Mode options
+
+| Name | Description | 
+| :--- | :--- | 
+| **controller** | This is the **default** mode of operation, in which `oathkeeper-maester` is expected to be deployed as a separate deployment. It uses the kubernetes api-server and ConfigMaps to store data. | 
+| **sidecar** | Alternative mode of operation, in which the `oathkeeper-maester` is expected to be deployed as a sidecar container to the main application. It uses local filesystem to create the access rules file. |
+
+### Global flags
+
+| Name | Description | Default values |
+| :--- | :--- | :---: |
+| **metrics-addr** | The address the metric endpoint binds to | `8080` |
+| **enable-leader-election** | Enable leader election for controller manager. Enabling this will ensure there is only one active controller manager. | `false` | 
+| **kubeconfig** | Paths to a kubeconfig. Only required if out-of-cluster. | `$KUBECONFIG` | 
+
+### Controller mode flags
+
+| Name | Description | Default values |
+| :--- | :--- | :---: |
+| **rulesConfigmapName** | Name of the Configmap that stores Oathkeeper rules. | `oathkeeper-rules` |
+| **rulesConfigmapNamespace** | Namespace of the Configmap that stores Oathkeeper rules. | `oathkeeper-maester-system` | 
+| **rulesFileName** | Name of the key in ConfigMap containing the rules.json | `access-rules.json` |
+
+### Sidecar mode flags
+
+| Name | Description | Default values |
+| :--- | :--- | :---: |
+| **rulesFilePath** | Path to the file with converted Oathkeeper rules | `/etc/config/access-rules.json` |
 

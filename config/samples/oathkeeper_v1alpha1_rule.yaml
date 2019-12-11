@@ -1,19 +1,21 @@
+---
 apiVersion: oathkeeper.ory.sh/v1alpha1
 kind: Rule
 metadata:
   name: sample-rule-1
   namespace: default
 spec:
+  description: Sample rule
   upstream:
     url: "http://abc.ef"
     preserveHost: false
   match:
-    url: "http://gh.ij"
-    methods: ["GET", "POST"]
+    methods: ["GET"]
+    url: <http|https>://foo.bar
   authenticators:
   - handler: anonymous
   authorizer:
     handler: allow
-  mutator:
-    handler: noop
+  mutators:
+  - handler: noop
     config: {}

@@ -27,10 +27,7 @@ import (
 	"github.com/ory/oathkeeper-maester/internal/validation"
 
 	"github.com/avast/retry-go"
-	apiv1 "k8s.io/api/core/v1"
 	apierrs "k8s.io/apimachinery/pkg/api/errors"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/types"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
@@ -38,23 +35,23 @@ import (
 const (
 	retryAttempts = 5
 	retryDelay    = time.Second * 2
-	FinalizerName = "finalizer.ory.oathkeeper.sh"
+	// FinalizerName name of the finalier
+	FinalizerName = "finalizer.oathkeeper.ory.sh"
 )
 
 // RuleReconciler reconciles a Rule object
 type RuleReconciler struct {
 	client.Client
 	Log              logr.Logger
-	RuleConfigmap    types.NamespacedName
 	ValidationConfig validation.Config
-	RulesFileName    string
+	OperatorMode
 }
 
 // +kubebuilder:rbac:groups=oathkeeper.ory.sh,resources=rules,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=oathkeeper.ory.sh,resources=rules/status,verbs=get;update;patch
 // +kubebuilder:rbac:groups="",resources=configmaps,verbs=get;list;watch;create;update;patch;delete
 
-//Reconcile ??
+// Reconcile main reconcile loop
 func (r *RuleReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 
 	ctx := context.Background()
@@ -133,91 +130,18 @@ func (r *RuleReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 		return ctrl.Result{}, err
 	}
 
-	configMap := r.RuleConfigmap
-	if rule.Spec.ConfigMapName != nil {
-		configMap = types.NamespacedName{
-			Name:      *rule.Spec.ConfigMapName,
-			Namespace: req.NamespacedName.Namespace,
-		}
-	}
-	if err := r.updateOrCreateRulesConfigmap(ctx, configMap, string(oathkeeperRulesJSON)); err != nil {
+	if err := r.OperatorMode.CreateOrUpdate(ctx, oathkeeperRulesJSON, &rule); err != nil {
 		r.Log.Error(err, "unable to process rules Configmap")
 		os.Exit(1)
 	}
-
 	return ctrl.Result{}, nil
 }
 
 //SetupWithManager ??
 func (r *RuleReconciler) SetupWithManager(mgr ctrl.Manager) error {
-	return ctrl.NewControllerManagedBy(mgr).
-		For(&oathkeeperv1alpha1.Rule{}).
-		Owns(&apiv1.ConfigMap{}).
-		Complete(r)
-}
-
-func (r *RuleReconciler) updateOrCreateRulesConfigmap(ctx context.Context, configMap types.NamespacedName, data string) error {
-
-	var oathkeeperRulesConfigmap apiv1.ConfigMap
-	var exists = false
-
-	fetchMapFunc := func() error {
-
-		if err := r.Get(ctx, configMap, &oathkeeperRulesConfigmap); err != nil {
-
-			if apierrs.IsForbidden(err) {
-				return retry.Unrecoverable(err)
-			}
-
-			if apierrs.IsNotFound(err) {
-				return nil
-			}
-
-			return err
-		}
-
-		exists = true
-		return nil
-	}
-
-	createMapFunc := func() error {
-		r.Log.Info("creating ConfigMap")
-		oathkeeperRulesConfigmap = apiv1.ConfigMap{
-			ObjectMeta: metav1.ObjectMeta{
-				Name:      configMap.Name,
-				Namespace: configMap.Namespace,
-			},
-			Data: map[string]string{r.RulesFileName: data},
-		}
-		return r.Create(ctx, &oathkeeperRulesConfigmap)
-	}
-
-	updateMapFunc := func() error {
-		r.Log.Info("updating ConfigMap")
-		oathkeeperRulesConfigmap.Data = map[string]string{r.RulesFileName: data}
-		err := r.Update(ctx, &oathkeeperRulesConfigmap)
-		return err
-	}
-
-	return retryOnError(func() error {
-		exists = false
-
-		if err := fetchMapFunc(); err != nil {
-			return err
-		}
-
-		if exists {
-			err := updateMapFunc()
-			if err != nil {
-				if isObjectHasBeenModified(err) {
-					r.Log.Error(err, "incorrect object version during ConfigMap update")
-				}
-			}
-			return err
-		}
-
-		return createMapFunc()
-	})
+	bldr := ctrl.NewControllerManagedBy(mgr).
+		For(&oathkeeperv1alpha1.Rule{})
+	return r.OperatorMode.Owns(bldr).Complete(r)
 }
 
 func isObjectHasBeenModified(err error) bool {

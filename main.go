@@ -18,10 +18,11 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/ory/oathkeeper-maester/internal/validation"
 	"os"
 	"regexp"
 	"strings"
+
+	"github.com/ory/oathkeeper-maester/internal/validation"
 
 	oathkeeperv1alpha1 "github.com/ory/oathkeeper-maester/api/v1alpha1"
 	"github.com/ory/oathkeeper-maester/controllers"
@@ -62,17 +63,32 @@ func main() {
 	var rulesConfigmapName string
 	var rulesConfigmapNamespace string
 	var rulesFileName string
+	var rulesFilePath string
+
+	var operator controllers.OperatorMode
+
+	controllerCommand := flag.NewFlagSet("controller", flag.ExitOnError)
+	sidecarCommand := flag.NewFlagSet("sidecar", flag.ExitOnError)
 
 	flag.StringVar(&metricsAddr, "metrics-addr", ":8080", "The address the metric endpoint binds to.")
 	flag.BoolVar(&enableLeaderElection, "enable-leader-election", false,
 		"Enable leader election for controller manager. Enabling this will ensure there is only one active controller manager.")
-	flag.StringVar(&rulesConfigmapName, "rulesConfigmapName", "oathkeeper-rules", "Name of the Configmap that stores Oathkeeper rules.")
-	flag.StringVar(&rulesConfigmapNamespace, "rulesConfigmapNamespace", "oathkeeper-maester-system", "Namespace of the Configmap that stores Oathkeeper rules.")
-	flag.StringVar(&rulesFileName, "rulesFileName", "access-rules.json", "Name of the file with converted Oathkeeper rules")
+
+	controllerCommand.StringVar(&rulesConfigmapName, "rulesConfigmapName", "oathkeeper-rules", "Name of the Configmap that stores Oathkeeper rules.")
+	controllerCommand.StringVar(&rulesConfigmapNamespace, "rulesConfigmapNamespace", "oathkeeper-maester-system", "Namespace of the Configmap that stores Oathkeeper rules.")
+	controllerCommand.StringVar(&rulesFileName, "rulesFileName", "access-rules.json", "Name of the key in ConfigMap containing the rules.json")
+
+	sidecarCommand.StringVar(&rulesFilePath, "rulesFilePath", "/etc/config/access-rules.json", "Path to the file with converted Oathkeeper rules")
 
 	flag.Parse()
 
 	ctrl.SetLogger(zap.Logger(true))
+
+	sideCarMode, err := selectMode(flag.Args(), controllerCommand, sidecarCommand)
+	if err != nil {
+		setupLog.Error(err, "problem parsing flags")
+		os.Exit(1)
+	}
 
 	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
 		Scheme:             scheme,
@@ -91,14 +107,31 @@ func main() {
 
 	validationConfig := initValidationConfig()
 
-	err = (&controllers.RuleReconciler{
+	if sideCarMode {
+		operator = &controllers.FilesOperator{
+			Log:           ctrl.Log.WithName("controllers").WithName("Rule"),
+			RulesFilePath: rulesFilePath,
+		}
+	} else {
+		operator = &controllers.ConfigMapOperator{
+			Client: mgr.GetClient(),
+			Log:    ctrl.Log.WithName("controllers").WithName("Rule"),
+			DefaultConfigMap: types.NamespacedName{
+				Name:      rulesConfigmapName,
+				Namespace: rulesConfigmapNamespace,
+			},
+			RulesFileName: rulesFileName,
+		}
+	}
+
+	ruleReconciler := &controllers.RuleReconciler{
 		Client:           mgr.GetClient(),
 		Log:              ctrl.Log.WithName("controllers").WithName("Rule"),
-		RuleConfigmap:    types.NamespacedName{Name: rulesConfigmapName, Namespace: rulesConfigmapNamespace},
 		ValidationConfig: validationConfig,
-		RulesFileName:    rulesFileName,
-	}).SetupWithManager(mgr)
-	if err != nil {
+		OperatorMode:     operator,
+	}
+
+	if err := ruleReconciler.SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "Rule")
 		os.Exit(1)
 	}
@@ -152,4 +185,31 @@ func validateRulesFileName(rfn string) error {
 		return nil
 	}
 	return fmt.Errorf("rulesFileName: %s is not a valid name", rfn)
+}
+
+func selectMode(args []string, controllerCommand *flag.FlagSet, sidecarCommand *flag.FlagSet) (bool, error) {
+	sidecar := true
+	controller := false
+
+	if len(args) < 1 {
+		setupLog.Info("running in controller mode")
+		return controller, nil
+	}
+
+	switch args[0] {
+	case "controller":
+		if err := controllerCommand.Parse(args[1:]); err != nil {
+			return false, err
+		}
+		setupLog.Info("running in controller mode")
+		return controller, nil
+	case "sidecar":
+		if err := sidecarCommand.Parse(args[1:]); err != nil {
+			return false, err
+		}
+		setupLog.Info("running in sidecar mode")
+		return sidecar, nil
+	default:
+		return false, fmt.Errorf(`modes "controller" and "sidecar" are supported but got: %s`, args[0])
+	}
 }
