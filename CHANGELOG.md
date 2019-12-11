@@ -3,6 +3,8 @@
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [Change Log](#change-log)
+  - [Unreleased](#unreleased)
+  - [v0.0.5 (2019-12-11)](#v005-2019-12-11)
   - [v0.0.4 (2019-12-11)](#v004-2019-12-11)
   - [v0.0.3 (2019-11-18)](#v003-2019-11-18)
   - [v0.0.2-beta-2 (2019-11-12)](#v002-beta-2-2019-11-12)
@@ -14,6 +16,21 @@
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 # Change Log
+
+## [Unreleased](https://github.com/ory/oathkeeper-maester/tree/HEAD)
+
+[Full Changelog](https://github.com/ory/oathkeeper-maester/compare/v0.0.5...HEAD)
+
+**Closed issues:**
+
+- High memory consumption in clusters with many ConfigMaps [\#32](https://github.com/ory/oathkeeper-maester/issues/32)
+
+## [v0.0.5](https://github.com/ory/oathkeeper-maester/tree/v0.0.5) (2019-12-11)
+[Full Changelog](https://github.com/ory/oathkeeper-maester/compare/v0.0.4...v0.0.5)
+
+**Merged pull requests:**
+
+- Don't watch ConfigMaps [\#33](https://github.com/ory/oathkeeper-maester/pull/33) ([Tomasz-Smelcerz-SAP](https://github.com/Tomasz-Smelcerz-SAP))
 
 ## [v0.0.4](https://github.com/ory/oathkeeper-maester/tree/v0.0.4) (2019-12-11)
 [Full Changelog](https://github.com/ory/oathkeeper-maester/compare/v0.0.3...v0.0.4)
@@ -31,7 +48,6 @@
 
 **Merged pull requests:**
 
-- Feature: configurable configmap [\#30](https://github.com/ory/oathkeeper-maester/pull/30) ([paulbdavis](https://github.com/paulbdavis))
 - Update CI config [\#29](https://github.com/ory/oathkeeper-maester/pull/29) ([piotrmsc](https://github.com/piotrmsc))
 
 ## [v0.0.2-beta-2](https://github.com/ory/oathkeeper-maester/tree/v0.0.2-beta-2) (2019-11-12)
@@ -43,6 +59,7 @@
 
 **Merged pull requests:**
 
+- Refactor retry logic to handle conflict on updates. [\#26](https://github.com/ory/oathkeeper-maester/pull/26) ([Tomasz-Smelcerz-SAP](https://github.com/Tomasz-Smelcerz-SAP))
 - Add 'hydrator' mutator to the list of default mutators [\#23](https://github.com/ory/oathkeeper-maester/pull/23) ([kubadz](https://github.com/kubadz))
 
 ## [v0.0.2-beta.1](https://github.com/ory/oathkeeper-maester/tree/v0.0.2-beta.1) (2019-08-12)
@@ -54,7 +71,6 @@
 
 **Merged pull requests:**
 
-- Refactor retry logic to handle conflict on updates. [\#26](https://github.com/ory/oathkeeper-maester/pull/26) ([Tomasz-Smelcerz-SAP](https://github.com/Tomasz-Smelcerz-SAP))
 - Fix [\#22](https://github.com/ory/oathkeeper-maester/pull/22) ([piotrmsc](https://github.com/piotrmsc))
 - Support multiple mutators [\#20](https://github.com/ory/oathkeeper-maester/pull/20) ([jakkab](https://github.com/jakkab))
 - Update Measter readme [\#19](https://github.com/ory/oathkeeper-maester/pull/19) ([tomekpapiernik](https://github.com/tomekpapiernik))
@@ -83,6 +99,7 @@
 ## [v0.0.1-beta.1](https://github.com/ory/oathkeeper-maester/tree/v0.0.1-beta.1) (2019-07-29)
 **Merged pull requests:**
 
+- Feature: configurable configmap [\#30](https://github.com/ory/oathkeeper-maester/pull/30) ([paulbdavis](https://github.com/paulbdavis))
 - Move dataKey to cmd parameters [\#12](https://github.com/ory/oathkeeper-maester/pull/12) ([Demonsthere](https://github.com/Demonsthere))
 - Release step in the CI [\#11](https://github.com/ory/oathkeeper-maester/pull/11) ([piotrmsc](https://github.com/piotrmsc))
 - Rule controller tests [\#8](https://github.com/ory/oathkeeper-maester/pull/8) ([Tomasz-Smelcerz-SAP](https://github.com/Tomasz-Smelcerz-SAP))
