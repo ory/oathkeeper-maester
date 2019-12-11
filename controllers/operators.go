@@ -22,13 +22,13 @@ type OperatorMode interface {
 	// CreateOrUpdate ORY Oathkeeper Access Rule list using implementation-specific means.
 	// oathkeeperRulesJSON - serialized JSON with an array of objects that conform to Oathkeeper Rule syntax
 	// triggeredBy - the recently created/update rule that triggered the operation
-	CreateOrUpdate(ctx context.Context, oathkeeperRulesJSON []byte, triggeredBy *oathkeeperv1alpha1.Rule)
+	CreateOrUpdate(ctx context.Context, oathkeeperRulesJSON []byte, triggeredBy *oathkeeperv1alpha1.Rule) error
 
 	//Registers additional K8s types necessary for the specific mode to work
 	Owns(*builder.Builder) *builder.Builder
 }
 
-//OperatorMode that maintains Oathkeeper rules as an json-formatted entry in a ConfigMap
+//ConfigMapOperator that maintains Oathkeeper rules as an json-formatted entry in a ConfigMap
 type ConfigMapOperator struct {
 	client.Client
 	Log              logr.Logger
@@ -36,7 +36,7 @@ type ConfigMapOperator struct {
 	RulesFileName    string
 }
 
-//OperatorMode that maintains Oathkeeper rules as a flat json file in a local filesystem
+//FilesOperator that maintains Oathkeeper rules as a flat json file in a local filesystem
 type FilesOperator struct {
 	Log           logr.Logger
 	RulesFilePath string
@@ -106,7 +106,7 @@ func (cmo *ConfigMapOperator) updateOrCreateRulesConfigmap(ctx context.Context, 
 	})
 }
 
-func (cmo *ConfigMapOperator) CreateOrUpdate(ctx context.Context, oathkeeperRulesJSON []byte, triggeredBy *oathkeeperv1alpha1.Rule) {
+func (cmo *ConfigMapOperator) CreateOrUpdate(ctx context.Context, oathkeeperRulesJSON []byte, triggeredBy *oathkeeperv1alpha1.Rule) error {
 
 	configMapRef := cmo.DefaultConfigMap
 	if triggeredBy != nil && triggeredBy.Spec.ConfigMapName != nil && len(*triggeredBy.Spec.ConfigMapName) > 0 {
@@ -115,11 +115,7 @@ func (cmo *ConfigMapOperator) CreateOrUpdate(ctx context.Context, oathkeeperRule
 			Namespace: triggeredBy.ObjectMeta.Namespace,
 		}
 	}
-
-	if err := cmo.updateOrCreateRulesConfigmap(ctx, configMapRef, string(oathkeeperRulesJSON)); err != nil {
-		cmo.Log.Error(err, "unable to process rules Configmap")
-		os.Exit(1)
-	}
+	return cmo.updateOrCreateRulesConfigmap(ctx, configMapRef, string(oathkeeperRulesJSON))
 }
 
 func (cmo *ConfigMapOperator) Owns(bldr *builder.Builder) *builder.Builder {
@@ -145,16 +141,12 @@ func (fo *FilesOperator) updateOrCreateRulesFile(ctx context.Context, data strin
 	return nil
 }
 
-func (fo *FilesOperator) CreateOrUpdate(ctx context.Context, oathkeeperRulesJSON []byte, triggeredBy *oathkeeperv1alpha1.Rule) {
+func (fo *FilesOperator) CreateOrUpdate(ctx context.Context, oathkeeperRulesJSON []byte, triggeredBy *oathkeeperv1alpha1.Rule) error {
 	if triggeredBy != nil && triggeredBy.Spec.ConfigMapName != nil && len(*triggeredBy.Spec.ConfigMapName) > 0 {
 		fo.Log.Info("Ignoring Spec.ConfigMapName value - sidecar mode enabled")
 	}
 
-	err := fo.updateOrCreateRulesFile(ctx, string(oathkeeperRulesJSON))
-	if err != nil {
-		fo.Log.Error(err, "unable to process rules Configmap")
-		os.Exit(1)
-	}
+	return fo.updateOrCreateRulesFile(ctx, string(oathkeeperRulesJSON))
 }
 
 func (fo *FilesOperator) Owns(bldr *builder.Builder) *builder.Builder {

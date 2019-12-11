@@ -18,6 +18,7 @@ package controllers
 import (
 	"context"
 	"fmt"
+	"os"
 	"strings"
 	"time"
 
@@ -129,8 +130,10 @@ func (r *RuleReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 		return ctrl.Result{}, err
 	}
 
-	r.OperatorMode.CreateOrUpdate(ctx, oathkeeperRulesJSON, &rule)
-
+	if err := r.OperatorMode.CreateOrUpdate(ctx, oathkeeperRulesJSON, &rule); err != nil {
+		r.Log.Error(err, "unable to process rules Configmap")
+		os.Exit(1)
+	}
 	return ctrl.Result{}, nil
 }
 
