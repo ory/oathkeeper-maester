@@ -5,6 +5,11 @@
 - [oathkeeper-maester](#oathkeeper-maester)
   - [Prerequisites](#prerequisites)
   - [How to use it](#how-to-use-it)
+  - [Command-line parameters](#command-line-parameters)
+    - [Mode options](#mode-options)
+    - [Global flags](#global-flags)
+    - [Controller mode flags](#controller-mode-flags)
+    - [Sidecar mode flags](#sidecar-mode-flags)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 

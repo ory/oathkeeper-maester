@@ -3,6 +3,7 @@
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [Change Log](#change-log)
+  - [v0.0.4 (2019-12-11)](#v004-2019-12-11)
   - [v0.0.3 (2019-11-18)](#v003-2019-11-18)
   - [v0.0.2-beta-2 (2019-11-12)](#v002-beta-2-2019-11-12)
   - [v0.0.2-beta.1 (2019-08-12)](#v002-beta1-2019-08-12)
@@ -13,6 +14,13 @@
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 # Change Log
+
+## [v0.0.4](https://github.com/ory/oathkeeper-maester/tree/v0.0.4) (2019-12-11)
+[Full Changelog](https://github.com/ory/oathkeeper-maester/compare/v0.0.3...v0.0.4)
+
+**Merged pull requests:**
+
+- Add sidecar mode [\#31](https://github.com/ory/oathkeeper-maester/pull/31) ([Demonsthere](https://github.com/Demonsthere))
 
 ## [v0.0.3](https://github.com/ory/oathkeeper-maester/tree/v0.0.3) (2019-11-18)
 [Full Changelog](https://github.com/ory/oathkeeper-maester/compare/v0.0.2-beta-2...v0.0.3)
@@ -46,6 +54,7 @@
 
 **Merged pull requests:**
 
+- Refactor retry logic to handle conflict on updates. [\#26](https://github.com/ory/oathkeeper-maester/pull/26) ([Tomasz-Smelcerz-SAP](https://github.com/Tomasz-Smelcerz-SAP))
 - Fix [\#22](https://github.com/ory/oathkeeper-maester/pull/22) ([piotrmsc](https://github.com/piotrmsc))
 - Support multiple mutators [\#20](https://github.com/ory/oathkeeper-maester/pull/20) ([jakkab](https://github.com/jakkab))
 - Update Measter readme [\#19](https://github.com/ory/oathkeeper-maester/pull/19) ([tomekpapiernik](https://github.com/tomekpapiernik))
@@ -74,7 +83,6 @@
 ## [v0.0.1-beta.1](https://github.com/ory/oathkeeper-maester/tree/v0.0.1-beta.1) (2019-07-29)
 **Merged pull requests:**
 
-- Refactor retry logic to handle conflict on updates. [\#26](https://github.com/ory/oathkeeper-maester/pull/26) ([Tomasz-Smelcerz-SAP](https://github.com/Tomasz-Smelcerz-SAP))
 - Move dataKey to cmd parameters [\#12](https://github.com/ory/oathkeeper-maester/pull/12) ([Demonsthere](https://github.com/Demonsthere))
 - Release step in the CI [\#11](https://github.com/ory/oathkeeper-maester/pull/11) ([piotrmsc](https://github.com/piotrmsc))
 - Rule controller tests [\#8](https://github.com/ory/oathkeeper-maester/pull/8) ([Tomasz-Smelcerz-SAP](https://github.com/Tomasz-Smelcerz-SAP))
