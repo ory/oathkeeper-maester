@@ -13,7 +13,6 @@ import (
 	apierrs "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
-	"sigs.k8s.io/controller-runtime/pkg/builder"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
@@ -23,9 +22,6 @@ type OperatorMode interface {
 	// oathkeeperRulesJSON - serialized JSON with an array of objects that conform to Oathkeeper Rule syntax
 	// triggeredBy - the recently created/update rule that triggered the operation
 	CreateOrUpdate(ctx context.Context, oathkeeperRulesJSON []byte, triggeredBy *oathkeeperv1alpha1.Rule) error
-
-	//Registers additional K8s types necessary for the specific mode to work
-	Owns(*builder.Builder) *builder.Builder
 }
 
 //ConfigMapOperator that maintains Oathkeeper rules as an json-formatted entry in a ConfigMap
@@ -118,10 +114,6 @@ func (cmo *ConfigMapOperator) CreateOrUpdate(ctx context.Context, oathkeeperRule
 	return cmo.updateOrCreateRulesConfigmap(ctx, configMapRef, string(oathkeeperRulesJSON))
 }
 
-func (cmo *ConfigMapOperator) Owns(bldr *builder.Builder) *builder.Builder {
-	return bldr.Owns(&apiv1.ConfigMap{})
-}
-
 func (fo *FilesOperator) updateOrCreateRulesFile(ctx context.Context, data string) error {
 	var f *os.File
 	f, err := os.Create(fo.RulesFilePath)
@@ -147,9 +139,4 @@ func (fo *FilesOperator) CreateOrUpdate(ctx context.Context, oathkeeperRulesJSON
 	}
 
 	return fo.updateOrCreateRulesFile(ctx, string(oathkeeperRulesJSON))
-}
-
-func (fo *FilesOperator) Owns(bldr *builder.Builder) *builder.Builder {
-	//NO-OP
-	return bldr
 }

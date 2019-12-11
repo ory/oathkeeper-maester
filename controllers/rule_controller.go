@@ -139,9 +139,9 @@ func (r *RuleReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 
 //SetupWithManager ??
 func (r *RuleReconciler) SetupWithManager(mgr ctrl.Manager) error {
-	bldr := ctrl.NewControllerManagedBy(mgr).
-		For(&oathkeeperv1alpha1.Rule{})
-	return r.OperatorMode.Owns(bldr).Complete(r)
+	return ctrl.NewControllerManagedBy(mgr).
+		For(&oathkeeperv1alpha1.Rule{}).
+		Complete(r)
 }
 
 func isObjectHasBeenModified(err error) bool {
