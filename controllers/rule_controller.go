@@ -58,6 +58,7 @@ func (r *RuleReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	_ = r.Log.WithValues("rule", req.NamespacedName)
 
 	var rule oathkeeperv1alpha1.Rule
+
 	skipValidation := false
 
 	if err := r.Get(ctx, req.NamespacedName, &rule); err != nil {
@@ -123,11 +124,20 @@ func (r *RuleReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 		}
 	}
 
-	oathkeeperRulesJSON, err := rulesList.FilterNotValid().
-		FilterConfigMapName(rule.Spec.ConfigMapName).
-		ToOathkeeperRules()
-	if err != nil {
-		return ctrl.Result{}, err
+	var err error
+	var oathkeeperRulesJSON []byte
+
+	if rule.Spec.ConfigMapName != nil {
+		r.Log.Info(fmt.Sprintf("Found ConfigMap definition in Rule %s/%s: Writing data to \"%s\"", rule.Namespace, rule.Name, *rule.Spec.ConfigMapName))
+		oathkeeperRulesJSON, err = rulesList.FilterNotValid().FilterConfigMapName(rule.Spec.ConfigMapName).ToOathkeeperRules()
+		if err != nil {
+			return ctrl.Result{}, err
+		}
+	} else {
+		oathkeeperRulesJSON, err = rulesList.FilterNotValid().ToOathkeeperRules()
+		if err != nil {
+			return ctrl.Result{}, err
+		}
 	}
 
 	if err := r.OperatorMode.CreateOrUpdate(ctx, oathkeeperRulesJSON, &rule); err != nil {

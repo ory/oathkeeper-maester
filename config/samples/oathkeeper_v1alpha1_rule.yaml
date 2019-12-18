@@ -19,3 +19,25 @@ spec:
   mutators:
   - handler: noop
     config: {}
+---
+apiVersion: oathkeeper.ory.sh/v1alpha1
+kind: Rule
+metadata:
+  name: sample-rule-2
+  namespace: default
+spec:
+  configMapName: some-cm
+  description: Sample rule
+  upstream:
+    url: "http://abc.ef"
+    preserveHost: false
+  match:
+    methods: ["GET"]
+    url: <http|https>://foo.bar
+  authenticators:
+  - handler: anonymous
+  authorizer:
+    handler: allow
+  mutators:
+  - handler: noop
+    config: {}
