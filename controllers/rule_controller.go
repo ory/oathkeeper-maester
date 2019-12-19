@@ -95,8 +95,14 @@ func (r *RuleReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 
 	var rulesList oathkeeperv1alpha1.RuleList
 
-	if err := r.List(ctx, &rulesList, client.InNamespace(req.NamespacedName.Namespace)); err != nil {
-		return ctrl.Result{}, err
+	if rule.Spec.ConfigMapName != nil {
+		if err := r.List(ctx, &rulesList, client.InNamespace(req.NamespacedName.Namespace)); err != nil {
+			return ctrl.Result{}, err
+		}
+	} else {
+		if err := r.List(ctx, &rulesList); err != nil {
+			return ctrl.Result{}, err
+		}
 	}
 
 	// examine DeletionTimestamp to determine if object is under deletion
