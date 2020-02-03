@@ -3,6 +3,7 @@
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [Change Log](#change-log)
+  - [v0.0.8+oryOS.15 (2019-12-26)](#v008oryos15-2019-12-26)
   - [v0.0.7 (2019-12-20)](#v007-2019-12-20)
   - [v0.0.6 (2019-12-20)](#v006-2019-12-20)
   - [v0.0.5 (2019-12-11)](#v005-2019-12-11)
@@ -17,6 +18,9 @@
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 # Change Log
+
+## [v0.0.8+oryOS.15](https://github.com/ory/oathkeeper-maester/tree/v0.0.8+oryOS.15) (2019-12-26)
+[Full Changelog](https://github.com/ory/oathkeeper-maester/compare/v0.0.7...v0.0.8+oryOS.15)
 
 ## [v0.0.7](https://github.com/ory/oathkeeper-maester/tree/v0.0.7) (2019-12-20)
 [Full Changelog](https://github.com/ory/oathkeeper-maester/compare/v0.0.6...v0.0.7)
@@ -82,6 +86,7 @@
 **Merged pull requests:**
 
 - Fix [\#22](https://github.com/ory/oathkeeper-maester/pull/22) ([piotrmsc](https://github.com/piotrmsc))
+- Support multiple mutators [\#20](https://github.com/ory/oathkeeper-maester/pull/20) ([jakkab](https://github.com/jakkab))
 - Update Measter readme [\#19](https://github.com/ory/oathkeeper-maester/pull/19) ([tomekpapiernik](https://github.com/tomekpapiernik))
 
 ## [v0.0.1-beta.3](https://github.com/ory/oathkeeper-maester/tree/v0.0.1-beta.3) (2019-07-30)
@@ -96,7 +101,6 @@
 
 **Merged pull requests:**
 
-- Support multiple mutators [\#20](https://github.com/ory/oathkeeper-maester/pull/20) ([jakkab](https://github.com/jakkab))
 - Project renaming [\#18](https://github.com/ory/oathkeeper-maester/pull/18) ([piotrmsc](https://github.com/piotrmsc))
 - Rename docker image to `oathkeeper-maester` [\#17](https://github.com/ory/oathkeeper-maester/pull/17) ([aeneasr](https://github.com/aeneasr))
 - Fix default value for rulesFileName [\#16](https://github.com/ory/oathkeeper-maester/pull/16) ([Demonsthere](https://github.com/Demonsthere))
