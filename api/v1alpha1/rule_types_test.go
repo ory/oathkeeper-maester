@@ -35,7 +35,7 @@ var (
     },
     "id": "foo1.default",
     "match": {
-      "url": "http://my-app/some-route1",
+      "url": "http://my-app/some-route1<.*>",
       "methods": [
         "GET",
         "POST"
@@ -187,7 +187,7 @@ func TestToOathkeeperRules(t *testing.T) {
 				"foo1",
 				"default",
 				"http://my-backend-service1",
-				"http://my-app/some-route1",
+				"http://my-app/some-route1<.*>",
 				newStringPtr("/api/v1"),
 				nil,
 				newBoolPtr(true),
