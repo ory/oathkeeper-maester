@@ -1,7 +1,5 @@
 package v1alpha1
 
-import "encoding/json"
-
 // RuleJson is a representation of an Oathkeeper rule.
 type RuleJSON struct {
 	ID       string `json:"id"`
@@ -13,7 +11,7 @@ func (rj RuleJSON) MarshalJSON() ([]byte, error) {
 
 	type Alias RuleJSON
 
-	return json.Marshal(&struct {
+	return unescapedMarshal(&struct {
 		Upstream *UpstreamJSON `json:"upstream"`
 		Alias
 	}{

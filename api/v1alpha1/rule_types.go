@@ -16,11 +16,12 @@ limitations under the License.
 package v1alpha1
 
 import (
-	"encoding/json"
 	"fmt"
-	"github.com/ory/oathkeeper-maester/internal/validation"
+
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+
+	"github.com/ory/oathkeeper-maester/internal/validation"
 )
 
 const (
@@ -139,7 +140,7 @@ func (rl RuleList) ToOathkeeperRules() ([]byte, error) {
 		rules[i] = rl.Items[i].ToRuleJSON()
 	}
 
-	return json.MarshalIndent(rules, "", "  ")
+	return unescapedMarshalIndent(rules, "", "  ")
 }
 
 // FilterNotValid filters out Rules which doesn't pass validation due to being not processed yet or due to negative result of validation. It returns a list of Rules which passed validation successfully.

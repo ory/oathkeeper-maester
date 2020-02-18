@@ -191,7 +191,7 @@ func TestToOathkeeperRules(t *testing.T) {
 				newStringPtr("/api/v1"),
 				nil,
 				newBoolPtr(true),
-				[]*Authenticator{&Authenticator{h1}},
+				[]*Authenticator{{h1}},
 				nil,
 				[]*Mutator{{h1}, {h2}})
 
@@ -203,7 +203,7 @@ func TestToOathkeeperRules(t *testing.T) {
 				nil,
 				nil,
 				newBoolPtr(false),
-				[]*Authenticator{&Authenticator{h1}, {h2}},
+				[]*Authenticator{{h1}, {h2}},
 				nil,
 				nil)
 
