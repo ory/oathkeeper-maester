@@ -3,6 +3,7 @@
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [Change Log](#change-log)
+  - [v0.0.9 (2020-02-18)](#v009-2020-02-18)
   - [v0.0.8+oryOS.15 (2019-12-26)](#v008oryos15-2019-12-26)
   - [v0.0.7 (2019-12-20)](#v007-2019-12-20)
   - [v0.0.6 (2019-12-20)](#v006-2019-12-20)
@@ -18,6 +19,17 @@
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 # Change Log
+
+## [v0.0.9](https://github.com/ory/oathkeeper-maester/tree/v0.0.9) (2020-02-18)
+[Full Changelog](https://github.com/ory/oathkeeper-maester/compare/v0.0.8+oryOS.15...v0.0.9)
+
+**Closed issues:**
+
+- \<.\*\> becomes \u003c.\*\u003e [\#38](https://github.com/ory/oathkeeper-maester/issues/38)
+
+**Merged pull requests:**
+
+- fix\(test\): Add failing test case for escaped chars [\#39](https://github.com/ory/oathkeeper-maester/pull/39) ([aeneasr](https://github.com/aeneasr))
 
 ## [v0.0.8+oryOS.15](https://github.com/ory/oathkeeper-maester/tree/v0.0.8+oryOS.15) (2019-12-26)
 [Full Changelog](https://github.com/ory/oathkeeper-maester/compare/v0.0.7...v0.0.8+oryOS.15)
@@ -73,7 +85,6 @@
 
 **Merged pull requests:**
 
-- Refactor retry logic to handle conflict on updates. [\#26](https://github.com/ory/oathkeeper-maester/pull/26) ([Tomasz-Smelcerz-SAP](https://github.com/Tomasz-Smelcerz-SAP))
 - Add 'hydrator' mutator to the list of default mutators [\#23](https://github.com/ory/oathkeeper-maester/pull/23) ([kubadz](https://github.com/kubadz))
 
 ## [v0.0.2-beta.1](https://github.com/ory/oathkeeper-maester/tree/v0.0.2-beta.1) (2019-08-12)
