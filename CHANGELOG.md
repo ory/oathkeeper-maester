@@ -3,6 +3,7 @@
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [Change Log](#change-log)
+  - [v0.1.0 (2020-07-14)](#v010-2020-07-14)
   - [v0.0.10 (2020-02-18)](#v0010-2020-02-18)
   - [v0.0.9 (2020-02-18)](#v009-2020-02-18)
   - [v0.0.8+oryOS.15 (2019-12-26)](#v008oryos15-2019-12-26)
@@ -21,15 +22,22 @@
 
 # Change Log
 
+## [v0.1.0](https://github.com/ory/oathkeeper-maester/tree/v0.1.0) (2020-07-14)
+[Full Changelog](https://github.com/ory/oathkeeper-maester/compare/v0.0.10...v0.1.0)
+
+**Merged pull requests:**
+
+- build: Update k8s packages to 1.17.8 [\#42](https://github.com/ory/oathkeeper-maester/pull/42) ([colunira](https://github.com/colunira))
+
 ## [v0.0.10](https://github.com/ory/oathkeeper-maester/tree/v0.0.10) (2020-02-18)
 [Full Changelog](https://github.com/ory/oathkeeper-maester/compare/v0.0.9...v0.0.10)
-
-## [v0.0.9](https://github.com/ory/oathkeeper-maester/tree/v0.0.9) (2020-02-18)
-[Full Changelog](https://github.com/ory/oathkeeper-maester/compare/v0.0.8+oryOS.15...v0.0.9)
 
 **Closed issues:**
 
 - \<.\*\> becomes \u003c.\*\u003e [\#38](https://github.com/ory/oathkeeper-maester/issues/38)
+
+## [v0.0.9](https://github.com/ory/oathkeeper-maester/tree/v0.0.9) (2020-02-18)
+[Full Changelog](https://github.com/ory/oathkeeper-maester/compare/v0.0.8+oryOS.15...v0.0.9)
 
 **Merged pull requests:**
 
