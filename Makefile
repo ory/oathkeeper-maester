@@ -14,24 +14,25 @@ test: generate fmt vet manifests
 
 # Start KIND pseudo-cluster
 kind-start:
-	GO111MODULE=on go get "sigs.k8s.io/kind@v0.4.0" && kind create cluster
-KUBECONFIG=$(shell kind get kubeconfig-path --name="kind")
+	GO111MODULE=on go get "sigs.k8s.io/kind@v0.7.0" && kind create cluster
 
 # Stop KIND pseudo-cluster
 kind-stop:
-	GO111MODULE=on go get "sigs.k8s.io/kind@v0.4.0" && kind delete cluster
+	GO111MODULE=on go get "sigs.k8s.io/kind@v0.7.0" && kind delete cluster
 
 # Deploy on KIND
 # Ensures the controller image is built, deploys the image to KIND cluster along with necessary configuration
 kind-deploy: manager manifests docker-build-notest kind-start
+	kubectl config set-context kind-kind
 	kind load docker-image controller:latest
-	KUBECONFIG=$(KUBECONFIG) kubectl apply -f config/crd/bases
-	kustomize build config/default | KUBECONFIG=$(KUBECONFIG) kubectl apply -f -
+	kubectl apply -f config/crd/bases
+	kustomize build config/default | kubectl apply -f -
 
 # private
 kind-test: kind-deploy
+	kubectl config set-context kind-kind
 	go get github.com/onsi/ginkgo/ginkgo
-	KUBECONFIG=$(KUBECONFIG) ginkgo -v ./tests/integration/...
+	ginkgo -v ./tests/integration/...
 
 # Run integration tests on local KIND cluster
 test-integration:
@@ -86,7 +87,7 @@ docker-push:
 # download controller-gen if necessary
 controller-gen:
 ifeq (, $(shell which controller-gen))
-	go get sigs.k8s.io/controller-tools/cmd/controller-gen@v0.2.0-beta.2
+	go get sigs.k8s.io/controller-tools/cmd/controller-gen@v0.2.9
 CONTROLLER_GEN=$(shell which controller-gen)
 else
 CONTROLLER_GEN=$(shell which controller-gen)

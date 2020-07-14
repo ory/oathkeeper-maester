@@ -3,6 +3,7 @@ package integration
 import (
 	"errors"
 	"fmt"
+	"k8s.io/client-go/rest"
 	"os"
 	"time"
 
@@ -169,14 +170,7 @@ func expectRuleCount(rulesArray *json.Json, cnt int) {
 }
 
 func getK8sDynamicClientOrDie() dynamic.Interface {
-	var kubeconfig = os.Getenv("KUBECONFIG")
-
-	// use the current context in kubeconfig
-	config, err := clientcmd.BuildConfigFromFlags("", kubeconfig)
-	if err != nil {
-		fmt.Printf("\nError building K8s config: %s\n", err.Error())
-		os.Exit(1)
-	}
+	config := getKubeConfigOrDie()
 
 	// create the client
 	client, err := dynamic.NewForConfig(config)
@@ -189,14 +183,7 @@ func getK8sDynamicClientOrDie() dynamic.Interface {
 }
 
 func getK8sClientOrDie() *kubernetes.Clientset {
-	var kubeconfig = os.Getenv("KUBECONFIG")
-
-	// use the current context in kubeconfig
-	config, err := clientcmd.BuildConfigFromFlags("", kubeconfig)
-	if err != nil {
-		fmt.Printf("\nError building K8s config: %s\n", err.Error())
-		os.Exit(1)
-	}
+	config := getKubeConfigOrDie()
 
 	// create the clientset
 	clientset, err := kubernetes.NewForConfig(config)
@@ -206,6 +193,24 @@ func getK8sClientOrDie() *kubernetes.Clientset {
 	}
 
 	return clientset
+}
+
+func getKubeConfigOrDie() *rest.Config {
+	if _, err := os.Stat(clientcmd.RecommendedHomeFile); os.IsNotExist(err) {
+		cfg, err := rest.InClusterConfig()
+		if err != nil {
+			fmt.Printf("Cannot create in-cluster config: %v", err)
+			panic(err)
+		}
+		return cfg
+	}
+
+	cfg, err := clientcmd.BuildConfigFromFlags("", clientcmd.RecommendedHomeFile)
+	if err != nil {
+		fmt.Printf("Cannot read kubeconfig: %s", err)
+		panic(err)
+	}
+	return cfg
 }
 
 func toNamespace(name string) *corev1.Namespace {
