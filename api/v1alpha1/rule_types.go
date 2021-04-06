@@ -57,6 +57,7 @@ type RuleList struct {
 
 // RuleSpec defines the desired state of Rule
 type RuleSpec struct {
+	// +kubebuilder:validation:Optional
 	// +optional
 	Upstream       *Upstream        `json:"upstream,omitempty"`
 	Match          *Match           `json:"match"`

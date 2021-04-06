@@ -72,49 +72,6 @@ var (
     ]
   },
   {
-  	"upstream": {
-      "url": "",
-      "preserve_host": false
-    },
-    "id": "fooNoUpstream.default",
-    "match": {
-      "url": "http://my-app/some-route1<.*>",
-      "methods": [
-        "GET",
-        "POST"
-      ]
-    },
-    "authenticators": [
-      {
-        "handler": "handler1",
-        "config": {
-          "key1": "val1"
-        }
-      }
-    ],
-    "authorizer": {
-      "handler": "deny"
-    },
-    "mutators": [
-      {
-        "handler": "handler1",
-        "config": {
-          "key1": "val1"
-        }
-      },
-      {
-        "handler": "handler2",
-        "config": {
-          "key1": [
-            "val1",
-            "val2",
-            "val3"
-          ]
-        }
-      }
-    ]
-  }
-  {
     "upstream": {
       "url": "http://my-backend-service2",
       "preserve_host": false
@@ -160,6 +117,36 @@ var (
       "preserve_host": false
     },
     "id": "foo3.default",
+    "match": {
+      "url": "http://my-app/some-route3",
+      "methods": [
+        "GET",
+        "POST"
+      ]
+    },
+    "authenticators": [
+      {
+        "handler": "unauthorized"
+      }
+    ],
+    "authorizer": {
+      "handler": "handler1",
+      "config": {
+        "key1": "val1"
+      }
+    },
+    "mutators": [
+      {
+        "handler": "noop"
+      }
+    ]
+  },
+  {
+    "upstream": {
+      "url": "",
+      "preserve_host": false
+    },
+    "id": "fooNoUpstream.default",
     "match": {
       "url": "http://my-app/some-route3",
       "methods": [
@@ -266,13 +253,13 @@ func TestToOathkeeperRules(t *testing.T) {
 				"fooNoUpstream",
 				"default",
 				"",
-				"",
+				"http://my-app/some-route3",
 				nil,
 				nil,
-				newBoolPtr(false),
-				[]*Authenticator{{h1}},
 				nil,
-				[]*Mutator{{h1}, {h2}})
+				nil,
+				&Authorizer{h1},
+				nil)
 
 			list.Items = []Rule{*rule1, *rule2, *rule3, *rule4}
 

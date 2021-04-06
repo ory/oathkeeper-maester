@@ -131,24 +131,6 @@ var _ = Describe("Oathkeeper controller", func() {
 			Expect(emptyMap.Data[rulesFileName]).To(Equal("[]"))
 		})
 	})
-	Context("should validate compliant rules", func() {
-		It("in validation scenario", func() {
-			By("add rule without all fields")
-			//Given
-			rule, err := getRule(getRuleNoUpstreamJson())
-			Expect(err).To(BeNil())
-			Expect(rule).ToNot(BeNil())
-
-			//When
-			_, createErr := ensureRule(rule)
-			Expect(createErr).To(BeNil())
-
-			//Then
-			rulesArray, validateErr := validateConfigMapContains(rule)
-			Expect(validateErr).To(BeNil())
-			expectRuleCount(rulesArray, 1)
-		})
-	})
 
 })
 
@@ -475,40 +457,6 @@ func getRule2Json() string {
 			        "config": {
 				        "aud": ["audience1", "audience2"]
 			        }
-			    }
-            ]
-		}
-	}
-	`
-}
-
-func getRuleNoUpstreamJson() string {
-	return `{
-		"apiVersion": "oathkeeper.ory.sh/v1alpha1",
-		"kind": "Rule",
-		"metadata": {
-			"name": "test-rule-no-upstream"
-	    },
-		"spec": {
-			"match": {
-				"methods": ["GET", "POST"],
-				"url": "http://gh.ij"
-			},
-			"authenticators": [
-				{"handler": "anonymous"}
-			],
-			"authorizer": {
-				"handler": "allow"
-			},
-			"mutators": [
-                {
-				    "handler": "header",
-				    "config": {
-				        "headers": {
-						    "X-User": "{{ print .Subject }}",
-						    "X-Some-Arbitrary-Data": "{{ print .Extra.some.arbitrary.data }}"
-				        }
-				    }
 			    }
             ]
 		}
