@@ -72,6 +72,49 @@ var (
     ]
   },
   {
+  	"upstream": {
+      "url": "",
+      "preserve_host": false
+    },
+    "id": "fooNoUpstream.default",
+    "match": {
+      "url": "http://my-app/some-route1<.*>",
+      "methods": [
+        "GET",
+        "POST"
+      ]
+    },
+    "authenticators": [
+      {
+        "handler": "handler1",
+        "config": {
+          "key1": "val1"
+        }
+      }
+    ],
+    "authorizer": {
+      "handler": "deny"
+    },
+    "mutators": [
+      {
+        "handler": "handler1",
+        "config": {
+          "key1": "val1"
+        }
+      },
+      {
+        "handler": "handler2",
+        "config": {
+          "key1": [
+            "val1",
+            "val2",
+            "val3"
+          ]
+        }
+      }
+    ]
+  }
+  {
     "upstream": {
       "url": "http://my-backend-service2",
       "preserve_host": false
@@ -219,7 +262,19 @@ func TestToOathkeeperRules(t *testing.T) {
 				&Authorizer{h1},
 				nil)
 
-			list.Items = []Rule{*rule1, *rule2, *rule3}
+			rule4 := newRule(
+				"fooNoUpstream",
+				"default",
+				"",
+				"",
+				nil,
+				nil,
+				newBoolPtr(false),
+				[]*Authenticator{{h1}},
+				nil,
+				[]*Mutator{{h1}, {h2}})
+
+			list.Items = []Rule{*rule1, *rule2, *rule3, *rule4}
 
 			//when
 			raw, err := list.ToOathkeeperRules()

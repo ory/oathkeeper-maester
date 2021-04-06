@@ -57,7 +57,8 @@ type RuleList struct {
 
 // RuleSpec defines the desired state of Rule
 type RuleSpec struct {
-	Upstream       *Upstream        `json:"upstream"`
+	// +optional
+	Upstream       *Upstream        `json:"upstream,omitempty"`
 	Match          *Match           `json:"match"`
 	Authenticators []*Authenticator `json:"authenticators,omitempty"`
 	Authorizer     *Authorizer      `json:"authorizer,omitempty"`
@@ -236,6 +237,10 @@ func (r Rule) ToRuleJSON() *RuleJSON {
 	}
 	if ruleJSON.Mutators == nil {
 		ruleJSON.Mutators = []*Mutator{{noopHandler}}
+	}
+
+	if ruleJSON.Upstream == nil {
+		ruleJSON.Upstream = &Upstream{}
 	}
 
 	if ruleJSON.Upstream.PreserveHost == nil {

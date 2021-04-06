@@ -28,6 +28,24 @@ spec:
 apiVersion: oathkeeper.ory.sh/v1alpha1
 kind: Rule
 metadata:
+  name: sample-rule-no-upstream
+  namespace: test-ns-1
+spec:
+  description: Sample rule
+  match:
+    methods: ["GET"]
+    url: <http|https>://foo.bar
+  authenticators:
+  - handler: anonymous
+  authorizer:
+    handler: allow
+  mutators:
+  - handler: noop
+    config: {}
+---
+apiVersion: oathkeeper.ory.sh/v1alpha1
+kind: Rule
+metadata:
   name: sample-rule-2
   namespace: test-ns-1
 spec:
