@@ -3,6 +3,7 @@
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [Change Log](#change-log)
+  - [v0.1.1 (2021-03-31)](#v011-2021-03-31)
   - [v0.1.0 (2020-07-14)](#v010-2020-07-14)
   - [v0.0.10 (2020-02-18)](#v0010-2020-02-18)
   - [v0.0.9 (2020-02-18)](#v009-2020-02-18)
@@ -22,6 +23,13 @@
 
 # Change Log
 
+## [v0.1.1](https://github.com/ory/oathkeeper-maester/tree/v0.1.1) (2021-03-31)
+[Full Changelog](https://github.com/ory/oathkeeper-maester/compare/v0.1.0...v0.1.1)
+
+**Merged pull requests:**
+
+- fix: upstream should not be required in Rule CRD [\#45](https://github.com/ory/oathkeeper-maester/pull/45) ([pommelinho](https://github.com/pommelinho))
+
 ## [v0.1.0](https://github.com/ory/oathkeeper-maester/tree/v0.1.0) (2020-07-14)
 [Full Changelog](https://github.com/ory/oathkeeper-maester/compare/v0.0.10...v0.1.0)
 
@@ -32,12 +40,12 @@
 ## [v0.0.10](https://github.com/ory/oathkeeper-maester/tree/v0.0.10) (2020-02-18)
 [Full Changelog](https://github.com/ory/oathkeeper-maester/compare/v0.0.9...v0.0.10)
 
+## [v0.0.9](https://github.com/ory/oathkeeper-maester/tree/v0.0.9) (2020-02-18)
+[Full Changelog](https://github.com/ory/oathkeeper-maester/compare/v0.0.8+oryOS.15...v0.0.9)
+
 **Closed issues:**
 
 - \<.\*\> becomes \u003c.\*\u003e [\#38](https://github.com/ory/oathkeeper-maester/issues/38)
-
-## [v0.0.9](https://github.com/ory/oathkeeper-maester/tree/v0.0.9) (2020-02-18)
-[Full Changelog](https://github.com/ory/oathkeeper-maester/compare/v0.0.8+oryOS.15...v0.0.9)
 
 **Merged pull requests:**
 
