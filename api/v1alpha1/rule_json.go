@@ -12,7 +12,7 @@ func (rj RuleJSON) MarshalJSON() ([]byte, error) {
 	type Alias RuleJSON
 
 	return unescapedMarshal(&struct {
-		Upstream *UpstreamJSON `json:"upstream"`
+		Upstream *UpstreamJSON `json:"upstream,omitempty"`
 		Alias
 	}{
 		Upstream: &UpstreamJSON{

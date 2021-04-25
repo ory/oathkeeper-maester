@@ -140,6 +140,36 @@ var (
         "handler": "noop"
       }
     ]
+  },
+  {
+    "upstream": {
+      "url": "",
+      "preserve_host": false
+    },
+    "id": "fooNoUpstream.default",
+    "match": {
+      "url": "http://my-app/some-route3",
+      "methods": [
+        "GET",
+        "POST"
+      ]
+    },
+    "authenticators": [
+      {
+        "handler": "unauthorized"
+      }
+    ],
+    "authorizer": {
+      "handler": "handler1",
+      "config": {
+        "key1": "val1"
+      }
+    },
+    "mutators": [
+      {
+        "handler": "noop"
+      }
+    ]
   }
 ]`
 
@@ -219,7 +249,19 @@ func TestToOathkeeperRules(t *testing.T) {
 				&Authorizer{h1},
 				nil)
 
-			list.Items = []Rule{*rule1, *rule2, *rule3}
+			rule4 := newRule(
+				"fooNoUpstream",
+				"default",
+				"",
+				"http://my-app/some-route3",
+				nil,
+				nil,
+				nil,
+				nil,
+				&Authorizer{h1},
+				nil)
+
+			list.Items = []Rule{*rule1, *rule2, *rule3, *rule4}
 
 			//when
 			raw, err := list.ToOathkeeperRules()

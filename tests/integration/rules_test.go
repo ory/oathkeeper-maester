@@ -131,6 +131,7 @@ var _ = Describe("Oathkeeper controller", func() {
 			Expect(emptyMap.Data[rulesFileName]).To(Equal("[]"))
 		})
 	})
+
 })
 
 //Converts Rule CRD instance to a *json.Json representation of an entry that should be created in the ConfigMap.
