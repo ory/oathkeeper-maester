@@ -52,9 +52,8 @@ type RuleReconciler struct {
 // +kubebuilder:rbac:groups="",resources=configmaps,verbs=get;list;watch;create;update;patch;delete
 
 // Reconcile main reconcile loop
-func (r *RuleReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
+func (r *RuleReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 
-	ctx := context.Background()
 	_ = r.Log.WithValues("rule", req.NamespacedName)
 
 	var rule oathkeeperv1alpha1.Rule
