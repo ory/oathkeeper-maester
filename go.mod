@@ -1,6 +1,6 @@
 module github.com/ory/oathkeeper-maester
 
-go 1.12
+go 1.15
 
 require (
 	github.com/avast/retry-go v2.4.1+incompatible
