@@ -45,6 +45,7 @@ spec:
                       description: Config configures the handler. Configuration keys
                         vary per handler.
                       type: object
+                      x-kubernetes-preserve-unknown-fields: true
                     handler:
                       description: Name is the name of a handler
                       type: string
@@ -60,6 +61,7 @@ spec:
                     description: Config configures the handler. Configuration keys
                       vary per handler.
                     type: object
+                    x-kubernetes-preserve-unknown-fields: true
                   handler:
                     description: Name is the name of a handler
                     type: string
@@ -99,6 +101,7 @@ spec:
                       description: Config configures the handler. Configuration keys
                         vary per handler.
                       type: object
+                      x-kubernetes-preserve-unknown-fields: true
                     handler:
                       description: Name is the name of a handler
                       type: string
