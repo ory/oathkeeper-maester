@@ -1,6 +1,7 @@
 package integration
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"k8s.io/client-go/rest"
@@ -86,12 +87,12 @@ var _ = Describe("Oathkeeper controller", func() {
 
 			By("update a ConfigMap entry after Rule update")
 			//Given
-			rule, getErr := k8sDynamicClient.Resource(ruleResource).Namespace(namespaceName).Get("test-rule-2", metav1.GetOptions{})
+			rule, getErr := k8sDynamicClient.Resource(ruleResource).Namespace(namespaceName).Get(context.TODO(), "test-rule-2", metav1.GetOptions{})
 			Expect(getErr).To(BeNil())
 
 			//When
 			updateRule(rule)
-			_, updateErr := k8sDynamicClient.Resource(ruleResource).Namespace(namespaceName).Update(rule, metav1.UpdateOptions{})
+			_, updateErr := k8sDynamicClient.Resource(ruleResource).Namespace(namespaceName).Update(context.TODO(), rule, metav1.UpdateOptions{})
 			Expect(updateErr).To(BeNil())
 
 			//Allow for some processing time
@@ -103,7 +104,7 @@ var _ = Describe("Oathkeeper controller", func() {
 			expectRuleCount(rulesArray, 2)
 			By("delete a ConfigMap entry after Rule delete")
 			//When
-			deleteErr := k8sDynamicClient.Resource(ruleResource).Namespace(namespaceName).Delete("test-rule-2", &metav1.DeleteOptions{})
+			deleteErr := k8sDynamicClient.Resource(ruleResource).Namespace(namespaceName).Delete(context.TODO(), "test-rule-2", metav1.DeleteOptions{})
 			Expect(deleteErr).To(BeNil())
 
 			//Allow for some processing time
@@ -119,7 +120,7 @@ var _ = Describe("Oathkeeper controller", func() {
 
 			By("delete last ConfigMap entry after all Rules are deleted")
 			//When
-			deleteErr = k8sDynamicClient.Resource(ruleResource).Namespace(namespaceName).Delete("test-rule-1", &metav1.DeleteOptions{})
+			deleteErr = k8sDynamicClient.Resource(ruleResource).Namespace(namespaceName).Delete(context.TODO(), "test-rule-1", metav1.DeleteOptions{})
 			Expect(deleteErr).To(BeNil())
 
 			//Allow for some processing time
@@ -226,7 +227,7 @@ func toNamespace(name string) *corev1.Namespace {
 func deleteNamespace(name string, k8sClient *kubernetes.Clientset) error {
 
 	worker := func() (interface{}, error) {
-		err := k8sClient.CoreV1().Namespaces().Delete(name, nil)
+		err := k8sClient.CoreV1().Namespaces().Delete(context.TODO(), name, metav1.DeleteOptions{})
 		return nil, err
 	}
 
@@ -238,7 +239,7 @@ func deleteNamespace(name string, k8sClient *kubernetes.Clientset) error {
 func createNamespace(name string, k8sClient *kubernetes.Clientset) (*corev1.Namespace, error) {
 
 	testNamespace := toNamespace(name)
-	return k8sClient.CoreV1().Namespaces().Create(testNamespace)
+	return k8sClient.CoreV1().Namespaces().Create(context.TODO(), testNamespace, metav1.CreateOptions{})
 }
 
 func getRule(json string) (*unstructured.Unstructured, error) {
@@ -253,7 +254,7 @@ func getRule(json string) (*unstructured.Unstructured, error) {
 }
 
 func getTargetMap() (*v1.ConfigMap, error) {
-	return k8sClient.CoreV1().ConfigMaps(getTargetMapNamespace()).Get(getTargetMapName(), metav1.GetOptions{})
+	return k8sClient.CoreV1().ConfigMaps(getTargetMapNamespace()).Get(context.TODO(), getTargetMapName(), metav1.GetOptions{})
 }
 
 //Entry point for validation
@@ -315,12 +316,12 @@ func validateConfigMapContains(sourceRule *unstructured.Unstructured) (*json.Jso
 func ensureRule(rule *unstructured.Unstructured) (*unstructured.Unstructured, error) {
 
 	//Create
-	_, createErr := k8sDynamicClient.Resource(ruleResource).Namespace(namespaceName).Create(rule, metav1.CreateOptions{})
+	_, createErr := k8sDynamicClient.Resource(ruleResource).Namespace(namespaceName).Create(context.TODO(), rule, metav1.CreateOptions{})
 	Expect(createErr).To(BeNil())
 
 	//Wait until Rule can be read from the cluster.
 	workerFunc := func() (interface{}, error) {
-		return k8sDynamicClient.Resource(ruleResource).Namespace(namespaceName).Get(rule.GetName(), metav1.GetOptions{})
+		return k8sDynamicClient.Resource(ruleResource).Namespace(namespaceName).Get(context.TODO(), rule.GetName(), metav1.GetOptions{})
 	}
 
 	//Execute with retries

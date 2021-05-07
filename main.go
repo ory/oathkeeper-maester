@@ -82,7 +82,7 @@ func main() {
 
 	flag.Parse()
 
-	ctrl.SetLogger(zap.Logger(true))
+	ctrl.SetLogger(zap.New(zap.UseDevMode(true)))
 
 	sideCarMode, err := selectMode(flag.Args(), controllerCommand, sidecarCommand)
 	if err != nil {

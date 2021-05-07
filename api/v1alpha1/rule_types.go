@@ -130,6 +130,8 @@ type Handler struct {
 	Name string `json:"handler"`
 	// Config configures the handler. Configuration keys vary per handler.
 	// +kubebuilder:validation:Type=object
+	// +kubebuilder:pruning:PreserveUnknownFields
+	// +kubebuilder:validation:XPreserveUnknownFields
 	Config *runtime.RawExtension `json:"config,omitempty"`
 }
 
@@ -180,7 +182,7 @@ func (rl RuleList) FilterOutRule(r Rule) RuleList {
 	rlCopy := rl
 	validRules := []Rule{}
 	for _, rule := range rl.Items {
-		if rule.ObjectMeta.SelfLink != r.ObjectMeta.SelfLink {
+		if rule.ObjectMeta.UID != r.ObjectMeta.UID {
 			validRules = append(validRules, rule)
 		}
 	}
