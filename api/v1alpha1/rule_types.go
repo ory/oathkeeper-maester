@@ -182,7 +182,7 @@ func (rl RuleList) FilterOutRule(r Rule) RuleList {
 	rlCopy := rl
 	validRules := []Rule{}
 	for _, rule := range rl.Items {
-		if rule.ObjectMeta.SelfLink != r.ObjectMeta.SelfLink {
+		if rule.ObjectMeta.UID != r.ObjectMeta.UID {
 			validRules = append(validRules, rule)
 		}
 	}
