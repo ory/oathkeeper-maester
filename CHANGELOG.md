@@ -3,7 +3,7 @@
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [Change Log](#change-log)
-  - [Unreleased](#unreleased)
+  - [v0.1.3 (2021-05-07)](#v013-2021-05-07)
   - [v0.1.2 (2021-04-25)](#v012-2021-04-25)
   - [v0.1.1 (2021-03-31)](#v011-2021-03-31)
   - [v0.1.0 (2020-07-14)](#v010-2020-07-14)
@@ -25,13 +25,20 @@
 
 # Change Log
 
-## [Unreleased](https://github.com/ory/oathkeeper-maester/tree/HEAD)
-
-[Full Changelog](https://github.com/ory/oathkeeper-maester/compare/v0.1.2...HEAD)
+## [v0.1.3](https://github.com/ory/oathkeeper-maester/tree/v0.1.3) (2021-05-07)
+[Full Changelog](https://github.com/ory/oathkeeper-maester/compare/v0.1.2...v0.1.3)
 
 **Fixed bugs:**
 
 - The field 'upstream' should not be required [\#43](https://github.com/ory/oathkeeper-maester/issues/43)
+
+**Closed issues:**
+
+- Rewrite integration tests to stretchr/testify [\#10](https://github.com/ory/oathkeeper-maester/issues/10)
+
+**Merged pull requests:**
+
+- build: Update CRDs and k8s dependencies [\#48](https://github.com/ory/oathkeeper-maester/pull/48) ([colunira](https://github.com/colunira))
 
 ## [v0.1.2](https://github.com/ory/oathkeeper-maester/tree/v0.1.2) (2021-04-25)
 [Full Changelog](https://github.com/ory/oathkeeper-maester/compare/v0.1.1...v0.1.2)
@@ -155,7 +162,6 @@
 - Fix default value for rulesFileName [\#16](https://github.com/ory/oathkeeper-maester/pull/16) ([Demonsthere](https://github.com/Demonsthere))
 - Enable integration tests in the CI [\#15](https://github.com/ory/oathkeeper-maester/pull/15) ([piotrmsc](https://github.com/piotrmsc))
 - Bugfix: retry on get and update ops [\#13](https://github.com/ory/oathkeeper-maester/pull/13) ([jakkab](https://github.com/jakkab))
-- Add controller scaffold [\#5](https://github.com/ory/oathkeeper-maester/pull/5) ([kubadz](https://github.com/kubadz))
 
 ## [v0.0.1-beta.2](https://github.com/ory/oathkeeper-maester/tree/v0.0.1-beta.2) (2019-07-29)
 [Full Changelog](https://github.com/ory/oathkeeper-maester/compare/v0.0.1-beta.1...v0.0.1-beta.2)
@@ -168,6 +174,7 @@
 - Rule controller tests [\#8](https://github.com/ory/oathkeeper-maester/pull/8) ([Tomasz-Smelcerz-SAP](https://github.com/Tomasz-Smelcerz-SAP))
 - Add basic controller logic and rule validation [\#7](https://github.com/ory/oathkeeper-maester/pull/7) ([jakkab](https://github.com/jakkab))
 - Initial changes to circleci config [\#6](https://github.com/ory/oathkeeper-maester/pull/6) ([piotrmsc](https://github.com/piotrmsc))
+- Add controller scaffold [\#5](https://github.com/ory/oathkeeper-maester/pull/5) ([kubadz](https://github.com/kubadz))
 
 
 
