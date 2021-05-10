@@ -3,6 +3,8 @@
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [Change Log](#change-log)
+  - [Unreleased](#unreleased)
+  - [v0.1.4 (2021-05-08)](#v014-2021-05-08)
   - [v0.1.3 (2021-05-07)](#v013-2021-05-07)
   - [v0.1.2 (2021-04-25)](#v012-2021-04-25)
   - [v0.1.1 (2021-03-31)](#v011-2021-03-31)
@@ -24,6 +26,17 @@
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 # Change Log
+
+## [Unreleased](https://github.com/ory/oathkeeper-maester/tree/HEAD)
+
+[Full Changelog](https://github.com/ory/oathkeeper-maester/compare/v0.1.4...HEAD)
+
+**Closed issues:**
+
+- Release v0.1.3 did not pass status check and was not pushed to docker registry [\#50](https://github.com/ory/oathkeeper-maester/issues/50)
+
+## [v0.1.4](https://github.com/ory/oathkeeper-maester/tree/v0.1.4) (2021-05-08)
+[Full Changelog](https://github.com/ory/oathkeeper-maester/compare/v0.1.3...v0.1.4)
 
 ## [v0.1.3](https://github.com/ory/oathkeeper-maester/tree/v0.1.3) (2021-05-07)
 [Full Changelog](https://github.com/ory/oathkeeper-maester/compare/v0.1.2...v0.1.3)
