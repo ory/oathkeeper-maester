@@ -1,6 +1,5 @@
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [oathkeeper-maester](#oathkeeper-maester)
   - [Prerequisites](#prerequisites)
@@ -13,7 +12,13 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# oathkeeper-maester
+# Ory Oathkeeper Maester
+
+⚠️ ⚠️ ⚠️ 
+
+> Ory Oathkeeper Maester is developed by the Ory community and is not actively maintained by Ory core maintainers due to lack of resources, time, and knolwedge. As such please be aware that there might be issues with the system. If you have ideas for better testing and development principles please open an issue or PR!
+
+⚠️ ⚠️ ⚠️
 
 ORY Maester is a Kubernetes controller that watches for instances of `rules.oathkeeper.ory.sh/v1alpha1` custom resource (CR) and creates or updates the Oathkeeper ConfigMap with Access Rules found in the CRs. The controller passes the Access Rules as an array in a format recognized by the Oathkeeper.
 
