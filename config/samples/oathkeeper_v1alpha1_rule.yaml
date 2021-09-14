@@ -132,3 +132,67 @@ spec:
   mutators:
   - handler: noop
     config: {}
+---
+apiVersion: oathkeeper.ory.sh/v1alpha1
+kind: Rule
+metadata:
+  name: sample-rule-handlers-1
+  namespace: default
+spec:
+  configMapName: handlers-test-cm
+  description: Sample rule with extra handlers
+  upstream:
+    url: "http://abc.ef"
+    preserveHost: false
+  match:
+    methods: ["GET"]
+    url: <http|https>://foo.bar
+  authenticators:
+    - handler: anonymous
+      config:
+        foo: bar
+        long: |
+            {
+              "bar": "foo"
+            }
+  authorizer:
+    handler: allow
+    config:
+      lorem: ipsum
+      answer: 42
+  mutators:
+    - handler: noop
+      config: {}
+    - handler: id_token
+      config:
+        ttl: 3600s
+        claims: |
+          {
+            "aud": [ "hub.animeapis.dev" ],
+            "session": {{ .Extra | toJson }}
+          }
+---
+apiVersion: oathkeeper.ory.sh/v1alpha1
+kind: Rule
+metadata:
+  name: sample-rule-handlers-2
+  namespace: default
+spec:
+  configMapName: handlers-test-cm
+  authenticators:
+    - handler: anonymous
+    - handler: cookie_session
+  authorizer:
+    handler: allow
+  mutators:
+    - handler: id_token
+      config:
+        ttl: 3600s
+        claims: |
+          {
+            "aud": [ "hub.animeapis.dev" ],
+            "session": {{ .Extra | toJson }}
+          }
+  match:
+    url: <{https,http}>://hub.animeshon.dev/<**>
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD"]
