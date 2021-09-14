@@ -33,7 +33,7 @@ jobs:
       - checkout
       - run:
           <<: *install-kube-builder
-       - run: make test
+      - run: make test
   test-integration:
     machine: true
     steps:
