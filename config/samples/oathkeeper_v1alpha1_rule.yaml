@@ -10,7 +10,6 @@ metadata:
   name: sample-rule-1
   namespace: test-ns-1
 spec:
-  description: Sample rule
   upstream:
     url: "http://abc.ef"
     preserveHost: false
@@ -31,7 +30,6 @@ metadata:
   name: sample-rule-no-upstream
   namespace: test-ns-1
 spec:
-  description: Sample rule
   match:
     methods: ["GET"]
     url: <http|https>://foo.bar
@@ -49,7 +47,6 @@ metadata:
   name: sample-rule-2
   namespace: test-ns-1
 spec:
-  description: Sample rule
   upstream:
     url: "http://abc.ef"
     preserveHost: false
@@ -75,7 +72,6 @@ metadata:
   name: sample-rule-1
   namespace: test-ns-2
 spec:
-  description: Sample rule
   upstream:
     url: "http://abc.ef"
     preserveHost: false
@@ -96,7 +92,6 @@ metadata:
   name: sample-rule-2
   namespace: test-ns-2
 spec:
-  description: Sample rule
   upstream:
     url: "http://abc.ef"
     preserveHost: false
@@ -118,7 +113,6 @@ metadata:
   namespace: default
 spec:
   configMapName: some-cm
-  description: Sample rule
   upstream:
     url: "http://abc.ef"
     preserveHost: false
@@ -140,7 +134,6 @@ metadata:
   namespace: default
 spec:
   configMapName: handlers-test-cm
-  description: Sample rule with extra handlers
   upstream:
     url: "http://abc.ef"
     preserveHost: false
