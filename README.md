@@ -1,7 +1,7 @@
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
-- [oathkeeper-maester](#oathkeeper-maester)
+- [Ory Oathkeeper Maester](#ory-oathkeeper-maester)
   - [Prerequisites](#prerequisites)
   - [How to use it](#how-to-use-it)
   - [Command-line parameters](#command-line-parameters)
@@ -9,6 +9,7 @@
     - [Global flags](#global-flags)
     - [Controller mode flags](#controller-mode-flags)
     - [Sidecar mode flags](#sidecar-mode-flags)
+    - [Environment variables](#environment-variables)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 

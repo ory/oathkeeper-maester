@@ -3,7 +3,7 @@
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [Change Log](#change-log)
-  - [Unreleased](#unreleased)
+  - [v0.1.5 (2021-09-24)](#v015-2021-09-24)
   - [v0.1.4 (2021-05-08)](#v014-2021-05-08)
   - [v0.1.3 (2021-05-07)](#v013-2021-05-07)
   - [v0.1.2 (2021-04-25)](#v012-2021-04-25)
@@ -27,13 +27,21 @@
 
 # Change Log
 
-## [Unreleased](https://github.com/ory/oathkeeper-maester/tree/HEAD)
-
-[Full Changelog](https://github.com/ory/oathkeeper-maester/compare/v0.1.4...HEAD)
+## [v0.1.5](https://github.com/ory/oathkeeper-maester/tree/v0.1.5) (2021-09-24)
+[Full Changelog](https://github.com/ory/oathkeeper-maester/compare/v0.1.4...v0.1.5)
 
 **Closed issues:**
 
 - Release v0.1.3 did not pass status check and was not pushed to docker registry [\#50](https://github.com/ory/oathkeeper-maester/issues/50)
+- Handlers "config" attribute is replaced by an empty object [\#49](https://github.com/ory/oathkeeper-maester/issues/49)
+- Controller crashes because logger can't create file [\#34](https://github.com/ory/oathkeeper-maester/issues/34)
+- Sidecar mode - write access rules to file [\#21](https://github.com/ory/oathkeeper-maester/issues/21)
+- Validate access rules against JSON Schema from Oathkeeper Upstream [\#9](https://github.com/ory/oathkeeper-maester/issues/9)
+
+**Merged pull requests:**
+
+- Chore/kind 0.11 [\#52](https://github.com/ory/oathkeeper-maester/pull/52) ([Demonsthere](https://github.com/Demonsthere))
+- feat: including option to scope manager to namespace [\#51](https://github.com/ory/oathkeeper-maester/pull/51) ([janiskemper](https://github.com/janiskemper))
 
 ## [v0.1.4](https://github.com/ory/oathkeeper-maester/tree/v0.1.4) (2021-05-08)
 [Full Changelog](https://github.com/ory/oathkeeper-maester/compare/v0.1.3...v0.1.4)
@@ -106,6 +114,7 @@
 **Merged pull requests:**
 
 - Filter only if CM field is set [\#37](https://github.com/ory/oathkeeper-maester/pull/37) ([Demonsthere](https://github.com/Demonsthere))
+- Enable integration tests in the CI [\#15](https://github.com/ory/oathkeeper-maester/pull/15) ([piotrmsc](https://github.com/piotrmsc))
 
 ## [v0.0.5](https://github.com/ory/oathkeeper-maester/tree/v0.0.5) (2019-12-11)
 [Full Changelog](https://github.com/ory/oathkeeper-maester/compare/v0.0.4...v0.0.5)
@@ -116,10 +125,6 @@
 
 ## [v0.0.4](https://github.com/ory/oathkeeper-maester/tree/v0.0.4) (2019-12-11)
 [Full Changelog](https://github.com/ory/oathkeeper-maester/compare/v0.0.3...v0.0.4)
-
-**Merged pull requests:**
-
-- Add sidecar mode [\#31](https://github.com/ory/oathkeeper-maester/pull/31) ([Demonsthere](https://github.com/Demonsthere))
 
 ## [v0.0.3](https://github.com/ory/oathkeeper-maester/tree/v0.0.3) (2019-11-18)
 [Full Changelog](https://github.com/ory/oathkeeper-maester/compare/v0.0.2-beta-2...v0.0.3)
@@ -173,7 +178,6 @@
 - Project renaming [\#18](https://github.com/ory/oathkeeper-maester/pull/18) ([piotrmsc](https://github.com/piotrmsc))
 - Rename docker image to `oathkeeper-maester` [\#17](https://github.com/ory/oathkeeper-maester/pull/17) ([aeneasr](https://github.com/aeneasr))
 - Fix default value for rulesFileName [\#16](https://github.com/ory/oathkeeper-maester/pull/16) ([Demonsthere](https://github.com/Demonsthere))
-- Enable integration tests in the CI [\#15](https://github.com/ory/oathkeeper-maester/pull/15) ([piotrmsc](https://github.com/piotrmsc))
 - Bugfix: retry on get and update ops [\#13](https://github.com/ory/oathkeeper-maester/pull/13) ([jakkab](https://github.com/jakkab))
 
 ## [v0.0.1-beta.2](https://github.com/ory/oathkeeper-maester/tree/v0.0.1-beta.2) (2019-07-29)
@@ -182,6 +186,7 @@
 ## [v0.0.1-beta.1](https://github.com/ory/oathkeeper-maester/tree/v0.0.1-beta.1) (2019-07-29)
 **Merged pull requests:**
 
+- Add sidecar mode [\#31](https://github.com/ory/oathkeeper-maester/pull/31) ([Demonsthere](https://github.com/Demonsthere))
 - Move dataKey to cmd parameters [\#12](https://github.com/ory/oathkeeper-maester/pull/12) ([Demonsthere](https://github.com/Demonsthere))
 - Release step in the CI [\#11](https://github.com/ory/oathkeeper-maester/pull/11) ([piotrmsc](https://github.com/piotrmsc))
 - Rule controller tests [\#8](https://github.com/ory/oathkeeper-maester/pull/8) ([Tomasz-Smelcerz-SAP](https://github.com/Tomasz-Smelcerz-SAP))
