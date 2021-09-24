@@ -94,6 +94,8 @@ func main() {
 		Scheme:             scheme,
 		MetricsBindAddress: metricsAddr,
 		LeaderElection:     enableLeaderElection,
+		// Defaults to "" which means all namespaces
+		Namespace: os.Getenv("NAMESPACE"),
 	})
 	if err != nil {
 		setupLog.Error(err, "unable to start manager")

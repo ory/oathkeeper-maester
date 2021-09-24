@@ -81,3 +81,9 @@ Usage example: `./manager [--global-flags] mode [--mode-flags]`
 | :--- | :--- | :---: |
 | **rulesFilePath** | Path to the file with converted Oathkeeper rules | `/etc/config/access-rules.json` |
 
+### Environment variables
+
+| Name | Description | Default values |
+| :--- | :--- | :---: |
+| **NAMESPACE** | Namespace option to scope Oathkeeper maester to one namespace only - useful for running several instances in one cluster. Defaults to "" which means that there is no namespace scope. | `` |
+
