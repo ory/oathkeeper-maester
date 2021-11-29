@@ -1,6 +1,6 @@
 module github.com/ory/oathkeeper-maester
 
-go 1.15
+go 1.16
 
 require (
 	github.com/avast/retry-go v2.4.1+incompatible
@@ -10,9 +10,10 @@ require (
 	github.com/onsi/ginkgo v1.16.4
 	github.com/onsi/gomega v1.10.2
 	github.com/stretchr/testify v1.6.1
+	golang.org/x/sys v0.0.0-20210124154548-22da62e12c0c // indirect
+	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
 	k8s.io/api v0.20.2
 	k8s.io/apimachinery v0.20.2
 	k8s.io/client-go v0.20.2
 	sigs.k8s.io/controller-runtime v0.8.3
-	sigs.k8s.io/kind v0.11.1 // indirect
 )
