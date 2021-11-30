@@ -3,6 +3,7 @@
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [Change Log](#change-log)
+  - [v0.1.6 (2021-11-30)](#v016-2021-11-30)
   - [v0.1.5 (2021-09-24)](#v015-2021-09-24)
   - [v0.1.4 (2021-05-08)](#v014-2021-05-08)
   - [v0.1.3 (2021-05-07)](#v013-2021-05-07)
@@ -27,6 +28,17 @@
 
 # Change Log
 
+## [v0.1.6](https://github.com/ory/oathkeeper-maester/tree/v0.1.6) (2021-11-30)
+[Full Changelog](https://github.com/ory/oathkeeper-maester/compare/v0.1.5...v0.1.6)
+
+**Fixed bugs:**
+
+- Bump golang version to at least 1.15.5 to fix CVEs [\#54](https://github.com/ory/oathkeeper-maester/issues/54)
+
+**Merged pull requests:**
+
+- chore: upgrade golang and add CVE scanning [\#55](https://github.com/ory/oathkeeper-maester/pull/55) ([Demonsthere](https://github.com/Demonsthere))
+
 ## [v0.1.5](https://github.com/ory/oathkeeper-maester/tree/v0.1.5) (2021-09-24)
 [Full Changelog](https://github.com/ory/oathkeeper-maester/compare/v0.1.4...v0.1.5)
 
@@ -40,6 +52,7 @@
 
 **Merged pull requests:**
 
+- chore: update samples [\#53](https://github.com/ory/oathkeeper-maester/pull/53) ([Demonsthere](https://github.com/Demonsthere))
 - Chore/kind 0.11 [\#52](https://github.com/ory/oathkeeper-maester/pull/52) ([Demonsthere](https://github.com/Demonsthere))
 - feat: including option to scope manager to namespace [\#51](https://github.com/ory/oathkeeper-maester/pull/51) ([janiskemper](https://github.com/janiskemper))
 
@@ -81,6 +94,7 @@
 **Merged pull requests:**
 
 - build: Update k8s packages to 1.17.8 [\#42](https://github.com/ory/oathkeeper-maester/pull/42) ([colunira](https://github.com/colunira))
+- Rule controller tests [\#8](https://github.com/ory/oathkeeper-maester/pull/8) ([Tomasz-Smelcerz-SAP](https://github.com/Tomasz-Smelcerz-SAP))
 
 ## [v0.0.10](https://github.com/ory/oathkeeper-maester/tree/v0.0.10) (2020-02-18)
 [Full Changelog](https://github.com/ory/oathkeeper-maester/compare/v0.0.9...v0.0.10)
@@ -114,7 +128,6 @@
 **Merged pull requests:**
 
 - Filter only if CM field is set [\#37](https://github.com/ory/oathkeeper-maester/pull/37) ([Demonsthere](https://github.com/Demonsthere))
-- Enable integration tests in the CI [\#15](https://github.com/ory/oathkeeper-maester/pull/15) ([piotrmsc](https://github.com/piotrmsc))
 
 ## [v0.0.5](https://github.com/ory/oathkeeper-maester/tree/v0.0.5) (2019-12-11)
 [Full Changelog](https://github.com/ory/oathkeeper-maester/compare/v0.0.4...v0.0.5)
@@ -125,6 +138,10 @@
 
 ## [v0.0.4](https://github.com/ory/oathkeeper-maester/tree/v0.0.4) (2019-12-11)
 [Full Changelog](https://github.com/ory/oathkeeper-maester/compare/v0.0.3...v0.0.4)
+
+**Merged pull requests:**
+
+- Add sidecar mode [\#31](https://github.com/ory/oathkeeper-maester/pull/31) ([Demonsthere](https://github.com/Demonsthere))
 
 ## [v0.0.3](https://github.com/ory/oathkeeper-maester/tree/v0.0.3) (2019-11-18)
 [Full Changelog](https://github.com/ory/oathkeeper-maester/compare/v0.0.2-beta-2...v0.0.3)
@@ -178,6 +195,7 @@
 - Project renaming [\#18](https://github.com/ory/oathkeeper-maester/pull/18) ([piotrmsc](https://github.com/piotrmsc))
 - Rename docker image to `oathkeeper-maester` [\#17](https://github.com/ory/oathkeeper-maester/pull/17) ([aeneasr](https://github.com/aeneasr))
 - Fix default value for rulesFileName [\#16](https://github.com/ory/oathkeeper-maester/pull/16) ([Demonsthere](https://github.com/Demonsthere))
+- Enable integration tests in the CI [\#15](https://github.com/ory/oathkeeper-maester/pull/15) ([piotrmsc](https://github.com/piotrmsc))
 - Bugfix: retry on get and update ops [\#13](https://github.com/ory/oathkeeper-maester/pull/13) ([jakkab](https://github.com/jakkab))
 
 ## [v0.0.1-beta.2](https://github.com/ory/oathkeeper-maester/tree/v0.0.1-beta.2) (2019-07-29)
@@ -186,10 +204,8 @@
 ## [v0.0.1-beta.1](https://github.com/ory/oathkeeper-maester/tree/v0.0.1-beta.1) (2019-07-29)
 **Merged pull requests:**
 
-- Add sidecar mode [\#31](https://github.com/ory/oathkeeper-maester/pull/31) ([Demonsthere](https://github.com/Demonsthere))
 - Move dataKey to cmd parameters [\#12](https://github.com/ory/oathkeeper-maester/pull/12) ([Demonsthere](https://github.com/Demonsthere))
 - Release step in the CI [\#11](https://github.com/ory/oathkeeper-maester/pull/11) ([piotrmsc](https://github.com/piotrmsc))
-- Rule controller tests [\#8](https://github.com/ory/oathkeeper-maester/pull/8) ([Tomasz-Smelcerz-SAP](https://github.com/Tomasz-Smelcerz-SAP))
 - Add basic controller logic and rule validation [\#7](https://github.com/ory/oathkeeper-maester/pull/7) ([jakkab](https://github.com/jakkab))
 - Initial changes to circleci config [\#6](https://github.com/ory/oathkeeper-maester/pull/6) ([piotrmsc](https://github.com/piotrmsc))
 - Add controller scaffold [\#5](https://github.com/ory/oathkeeper-maester/pull/5) ([kubadz](https://github.com/kubadz))
