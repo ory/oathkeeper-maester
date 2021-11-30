@@ -1,12 +1,14 @@
 # Build the manager binary
-FROM alpine
+FROM golang:1.16 as builder
+WORKDIR /go/src/app
+COPY . .
+RUN apt update &&\
+    apt install ca-certificates &&\
+    make manager
 
-RUN apk add -U --no-cache ca-certificates
-
-FROM scratch
-
-COPY --from=0 /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
-COPY manager .
+FROM gcr.io/distroless/static:latest
+COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
+COPY --from=builder /go/src/app/manager .
 USER 1000
 
 ENTRYPOINT ["/manager"]
