@@ -3,6 +3,7 @@
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [Change Log](#change-log)
+  - [v0.1.7 (2022-06-23)](#v017-2022-06-23)
   - [v0.1.6 (2021-11-30)](#v016-2021-11-30)
   - [v0.1.5 (2021-09-24)](#v015-2021-09-24)
   - [v0.1.4 (2021-05-08)](#v014-2021-05-08)
@@ -27,6 +28,22 @@
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 # Change Log
+
+## [v0.1.7](https://github.com/ory/oathkeeper-maester/tree/v0.1.7) (2022-06-23)
+[Full Changelog](https://github.com/ory/oathkeeper-maester/compare/v0.1.6...v0.1.7)
+
+**Fixed bugs:**
+
+- bearer\_token authenticator is not available [\#57](https://github.com/ory/oathkeeper-maester/issues/57)
+
+**Closed issues:**
+
+- New authorizers remote and remote\_json not in default config [\#40](https://github.com/ory/oathkeeper-maester/issues/40)
+
+**Merged pull requests:**
+
+- feat: add missing defaults [\#59](https://github.com/ory/oathkeeper-maester/pull/59) ([Demonsthere](https://github.com/Demonsthere))
+- feat: add bearer\_token [\#58](https://github.com/ory/oathkeeper-maester/pull/58) ([Demonsthere](https://github.com/Demonsthere))
 
 ## [v0.1.6](https://github.com/ory/oathkeeper-maester/tree/v0.1.6) (2021-11-30)
 [Full Changelog](https://github.com/ory/oathkeeper-maester/compare/v0.1.5...v0.1.6)
@@ -53,8 +70,8 @@
 **Merged pull requests:**
 
 - chore: update samples [\#53](https://github.com/ory/oathkeeper-maester/pull/53) ([Demonsthere](https://github.com/Demonsthere))
-- Chore/kind 0.11 [\#52](https://github.com/ory/oathkeeper-maester/pull/52) ([Demonsthere](https://github.com/Demonsthere))
 - feat: including option to scope manager to namespace [\#51](https://github.com/ory/oathkeeper-maester/pull/51) ([janiskemper](https://github.com/janiskemper))
+- Refactor retry logic to handle conflict on updates. [\#26](https://github.com/ory/oathkeeper-maester/pull/26) ([Tomasz-Smelcerz-SAP](https://github.com/Tomasz-Smelcerz-SAP))
 
 ## [v0.1.4](https://github.com/ory/oathkeeper-maester/tree/v0.1.4) (2021-05-08)
 [Full Changelog](https://github.com/ory/oathkeeper-maester/compare/v0.1.3...v0.1.4)
@@ -94,7 +111,6 @@
 **Merged pull requests:**
 
 - build: Update k8s packages to 1.17.8 [\#42](https://github.com/ory/oathkeeper-maester/pull/42) ([colunira](https://github.com/colunira))
-- Rule controller tests [\#8](https://github.com/ory/oathkeeper-maester/pull/8) ([Tomasz-Smelcerz-SAP](https://github.com/Tomasz-Smelcerz-SAP))
 
 ## [v0.0.10](https://github.com/ory/oathkeeper-maester/tree/v0.0.10) (2020-02-18)
 [Full Changelog](https://github.com/ory/oathkeeper-maester/compare/v0.0.9...v0.0.10)
@@ -132,10 +148,6 @@
 ## [v0.0.5](https://github.com/ory/oathkeeper-maester/tree/v0.0.5) (2019-12-11)
 [Full Changelog](https://github.com/ory/oathkeeper-maester/compare/v0.0.4...v0.0.5)
 
-**Merged pull requests:**
-
-- Don't watch ConfigMaps [\#33](https://github.com/ory/oathkeeper-maester/pull/33) ([Tomasz-Smelcerz-SAP](https://github.com/Tomasz-Smelcerz-SAP))
-
 ## [v0.0.4](https://github.com/ory/oathkeeper-maester/tree/v0.0.4) (2019-12-11)
 [Full Changelog](https://github.com/ory/oathkeeper-maester/compare/v0.0.3...v0.0.4)
 
@@ -164,7 +176,6 @@
 
 **Merged pull requests:**
 
-- Refactor retry logic to handle conflict on updates. [\#26](https://github.com/ory/oathkeeper-maester/pull/26) ([Tomasz-Smelcerz-SAP](https://github.com/Tomasz-Smelcerz-SAP))
 - Add 'hydrator' mutator to the list of default mutators [\#23](https://github.com/ory/oathkeeper-maester/pull/23) ([kubadz](https://github.com/kubadz))
 
 ## [v0.0.2-beta.1](https://github.com/ory/oathkeeper-maester/tree/v0.0.2-beta.1) (2019-08-12)
@@ -176,6 +187,7 @@
 
 **Merged pull requests:**
 
+- Don't watch ConfigMaps [\#33](https://github.com/ory/oathkeeper-maester/pull/33) ([Tomasz-Smelcerz-SAP](https://github.com/Tomasz-Smelcerz-SAP))
 - Fix [\#22](https://github.com/ory/oathkeeper-maester/pull/22) ([piotrmsc](https://github.com/piotrmsc))
 - Support multiple mutators [\#20](https://github.com/ory/oathkeeper-maester/pull/20) ([jakkab](https://github.com/jakkab))
 - Update Measter readme [\#19](https://github.com/ory/oathkeeper-maester/pull/19) ([tomekpapiernik](https://github.com/tomekpapiernik))
@@ -204,8 +216,10 @@
 ## [v0.0.1-beta.1](https://github.com/ory/oathkeeper-maester/tree/v0.0.1-beta.1) (2019-07-29)
 **Merged pull requests:**
 
+- Chore/kind 0.11 [\#52](https://github.com/ory/oathkeeper-maester/pull/52) ([Demonsthere](https://github.com/Demonsthere))
 - Move dataKey to cmd parameters [\#12](https://github.com/ory/oathkeeper-maester/pull/12) ([Demonsthere](https://github.com/Demonsthere))
 - Release step in the CI [\#11](https://github.com/ory/oathkeeper-maester/pull/11) ([piotrmsc](https://github.com/piotrmsc))
+- Rule controller tests [\#8](https://github.com/ory/oathkeeper-maester/pull/8) ([Tomasz-Smelcerz-SAP](https://github.com/Tomasz-Smelcerz-SAP))
 - Add basic controller logic and rule validation [\#7](https://github.com/ory/oathkeeper-maester/pull/7) ([jakkab](https://github.com/jakkab))
 - Initial changes to circleci config [\#6](https://github.com/ory/oathkeeper-maester/pull/6) ([piotrmsc](https://github.com/piotrmsc))
 - Add controller scaffold [\#5](https://github.com/ory/oathkeeper-maester/pull/5) ([kubadz](https://github.com/kubadz))
