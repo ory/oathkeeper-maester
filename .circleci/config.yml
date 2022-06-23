@@ -41,14 +41,6 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Update golang
-          command: |
-            sudo rm -rf /usr/local/go/
-            curl -LO https://go.dev/dl/go1.16.10.linux-amd64.tar.gz
-            sudo tar -C /usr/local -xzf go1.16.10.linux-amd64.tar.gz
-            sudo echo "export PATH=$PATH:/usr/local/go/bin" >> $HOME/.profile
-            go version
-      - run:
           <<: *install-kube-builder
       - run:
           name: Install kustomize
