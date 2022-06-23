@@ -15,7 +15,7 @@ kube-builder: &install-kube-builder
     sudo mv /tmp/kubebuilder_2.3.2_${os}_${arch} /usr/local/kubebuilder
     export PATH=$PATH:/usr/local/kubebuilder/bin
 golaing_image: &golang_image
-  image: circleci/golang:1.16.10
+  image: cimg/go:1.16.15
 version: 2
 jobs:
   build:
@@ -91,7 +91,7 @@ jobs:
 
   release-changelog:
     docker:
-      - image: circleci/ruby:2.5-node
+      - image: cimg/ruby:3.1.2-node
     steps:
       - checkout
       - run: gem install github_changelog_generator -v 1.14.3
