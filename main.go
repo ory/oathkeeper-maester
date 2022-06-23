@@ -38,16 +38,6 @@ import (
 var (
 	scheme                         = runtime.NewScheme()
 	setupLog                       = ctrl.Log.WithName("setup")
-	defaultAuthenticatorsAvailable = [...]string{"noop", "unauthorized", "anonymous", "cookie_session", "oauth2_client_credentials", "oauth2_introspection", "jwt"}
-	defaultAuthorizersAvailable    = [...]string{"allow", "deny", "keto_engine_acp_ory"}
-	defaultMutatorsAvailable       = [...]string{"noop", "id_token", "header", "cookie", "hydrator"}
-)
-
-const (
-	authenticatorsAvailableEnv = "authenticatorsAvailable"
-	authorizersAvailableEnv    = "authorizersAvailable"
-	mutatorsAvailableEnv       = "mutatorsAvailable"
-	rulesFileNameRegexp        = "\\A[-._a-zA-Z0-9]+\\z"
 )
 
 func init() {
@@ -171,18 +161,18 @@ func removeEmptyStrings(list []string) []string {
 }
 
 func initValidationConfig() validation.Config {
-	authenticatorsAvailable := os.Getenv(authenticatorsAvailableEnv)
-	authorizersAvailable := os.Getenv(authorizersAvailableEnv)
-	mutatorsAvailable := os.Getenv(mutatorsAvailableEnv)
+	authenticatorsAvailable := os.Getenv(oathkeeperv1alpha1.AuthenticatorsAvailableEnv)
+	authorizersAvailable := os.Getenv(oathkeeperv1alpha1.AuthorizersAvailableEnv)
+	mutatorsAvailable := os.Getenv(oathkeeperv1alpha1.MutatorsAvailableEnv)
 	return validation.Config{
-		AuthenticatorsAvailable: parseListOrDefault(authenticatorsAvailable, defaultAuthenticatorsAvailable[:], authenticatorsAvailableEnv),
-		AuthorizersAvailable:    parseListOrDefault(authorizersAvailable, defaultAuthorizersAvailable[:], authorizersAvailableEnv),
-		MutatorsAvailable:       parseListOrDefault(mutatorsAvailable, defaultMutatorsAvailable[:], mutatorsAvailableEnv),
+		AuthenticatorsAvailable: parseListOrDefault(authenticatorsAvailable, oathkeeperv1alpha1.DefaultAuthenticatorsAvailable[:], oathkeeperv1alpha1.AuthenticatorsAvailableEnv),
+		AuthorizersAvailable:    parseListOrDefault(authorizersAvailable, oathkeeperv1alpha1.DefaultAuthorizersAvailable[:], oathkeeperv1alpha1.AuthorizersAvailableEnv),
+		MutatorsAvailable:       parseListOrDefault(mutatorsAvailable, oathkeeperv1alpha1.DefaultMutatorsAvailable[:], oathkeeperv1alpha1.MutatorsAvailableEnv),
 	}
 }
 
 func validateRulesFileName(rfn string) error {
-	match, _ := regexp.MatchString(rulesFileNameRegexp, rfn)
+	match, _ := regexp.MatchString(oathkeeperv1alpha1.RulesFileNameRegexp, rfn)
 	if match {
 		return nil
 	}
