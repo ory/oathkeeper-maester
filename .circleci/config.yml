@@ -86,9 +86,7 @@ jobs:
             ./.circleci/release_name.bash
             source $BASH_ENV
       - setup_remote_docker
-      - run: 
-        command: |
-          echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_USERNAME" --password-stdin
+      - run: echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_USERNAME" --password-stdin
       - run: curl -sL https://git.io/goreleaser | bash
 
   release-changelog:
