@@ -9,7 +9,7 @@ run-with-cleanup = $(1) && $(2) || (ret=$$?; $(2) && exit $$ret)
 all: manager
 
 # Run tests
-test: generate format vet manifests
+test: generate vet manifests
 	go test ./api/... ./controllers/... ./internal/... -coverprofile cover.out
 
 # Start KIND pseudo-cluster
@@ -39,11 +39,11 @@ test-integration:
 	$(call run-with-cleanup, $(MAKE) kind-test, $(MAKE) kind-stop)
 
 # Build manager binary
-manager: generate format vet
+manager: generate vet
 	CGO_ENABLED=0 GO111MODULE=on GOOS=linux GOARCH=amd64 go build -a -o manager main.go
 
 # Run against the configured Kubernetes cluster in ~/.kube/config
-run: generate format vet
+run: generate vet
 	go run ./main.go
 
 # Install CRDs into a cluster
