@@ -17,13 +17,21 @@
 
 ⚠️ ⚠️ ⚠️
 
-> Ory Oathkeeper Maester is developed by the Ory community and is not actively maintained by Ory core maintainers due to lack of resources, time, and knolwedge. As such please be aware that there might be issues with the system. If you have ideas for better testing and development principles please open an issue or PR!
+> Ory Oathkeeper Maester is developed by the Ory community and is not actively
+> maintained by Ory core maintainers due to lack of resources, time, and
+> knolwedge. As such please be aware that there might be issues with the system.
+> If you have ideas for better testing and development principles please open an
+> issue or PR!
 
 ⚠️ ⚠️ ⚠️
 
-ORY Maester is a Kubernetes controller that watches for instances of `rules.oathkeeper.ory.sh/v1alpha1` custom resource (CR) and creates or updates the Oathkeeper ConfigMap with Access Rules found in the CRs. The controller passes the Access Rules as an array in a format recognized by the Oathkeeper.
+ORY Maester is a Kubernetes controller that watches for instances of
+`rules.oathkeeper.ory.sh/v1alpha1` custom resource (CR) and creates or updates
+the Oathkeeper ConfigMap with Access Rules found in the CRs. The controller
+passes the Access Rules as an array in a format recognized by the Oathkeeper.
 
-The project is based on [Kubebuilder](https://github.com/kubernetes-sigs/kubebuilder)
+The project is based on
+[Kubebuilder](https://github.com/kubernetes-sigs/kubebuilder)
 
 ## Prerequisites
 
@@ -33,7 +41,8 @@ The project is based on [Kubebuilder](https://github.com/kubernetes-sigs/kubebui
 - kustomize
 - [kind](https://github.com/kubernetes-sigs/kind) for local integration testing
 - [ginkgo](https://onsi.github.io/ginkgo/) for local integration testing
-- access to K8s environment: minikube or KIND (https://github.com/kubernetes-sigs/kind), or a remote K8s cluster
+- access to K8s environment: minikube or KIND
+  (https://github.com/kubernetes-sigs/kind), or a remote K8s cluster
 
 ## How to use it
 
@@ -41,10 +50,11 @@ The project is based on [Kubebuilder](https://github.com/kubernetes-sigs/kubebui
 - `make test` to run tests
 - `make test-integration` to run integration tests with local KIND environment
 
-Other targets require a working K8s environment.
-Set `KUBECONFIG` environment variable to the proper value.
+Other targets require a working K8s environment. Set `KUBECONFIG` environment
+variable to the proper value.
 
-- `make install` to generate CRD file from go sources and install it in the cluster
+- `make install` to generate CRD file from go sources and install it in the
+  cluster
 - `make run` to run controller locally
 
 Refer to the Makefile for the details.

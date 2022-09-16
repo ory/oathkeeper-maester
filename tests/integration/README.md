@@ -1,7 +1,8 @@
 # oathkeeper-maester integration tests.
 
-This directory contains integration tests for oathkeeper-maester
-The tests execute against a cluster. For local testing use either minikube or KIND environment.
+This directory contains integration tests for oathkeeper-maester The tests
+execute against a cluster. For local testing use either minikube or KIND
+environment.
 
 ## How to run in with "KIND"
 
@@ -10,7 +11,9 @@ The tests execute against a cluster. For local testing use either minikube or KI
 
 ## How to run it against a cluster
 
-- Setup a test environment: either a K8s cluster or minikube. Install the controller.
+- Setup a test environment: either a K8s cluster or minikube. Install the
+  controller.
 - Export KUBECONFIG environment variable
-- Execute the tests with: `ginkgo -v ./tests/integration/...`
-  If you don't have ginkgo binary installed, standard `go test -v ./tests/integration/...` also works, but the output isn't formatted nicely.
+- Execute the tests with: `ginkgo -v ./tests/integration/...` If you don't have
+  ginkgo binary installed, standard `go test -v ./tests/integration/...` also
+  works, but the output isn't formatted nicely.
