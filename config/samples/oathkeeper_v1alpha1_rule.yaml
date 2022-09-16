@@ -17,12 +17,12 @@ spec:
     methods: ["GET"]
     url: <http|https>://foo.bar
   authenticators:
-  - handler: anonymous
+    - handler: anonymous
   authorizer:
     handler: allow
   mutators:
-  - handler: noop
-    config: {}
+    - handler: noop
+      config: {}
 ---
 apiVersion: oathkeeper.ory.sh/v1alpha1
 kind: Rule
@@ -34,12 +34,12 @@ spec:
     methods: ["GET"]
     url: <http|https>://foo.bar
   authenticators:
-  - handler: anonymous
+    - handler: anonymous
   authorizer:
     handler: allow
   mutators:
-  - handler: noop
-    config: {}
+    - handler: noop
+      config: {}
 ---
 apiVersion: oathkeeper.ory.sh/v1alpha1
 kind: Rule
@@ -54,12 +54,12 @@ spec:
     methods: ["GET"]
     url: <http|https>://foo.bar
   authenticators:
-  - handler: anonymous
+    - handler: anonymous
   authorizer:
     handler: allow
   mutators:
-  - handler: noop
-    config: {}
+    - handler: noop
+      config: {}
 ---
 apiVersion: v1
 kind: Namespace
@@ -79,12 +79,12 @@ spec:
     methods: ["GET"]
     url: <http|https>://foo.bar
   authenticators:
-  - handler: anonymous
+    - handler: anonymous
   authorizer:
     handler: allow
   mutators:
-  - handler: noop
-    config: {}
+    - handler: noop
+      config: {}
 ---
 apiVersion: oathkeeper.ory.sh/v1alpha1
 kind: Rule
@@ -99,12 +99,12 @@ spec:
     methods: ["GET"]
     url: <http|https>://foo.bar
   authenticators:
-  - handler: anonymous
+    - handler: anonymous
   authorizer:
     handler: allow
   mutators:
-  - handler: noop
-    config: {}
+    - handler: noop
+      config: {}
 ---
 apiVersion: oathkeeper.ory.sh/v1alpha1
 kind: Rule
@@ -120,12 +120,12 @@ spec:
     methods: ["GET"]
     url: <http|https>://foo.bar
   authenticators:
-  - handler: anonymous
+    - handler: anonymous
   authorizer:
     handler: allow
   mutators:
-  - handler: noop
-    config: {}
+    - handler: noop
+      config: {}
 ---
 apiVersion: oathkeeper.ory.sh/v1alpha1
 kind: Rule
@@ -145,9 +145,9 @@ spec:
       config:
         foo: bar
         long: |
-            {
-              "bar": "foo"
-            }
+          {
+            "bar": "foo"
+          }
   authorizer:
     handler: allow
     config:

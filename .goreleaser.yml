@@ -27,7 +27,6 @@ snapshot:
 changelog:
   sort: asc
 
-
 dockers:
   - image_templates:
       - "oryd/oathkeeper-maester:v{{ .Major }}"
