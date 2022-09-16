@@ -60,8 +60,9 @@ manifests: controller-gen
 	$(CONTROLLER_GEN) $(CRD_OPTIONS) rbac:roleName=manager-role webhook paths="./..." output:crd:artifacts:config=config/crd/bases
 
 # Run go fmt against code
-fmt:
+format: node_modules
 	go fmt ./...
+	npm exec -- prettier --write .
 
 # Run go vet against code
 vet:
@@ -93,3 +94,6 @@ else
 CONTROLLER_GEN=$(shell which controller-gen)
 endif
 
+node_modules: package-lock.json
+	npm ci
+	touch node_modules
