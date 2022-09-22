@@ -152,7 +152,7 @@ func (r *RuleReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.
 	return ctrl.Result{}, nil
 }
 
-//SetupWithManager ??
+// SetupWithManager ??
 func (r *RuleReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&oathkeeperv1alpha1.Rule{}).

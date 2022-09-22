@@ -9,7 +9,7 @@ run-with-cleanup = $(1) && $(2) || (ret=$$?; $(2) && exit $$ret)
 all: manager
 
 # Run tests
-test: generate fmt vet manifests
+test: generate vet manifests
 	go test ./api/... ./controllers/... ./internal/... -coverprofile cover.out
 
 # Start KIND pseudo-cluster
@@ -39,11 +39,11 @@ test-integration:
 	$(call run-with-cleanup, $(MAKE) kind-test, $(MAKE) kind-stop)
 
 # Build manager binary
-manager: generate fmt vet
+manager: generate vet
 	CGO_ENABLED=0 GO111MODULE=on GOOS=linux GOARCH=amd64 go build -a -o manager main.go
 
 # Run against the configured Kubernetes cluster in ~/.kube/config
-run: generate fmt vet
+run: generate vet
 	go run ./main.go
 
 # Install CRDs into a cluster
@@ -59,9 +59,10 @@ deploy: manifests
 manifests: controller-gen
 	$(CONTROLLER_GEN) $(CRD_OPTIONS) rbac:roleName=manager-role webhook paths="./..." output:crd:artifacts:config=config/crd/bases
 
-# Run go fmt against code
-fmt:
+# Format the source code
+format: node_modules
 	go fmt ./...
+	npm exec -- prettier --write .
 
 # Run go vet against code
 vet:
@@ -93,3 +94,6 @@ else
 CONTROLLER_GEN=$(shell which controller-gen)
 endif
 
+node_modules: package-lock.json
+	npm ci
+	touch node_modules

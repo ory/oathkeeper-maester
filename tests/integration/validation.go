@@ -8,8 +8,8 @@ import (
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 )
 
-//Validates rules are equal
-//`actual` is a representation of an entry from the ConfigMap handled by the Controller
+// Validates rules are equal
+// `actual` is a representation of an entry from the ConfigMap handled by the Controller
 func validateRuleEquals(actual *json.Json, expected *json.Json) {
 	Expect(actual).To(Equal(expected))
 	expectOnlyKeys(actual, "id", "upstream", "match", "authenticators", "authorizer", "mutators")
@@ -52,8 +52,8 @@ func compareHandlerArrays(actual *json.Json, expected *json.Json) {
 
 }
 
-//Compares `handler` objects, a common type for `authenticators`, `authorizer`, and `mutator` configurations
-//The object consists of two properties: `hander`:string` and `config`:object
+// Compares `handler` objects, a common type for `authenticators`, `authorizer`, and `mutator` configurations
+// The object consists of two properties: `hander`:string` and `config`:object
 func compareHandlers(actual *json.Json, expected *json.Json) {
 	//expected.SetPath(
 	Expect(actual).To(Equal(expected))
@@ -135,8 +135,8 @@ func getKeysOf(input map[string]interface{}) []string {
 	return keys
 }
 
-//Converts from dynamic client representation to *json.Json.
-//"spec" must be a top-level attribute of dynamicObject.
+// Converts from dynamic client representation to *json.Json.
+// "spec" must be a top-level attribute of dynamicObject.
 func wrapSpecAsJson(dynamicObject *unstructured.Unstructured) *json.Json {
 	//A little trick since go-simplejson doesn't offer a constructor for arbitrary data
 	res := json.New()
