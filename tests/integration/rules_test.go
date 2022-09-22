@@ -135,8 +135,8 @@ var _ = Describe("Oathkeeper controller", func() {
 
 })
 
-//Converts Rule CRD instance to a *json.Json representation of an entry that should be created in the ConfigMap.
-//At the moment CRD structure and ConfigMap entry structure is very similar, we can use that to avoid separate json file with "expected" data.
+// Converts Rule CRD instance to a *json.Json representation of an entry that should be created in the ConfigMap.
+// At the moment CRD structure and ConfigMap entry structure is very similar, we can use that to avoid separate json file with "expected" data.
 func toExpected(rule *unstructured.Unstructured) *json.Json {
 	expected := wrapSpecAsJson(rule)
 
@@ -257,8 +257,8 @@ func getTargetMap() (*v1.ConfigMap, error) {
 	return k8sClient.CoreV1().ConfigMaps(getTargetMapNamespace()).Get(context.TODO(), getTargetMapName(), metav1.GetOptions{})
 }
 
-//Entry point for validation
-//Returns parsed rules array as json.Json object
+// Entry point for validation
+// Returns parsed rules array as json.Json object
 func validateConfigMapContains(sourceRule *unstructured.Unstructured) (*json.Json, error) {
 
 	//It's a copy!
@@ -312,7 +312,7 @@ func validateConfigMapContains(sourceRule *unstructured.Unstructured) (*json.Jso
 	return rulesArray, nil
 }
 
-//Creates a Rule and ensures it can be read back from the cluster.
+// Creates a Rule and ensures it can be read back from the cluster.
 func ensureRule(rule *unstructured.Unstructured) (*unstructured.Unstructured, error) {
 
 	//Create
@@ -338,8 +338,8 @@ func ensureRule(rule *unstructured.Unstructured) (*unstructured.Unstructured, er
 	return createdRule, nil
 }
 
-//Finds and returns a rule with specified id
-//actualRules must be an array of rules (sadly go-simplejson doesn't offer such type)
+// Finds and returns a rule with specified id
+// actualRules must be an array of rules (sadly go-simplejson doesn't offer such type)
 func findRule(actualRules *json.Json, expectedRuleId string) (*json.Json, error) {
 
 	//Can it be done simpler? go-simplejson doesn't seem to offer any generic way of iterating over array.

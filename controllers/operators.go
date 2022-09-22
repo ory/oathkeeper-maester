@@ -24,7 +24,7 @@ type OperatorMode interface {
 	CreateOrUpdate(ctx context.Context, oathkeeperRulesJSON []byte, triggeredBy *oathkeeperv1alpha1.Rule) error
 }
 
-//ConfigMapOperator that maintains Oathkeeper rules as an json-formatted entry in a ConfigMap
+// ConfigMapOperator that maintains Oathkeeper rules as an json-formatted entry in a ConfigMap
 type ConfigMapOperator struct {
 	client.Client
 	Log              logr.Logger
@@ -32,7 +32,7 @@ type ConfigMapOperator struct {
 	RulesFileName    string
 }
 
-//FilesOperator that maintains Oathkeeper rules as a flat json file in a local filesystem
+// FilesOperator that maintains Oathkeeper rules as a flat json file in a local filesystem
 type FilesOperator struct {
 	Log           logr.Logger
 	RulesFilePath string

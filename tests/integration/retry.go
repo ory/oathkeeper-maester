@@ -7,19 +7,19 @@ import (
 	"github.com/avast/retry-go"
 )
 
-//Modify this var to provide different function for logging retires.
+// Modify this var to provide different function for logging retires.
 var logRetry = func(msg string, args ...interface{}) {
 	fmt.Printf(msg, args...)
 }
 
-//Function to be executed - and possibly retried.
+// Function to be executed - and possibly retried.
 type workerFunc func() (interface{}, error)
 
-//Helper function introduced to inject maxRetries into retry logging - so that users provide maxRetries only once, in `withRetries` function
+// Helper function introduced to inject maxRetries into retry logging - so that users provide maxRetries only once, in `withRetries` function
 type getOnRetryLoggingFunc func(maxRetries uint) retry.OnRetryFunc
 
-//Generic function to handle retries.
-//getRetryLogging can be nil if you don't want to log retries. To log retries, use the result of `onRetryLogMsg` as an argument.
+// Generic function to handle retries.
+// getRetryLogging can be nil if you don't want to log retries. To log retries, use the result of `onRetryLogMsg` as an argument.
 func withRetries(maxRetries uint, delay time.Duration, getRetryLogging getOnRetryLoggingFunc, worker workerFunc) (interface{}, error) {
 
 	var response interface{} = nil
@@ -42,7 +42,7 @@ func withRetries(maxRetries uint, delay time.Duration, getRetryLogging getOnRetr
 	return response, err
 }
 
-//Returns `getOnRetryLoggingFunc` instance for given message.
+// Returns `getOnRetryLoggingFunc` instance for given message.
 func onRetryLogMsg(msg string) getOnRetryLoggingFunc {
 	return func(maxRetries uint) retry.OnRetryFunc {
 		return func(retryNo uint, err error) {
