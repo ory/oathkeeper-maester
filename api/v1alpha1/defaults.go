@@ -1,3 +1,5 @@
+// Copyright © 2022 Ory Corp
+
 package v1alpha1
 
 var (

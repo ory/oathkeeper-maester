@@ -60,7 +60,8 @@ manifests: controller-gen
 	$(CONTROLLER_GEN) $(CRD_OPTIONS) rbac:roleName=manager-role webhook paths="./..." output:crd:artifacts:config=config/crd/bases
 
 # Format the source code
-format: node_modules
+format: .bin/ory node_modules
+	.bin/ory dev headers license --exclude=api/v1alpha1/zz_generated.deepcopy.go
 	go fmt ./...
 	npm exec -- prettier --write .
 
@@ -93,6 +94,10 @@ CONTROLLER_GEN=$(shell which controller-gen)
 else
 CONTROLLER_GEN=$(shell which controller-gen)
 endif
+
+.bin/ory: Makefile
+	curl https://raw.githubusercontent.com/ory/meta/master/install.sh | bash -s -- -b .bin ory v0.1.43
+	touch .bin/ory
 
 node_modules: package-lock.json
 	npm ci
