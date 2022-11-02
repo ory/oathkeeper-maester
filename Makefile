@@ -64,6 +64,12 @@ format: node_modules
 	go fmt ./...
 	npm exec -- prettier --write .
 
+licenses: .bin/licenses node_modules  # checks open-source licenses
+	.bin/licenses
+
+.bin/licenses: Makefile
+	curl https://raw.githubusercontent.com/ory/ci/master/licenses/install | sh
+
 # Run go vet against code
 vet:
 	go vet ./...
