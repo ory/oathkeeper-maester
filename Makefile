@@ -102,7 +102,7 @@ CONTROLLER_GEN=$(shell which controller-gen)
 endif
 
 .bin/ory: Makefile
-	curl https://raw.githubusercontent.com/ory/meta/master/install.sh | bash -s -- -b .bin ory v0.1.45
+	curl https://raw.githubusercontent.com/ory/meta/master/install.sh | bash -s -- -b .bin ory v0.1.47
 	touch .bin/ory
 
 node_modules: package-lock.json
