@@ -1,3 +1,5 @@
 CHANGELOG.md
 CONTRIBUTING.md
 .github/pull_request_template.md
+api/v1alpha1/tests/*
+tests/integration/files/*

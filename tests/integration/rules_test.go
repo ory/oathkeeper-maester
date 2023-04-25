@@ -5,6 +5,7 @@ package integration
 
 import (
 	"context"
+	_ "embed"
 	"errors"
 	"fmt"
 	"k8s.io/client-go/rest"
@@ -40,6 +41,12 @@ var (
 	ruleResource     schema.GroupVersionResource = schema.GroupVersionResource{Group: oathkeeperv1alpha1.GroupVersion.Group, Version: oathkeeperv1alpha1.GroupVersion.Version, Resource: "rules"}
 )
 
+//go:embed files/rule1.json
+var rule1 string
+
+//go:embed files/rule2.json
+var rule2 string
+
 var _ = BeforeSuite(func() {
 	//Create namespace
 	_, err := createNamespace(namespaceName, k8sClient)
@@ -60,7 +67,7 @@ var _ = Describe("Oathkeeper controller", func() {
 
 			By("create a valid ConfigMap from a single Rule")
 			//Given
-			rule, err := getRule(getRule1Json())
+			rule, err := getRule(rule1)
 			Expect(err).To(BeNil())
 			Expect(rule).ToNot(BeNil())
 
@@ -75,7 +82,7 @@ var _ = Describe("Oathkeeper controller", func() {
 
 			By("add an entry to the ConfigMap after adding another Rule")
 			//Given
-			rule, err = getRule(getRule2Json())
+			rule, err = getRule(rule2)
 			Expect(err).To(BeNil())
 			Expect(rule).ToNot(BeNil())
 
@@ -114,7 +121,7 @@ var _ = Describe("Oathkeeper controller", func() {
 			time.Sleep(3 * time.Second)
 
 			//Then
-			rule, err = getRule(getRule1Json())
+			rule, err = getRule(rule1)
 			Expect(err).To(BeNil())
 
 			rulesArray, validateErr = validateConfigMapContains(rule)
@@ -384,96 +391,4 @@ func getTargetMapName() string {
 	}
 
 	return res
-}
-
-func getRule1Json() string {
-	return `{
-		"apiVersion": "oathkeeper.ory.sh/v1alpha1",
-		"kind": "Rule",
-		"metadata": {
-			"name": "test-rule-1"
-	    },
-		"spec": {
-			"match": {
-				"methods": ["GET", "POST"],
-				"url": "http://gh.ij"
-			},
-			"upstream": {
-			    "preserveHost": false,
-			    "url": "http://abc.def"
-			},
-			"authenticators": [
-				{"handler": "anonymous"}
-			],
-			"authorizer": {
-				"handler": "allow"
-			},
-			"mutators": [
-                {
-				    "handler": "header",
-				    "config": {
-				        "headers": {
-						    "X-User": "{{ print .Subject }}",
-						    "X-Some-Arbitrary-Data": "{{ print .Extra.some.arbitrary.data }}"
-				        }
-				    }
-			    }
-            ],
-			"errors": [
-				{
-					"handler": "redirect"
-				}
-			]
-		}
-	}
-	`
-}
-
-func getRule2Json() string {
-	return `{
-		"apiVersion": "oathkeeper.ory.sh/v1alpha1",
-		"kind": "Rule",
-		"metadata": {
-			"name": "test-rule-2"
-	    },
-		"spec": {
-			"match": {
-				"methods": ["POST", "PUT"],
-				"url": "http://xyz.com"
-			},
-			"upstream": {
-			    "url": "http://abcde.fgh"
-			},
-			"authenticators": [
-				{
-					"handler": "oauth2_client_credentials",
-					"config": {
-						"required_scope": ["scope-a", "scope-b"]
-					}
-				},
-				{"handler": "anonymous"}
-			],
-			"authorizer": {
-			    "handler": "keto_engine_acp_ory",
-				"config": {
-				    "required_action": "my:action:1234",
-					"required_resource": "my:resource:foobar:foo:1234"
-				}
-			},
-			"mutators": [
-                {
-			        "handler": "id_token",
-			        "config": {
-				        "aud": ["audience1", "audience2"]
-			        }
-			    }
-            ],
-			"errors": [
-				{
-					"handler": "redirect"
-				}
-			]
-		}
-	}
-	`
 }

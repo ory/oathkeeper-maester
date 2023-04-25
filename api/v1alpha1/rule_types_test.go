@@ -4,6 +4,7 @@
 package v1alpha1
 
 import (
+	_ "embed"
 	"fmt"
 	"testing"
 
@@ -14,206 +15,14 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 )
 
-var (
-	template = `[
-  {
-    "upstream": {
-      "url": "http://my-backend-service1",
-      "strip_path": "/api/v1",
-      "preserve_host": true
-    },
-    "id": "foo1.default",
-    "match": {
-      "url": "http://my-app/some-route1<.*>",
-      "methods": [
-        "GET",
-        "POST"
-      ]
-    },
-    "authenticators": [
-      {
-        "handler": "handler1",
-        "config": {
-          "key1": "val1"
-        }
-      }
-    ],
-    "authorizer": {
-      "handler": "deny"
-    },
-    "mutators": [
-      {
-        "handler": "handler1",
-        "config": {
-          "key1": "val1"
-        }
-      },
-      {
-        "handler": "handler2",
-        "config": {
-          "key1": [
-            "val1",
-            "val2",
-            "val3"
-          ]
-        }
-      }
-    ],
-    "errors": [
-      {
-        "handler": "handler1",
-        "config": {
-          "key1": "val1"
-        }
-      }
-    ]
-  },
-  {
-    "upstream": {
-      "url": "http://my-backend-service2",
-      "preserve_host": false
-    },
-    "id": "foo2.default",
-    "match": {
-      "url": "http://my-app/some-route2",
-      "methods": [
-        "GET",
-        "POST"
-      ]
-    },
-    "authenticators": [
-      {
-        "handler": "handler1",
-        "config": {
-          "key1": "val1"
-        }
-      },
-      {
-        "handler": "handler2",
-        "config": {
-          "key1": [
-            "val1",
-            "val2",
-            "val3"
-          ]
-        }
-      }
-    ],
-    "authorizer": {
-      "handler": "deny"
-    },
-    "mutators": [
-      {
-        "handler": "noop"
-      }
-    ],
-    "errors": [
-      {
-        "handler": "handler2",
-        "config": {
-          "key1": [
-            "val1",
-            "val2",
-            "val3"
-          ]
-        }
-      }
-    ]
-  },
-  {
-    "upstream": {
-      "url": "http://my-backend-service3",
-      "preserve_host": false
-    },
-    "id": "foo3.default",
-    "match": {
-      "url": "http://my-app/some-route3",
-      "methods": [
-        "GET",
-        "POST"
-      ]
-    },
-    "authenticators": [
-      {
-        "handler": "unauthorized"
-      }
-    ],
-    "authorizer": {
-      "handler": "handler1",
-      "config": {
-        "key1": "val1"
-      }
-    },
-    "mutators": [
-      {
-        "handler": "noop"
-      }
-    ],
-    "errors": [
-      {
-        "handler": "handler1",
-        "config": {
-          "key1": "val1"
-        }
-      },
-      {
-        "handler": "handler2",
-        "config": {
-          "key1": [
-            "val1",
-            "val2",
-            "val3"
-          ]
-        }
-      }
-    ]
-  },
-  {
-    "upstream": {
-      "url": "",
-      "preserve_host": false
-    },
-    "id": "fooNoUpstream.default",
-    "match": {
-      "url": "http://my-app/some-route3",
-      "methods": [
-        "GET",
-        "POST"
-      ]
-    },
-    "authenticators": [
-      {
-        "handler": "unauthorized"
-      }
-    ],
-    "authorizer": {
-      "handler": "handler1",
-      "config": {
-        "key1": "val1"
-      }
-    },
-    "mutators": [
-      {
-        "handler": "noop"
-      }
-    ]
-  }
-]`
+//go:embed tests/rules.json
+var template string
 
-	sampleConfig = `{
-  "key1": "val1"
-}
-`
+//go:embed tests/sample_config.json
+var sampleConfig string
 
-	sampleConfig2 = `{
-  "key1": [
-    "val1",
-    "val2",
-    "val3"
-  ]
-}
-`
-)
+//go:embed tests/sample_config2.json
+var sampleConfig2 string
 
 func TestToOathkeeperRules(t *testing.T) {
 
@@ -473,7 +282,7 @@ func newStaticRule(authenticators []*Authenticator, authorizer *Authorizer, muta
 	return newRule("r1", "test", "", "", newStringPtr(""), nil, newBoolPtr(false), authenticators, authorizer, mutators, errors)
 }
 
-func newRule(name, namespace, upstreamURL, matchURL string, stripURLPath, configMapName *string, preserveURLHost *bool, authenticators []*Authenticator, authorizer *Authorizer, mutators []*Mutator, errorrs []*Error) *Rule {
+func newRule(name, namespace, upstreamURL, matchURL string, stripURLPath, configMapName *string, preserveURLHost *bool, authenticators []*Authenticator, authorizer *Authorizer, mutators []*Mutator, errors []*Error) *Rule {
 
 	spec := RuleSpec{
 		Upstream: &Upstream{
@@ -488,7 +297,7 @@ func newRule(name, namespace, upstreamURL, matchURL string, stripURLPath, config
 		Authenticators: authenticators,
 		Authorizer:     authorizer,
 		Mutators:       mutators,
-		Errors:         errorrs,
+		Errors:         errors,
 		ConfigMapName:  configMapName,
 	}
 
