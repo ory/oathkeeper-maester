@@ -418,7 +418,12 @@ func getRule1Json() string {
 				        }
 				    }
 			    }
-            ]
+            ],
+			"errors": [
+				{
+					"handler": "redirect"
+				}
+			]
 		}
 	}
 	`
@@ -462,7 +467,12 @@ func getRule2Json() string {
 				        "aud": ["audience1", "audience2"]
 			        }
 			    }
-            ]
+            ],
+			"errors": [
+				{
+					"handler": "redirect"
+				}
+			]
 		}
 	}
 	`
