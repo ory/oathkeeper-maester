@@ -52,6 +52,7 @@ type RuleSpec struct {
 	Authenticators []*Authenticator `json:"authenticators,omitempty"`
 	Authorizer     *Authorizer      `json:"authorizer,omitempty"`
 	Mutators       []*Mutator       `json:"mutators,omitempty"`
+	Errors         []*Error         `json:"errors,omitempty"`
 	// +kubebuilder:validation:MinLength=1
 	// +kubebuilder:validation:MaxLength=253
 	// +kubebuilder:validation:Pattern=[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*
@@ -109,6 +110,11 @@ type Authorizer struct {
 
 // Mutator represents a handler that transforms the HTTP request before forwarding it.
 type Mutator struct {
+	*Handler `json:",inline"`
+}
+
+// Error represents a handler that is responsible for executing logic when an error happens.
+type Error struct {
 	*Handler `json:",inline"`
 }
 

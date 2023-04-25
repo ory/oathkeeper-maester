@@ -152,10 +152,12 @@ func initValidationConfig() validation.Config {
 	authenticatorsAvailable := os.Getenv(oathkeeperv1alpha1.AuthenticatorsAvailableEnv)
 	authorizersAvailable := os.Getenv(oathkeeperv1alpha1.AuthorizersAvailableEnv)
 	mutatorsAvailable := os.Getenv(oathkeeperv1alpha1.MutatorsAvailableEnv)
+	errorsAvailable := os.Getenv(oathkeeperv1alpha1.ErrorsAvailableEnv)
 	return validation.Config{
 		AuthenticatorsAvailable: parseListOrDefault(authenticatorsAvailable, oathkeeperv1alpha1.DefaultAuthenticatorsAvailable[:], oathkeeperv1alpha1.AuthenticatorsAvailableEnv),
 		AuthorizersAvailable:    parseListOrDefault(authorizersAvailable, oathkeeperv1alpha1.DefaultAuthorizersAvailable[:], oathkeeperv1alpha1.AuthorizersAvailableEnv),
 		MutatorsAvailable:       parseListOrDefault(mutatorsAvailable, oathkeeperv1alpha1.DefaultMutatorsAvailable[:], oathkeeperv1alpha1.MutatorsAvailableEnv),
+		ErrorsAvailable:         parseListOrDefault(errorsAvailable, oathkeeperv1alpha1.DefaultErrorsAvailable[:], oathkeeperv1alpha1.ErrorsAvailableEnv),
 	}
 }
 

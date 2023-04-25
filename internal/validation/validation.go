@@ -7,6 +7,7 @@ type Config struct {
 	AuthenticatorsAvailable []string
 	AuthorizersAvailable    []string
 	MutatorsAvailable       []string
+	ErrorsAvailable         []string
 }
 
 func (c Config) IsAuthenticatorValid(authenticator string) bool {
@@ -17,6 +18,9 @@ func (c Config) IsAuthorizerValid(authorizer string) bool {
 }
 func (c Config) IsMutatorValid(mutator string) bool {
 	return isValid(mutator, c.MutatorsAvailable)
+}
+func (c Config) IsErrorValid(err string) bool {
+	return isValid(err, c.ErrorsAvailable)
 }
 
 func isValid(current string, available []string) bool {
