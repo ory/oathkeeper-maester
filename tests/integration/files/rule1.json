@@ -1,0 +1,44 @@
+{
+    "apiVersion": "oathkeeper.ory.sh/v1alpha1",
+    "kind": "Rule",
+    "metadata": {
+        "name": "test-rule-1"
+    },
+    "spec": {
+        "match": {
+            "methods": [
+                "GET",
+                "POST"
+            ],
+            "url": "http://gh.ij"
+        },
+        "upstream": {
+            "preserveHost": false,
+            "url": "http://abc.def"
+        },
+        "authenticators": [
+            {
+                "handler": "anonymous"
+            }
+        ],
+        "authorizer": {
+            "handler": "allow"
+        },
+        "mutators": [
+            {
+                "handler": "header",
+                "config": {
+                    "headers": {
+                        "X-User": "{{ print .Subject }}",
+                        "X-Some-Arbitrary-Data": "{{ print .Extra.some.arbitrary.data }}"
+                    }
+                }
+            }
+        ],
+        "errors": [
+            {
+                "handler": "redirect"
+            }
+        ]
+    }
+}

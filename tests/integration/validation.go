@@ -1,4 +1,4 @@
-// Copyright © 2022 Ory Corp
+// Copyright © 2023 Ory Corp
 // SPDX-License-Identifier: Apache-2.0
 
 package integration
@@ -15,7 +15,7 @@ import (
 // `actual` is a representation of an entry from the ConfigMap handled by the Controller
 func validateRuleEquals(actual *json.Json, expected *json.Json) {
 	Expect(actual).To(Equal(expected))
-	expectOnlyKeys(actual, "id", "upstream", "match", "authenticators", "authorizer", "mutators")
+	expectOnlyKeys(actual, "id", "upstream", "match", "authenticators", "authorizer", "mutators", "errors")
 
 	expectString(actual, "id")
 	compareUpstreams(actual.Get("upstream"), expected.Get("upstream"))
@@ -23,6 +23,7 @@ func validateRuleEquals(actual *json.Json, expected *json.Json) {
 	compareHandlerArrays(actual.Get("authenticators"), expected.Get("authenticators"))
 	compareHandlers(actual.Get("authorizer"), expected.Get("authorizer"))
 	compareHandlerArrays(actual.Get("mutators"), expected.Get("mutators"))
+	compareHandlerArrays(actual.Get("errors"), expected.Get("errors"))
 }
 
 func compareUpstreams(actual *json.Json, expected *json.Json) {
@@ -55,7 +56,7 @@ func compareHandlerArrays(actual *json.Json, expected *json.Json) {
 
 }
 
-// Compares `handler` objects, a common type for `authenticators`, `authorizer`, and `mutator` configurations
+// Compares `handler` objects, a common type for `authenticators`, `authorizer`, `mutator` and `errors` configurations
 // The object consists of two properties: `hander`:string` and `config`:object
 func compareHandlers(actual *json.Json, expected *json.Json) {
 	//expected.SetPath(

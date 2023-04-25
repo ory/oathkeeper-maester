@@ -1,0 +1,56 @@
+{
+    "apiVersion": "oathkeeper.ory.sh/v1alpha1",
+    "kind": "Rule",
+    "metadata": {
+        "name": "test-rule-2"
+    },
+    "spec": {
+        "match": {
+            "methods": [
+                "POST",
+                "PUT"
+            ],
+            "url": "http://xyz.com"
+        },
+        "upstream": {
+            "url": "http://abcde.fgh"
+        },
+        "authenticators": [
+            {
+                "handler": "oauth2_client_credentials",
+                "config": {
+                    "required_scope": [
+                        "scope-a",
+                        "scope-b"
+                    ]
+                }
+            },
+            {
+                "handler": "anonymous"
+            }
+        ],
+        "authorizer": {
+            "handler": "keto_engine_acp_ory",
+            "config": {
+                "required_action": "my:action:1234",
+                "required_resource": "my:resource:foobar:foo:1234"
+            }
+        },
+        "mutators": [
+            {
+                "handler": "id_token",
+                "config": {
+                    "aud": [
+                        "audience1",
+                        "audience2"
+                    ]
+                }
+            }
+        ],
+        "errors": [
+            {
+                "handler": "redirect"
+            }
+        ]
+    }
+}

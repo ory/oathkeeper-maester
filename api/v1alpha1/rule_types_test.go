@@ -1,9 +1,10 @@
-// Copyright © 2022 Ory Corp
+// Copyright © 2023 Ory Corp
 // SPDX-License-Identifier: Apache-2.0
 
 package v1alpha1
 
 import (
+	_ "embed"
 	"fmt"
 	"testing"
 
@@ -14,168 +15,14 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 )
 
-var (
-	template = `[
-  {
-    "upstream": {
-      "url": "http://my-backend-service1",
-      "strip_path": "/api/v1",
-      "preserve_host": true
-    },
-    "id": "foo1.default",
-    "match": {
-      "url": "http://my-app/some-route1<.*>",
-      "methods": [
-        "GET",
-        "POST"
-      ]
-    },
-    "authenticators": [
-      {
-        "handler": "handler1",
-        "config": {
-          "key1": "val1"
-        }
-      }
-    ],
-    "authorizer": {
-      "handler": "deny"
-    },
-    "mutators": [
-      {
-        "handler": "handler1",
-        "config": {
-          "key1": "val1"
-        }
-      },
-      {
-        "handler": "handler2",
-        "config": {
-          "key1": [
-            "val1",
-            "val2",
-            "val3"
-          ]
-        }
-      }
-    ]
-  },
-  {
-    "upstream": {
-      "url": "http://my-backend-service2",
-      "preserve_host": false
-    },
-    "id": "foo2.default",
-    "match": {
-      "url": "http://my-app/some-route2",
-      "methods": [
-        "GET",
-        "POST"
-      ]
-    },
-    "authenticators": [
-      {
-        "handler": "handler1",
-        "config": {
-          "key1": "val1"
-        }
-      },
-      {
-        "handler": "handler2",
-        "config": {
-          "key1": [
-            "val1",
-            "val2",
-            "val3"
-          ]
-        }
-      }
-    ],
-    "authorizer": {
-      "handler": "deny"
-    },
-    "mutators": [
-      {
-        "handler": "noop"
-      }
-    ]
-  },
-  {
-    "upstream": {
-      "url": "http://my-backend-service3",
-      "preserve_host": false
-    },
-    "id": "foo3.default",
-    "match": {
-      "url": "http://my-app/some-route3",
-      "methods": [
-        "GET",
-        "POST"
-      ]
-    },
-    "authenticators": [
-      {
-        "handler": "unauthorized"
-      }
-    ],
-    "authorizer": {
-      "handler": "handler1",
-      "config": {
-        "key1": "val1"
-      }
-    },
-    "mutators": [
-      {
-        "handler": "noop"
-      }
-    ]
-  },
-  {
-    "upstream": {
-      "url": "",
-      "preserve_host": false
-    },
-    "id": "fooNoUpstream.default",
-    "match": {
-      "url": "http://my-app/some-route3",
-      "methods": [
-        "GET",
-        "POST"
-      ]
-    },
-    "authenticators": [
-      {
-        "handler": "unauthorized"
-      }
-    ],
-    "authorizer": {
-      "handler": "handler1",
-      "config": {
-        "key1": "val1"
-      }
-    },
-    "mutators": [
-      {
-        "handler": "noop"
-      }
-    ]
-  }
-]`
+//go:embed tests/rules.json
+var template string
 
-	sampleConfig = `{
-  "key1": "val1"
-}
-`
+//go:embed tests/sample_config.json
+var sampleConfig string
 
-	sampleConfig2 = `{
-  "key1": [
-    "val1",
-    "val2",
-    "val3"
-  ]
-}
-`
-)
+//go:embed tests/sample_config2.json
+var sampleConfig2 string
 
 func TestToOathkeeperRules(t *testing.T) {
 
@@ -212,7 +59,9 @@ func TestToOathkeeperRules(t *testing.T) {
 				newBoolPtr(true),
 				[]*Authenticator{{h1}},
 				nil,
-				[]*Mutator{{h1}, {h2}})
+				[]*Mutator{{h1}, {h2}},
+				[]*Error{{h1}},
+			)
 
 			rule2 := newRule(
 				"foo2",
@@ -224,7 +73,8 @@ func TestToOathkeeperRules(t *testing.T) {
 				newBoolPtr(false),
 				[]*Authenticator{{h1}, {h2}},
 				nil,
-				nil)
+				nil,
+				[]*Error{{h2}})
 
 			rule3 := newRule(
 				"foo3",
@@ -236,7 +86,8 @@ func TestToOathkeeperRules(t *testing.T) {
 				nil,
 				nil,
 				&Authorizer{h1},
-				nil)
+				nil,
+				[]*Error{{h1}, {h2}})
 
 			rule4 := newRule(
 				"fooNoUpstream",
@@ -248,6 +99,7 @@ func TestToOathkeeperRules(t *testing.T) {
 				nil,
 				nil,
 				&Authorizer{h1},
+				nil,
 				nil)
 
 			list.Items = []Rule{*rule1, *rule2, *rule3, *rule4}
@@ -278,7 +130,7 @@ func TestToRuleJson(t *testing.T) {
 
 		{
 			"If no handlers have been specified, it should generate an ID and add default values for missing handlers",
-			newStaticRule(nil, nil, nil),
+			newStaticRule(nil, nil, nil, nil),
 			func(r *RuleJSON) {
 				assert.Equal(unauthorizedHandler, r.Authenticators[0].Handler)
 				assert.Equal(denyHandler, r.Authorizer.Handler)
@@ -287,7 +139,7 @@ func TestToRuleJson(t *testing.T) {
 		},
 		{
 			"If one handler type has been provided, it should generate an ID, rewrite the provided handler and add default values for missing handlers",
-			newStaticRule(nil, nil, []*Mutator{{testHandler}}),
+			newStaticRule(nil, nil, []*Mutator{{testHandler}}, nil),
 			func(r *RuleJSON) {
 				assert.Equal(unauthorizedHandler, r.Authenticators[0].Handler)
 				assert.Equal(denyHandler, r.Authorizer.Handler)
@@ -296,7 +148,7 @@ func TestToRuleJson(t *testing.T) {
 		},
 		{
 			"If all handler types are defined, it should generate an ID and rewrite the handlers",
-			newStaticRule([]*Authenticator{{testHandler}}, &Authorizer{testHandler}, []*Mutator{{testHandler}}),
+			newStaticRule([]*Authenticator{{testHandler}}, &Authorizer{testHandler}, []*Mutator{{testHandler}}, nil),
 			func(r *RuleJSON) {
 				assert.Equal(testHandler, r.Authenticators[0].Handler)
 				assert.Equal(testHandler, r.Authorizer.Handler)
@@ -305,13 +157,14 @@ func TestToRuleJson(t *testing.T) {
 		},
 		{
 			"if multiple authentication and/or mutation handlers have been provided, it should rewrite all of them",
-			newStaticRule([]*Authenticator{{testHandler}, {testHandler2}}, nil, []*Mutator{{testHandler}, {testHandler2}}),
+			newStaticRule([]*Authenticator{{testHandler}, {testHandler2}}, nil, []*Mutator{{testHandler}, {testHandler2}}, []*Error{{testHandler}}),
 			func(r *RuleJSON) {
 				assert.Equal(testHandler, r.Authenticators[0].Handler)
 				assert.Equal(testHandler2, r.Authenticators[1].Handler)
 				assert.Equal(testHandler, r.Mutators[0].Handler)
 				assert.Equal(testHandler2, r.Mutators[1].Handler)
 				assert.Equal(denyHandler, r.Authorizer.Handler)
+				assert.Equal(testHandler, r.Errors[0].Handler)
 			},
 		},
 	} {
@@ -349,6 +202,7 @@ func TestValidateWith(t *testing.T) {
 		newStringPtr("/api/v1"),
 		nil,
 		newBoolPtr(true),
+		nil,
 		nil,
 		nil,
 		nil)
@@ -424,11 +278,11 @@ func TestFilterNotValid(t *testing.T) {
 	})
 }
 
-func newStaticRule(authenticators []*Authenticator, authorizer *Authorizer, mutators []*Mutator) *Rule {
-	return newRule("r1", "test", "", "", newStringPtr(""), nil, newBoolPtr(false), authenticators, authorizer, mutators)
+func newStaticRule(authenticators []*Authenticator, authorizer *Authorizer, mutators []*Mutator, errors []*Error) *Rule {
+	return newRule("r1", "test", "", "", newStringPtr(""), nil, newBoolPtr(false), authenticators, authorizer, mutators, errors)
 }
 
-func newRule(name, namespace, upstreamURL, matchURL string, stripURLPath, configMapName *string, preserveURLHost *bool, authenticators []*Authenticator, authorizer *Authorizer, mutators []*Mutator) *Rule {
+func newRule(name, namespace, upstreamURL, matchURL string, stripURLPath, configMapName *string, preserveURLHost *bool, authenticators []*Authenticator, authorizer *Authorizer, mutators []*Mutator, errors []*Error) *Rule {
 
 	spec := RuleSpec{
 		Upstream: &Upstream{
@@ -443,6 +297,7 @@ func newRule(name, namespace, upstreamURL, matchURL string, stripURLPath, config
 		Authenticators: authenticators,
 		Authorizer:     authorizer,
 		Mutators:       mutators,
+		Errors:         errors,
 		ConfigMapName:  configMapName,
 	}
 
