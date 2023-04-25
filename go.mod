@@ -11,9 +11,7 @@ require (
 	github.com/onsi/ginkgo v1.16.4
 	github.com/onsi/gomega v1.10.2
 	github.com/stretchr/testify v1.6.1
-	golang.org/x/crypto v0.0.0-20220314234659-1baeb1ce4c0b // indirect
-	golang.org/x/term v0.5.0 // indirect
-	golang.org/x/text v0.3.8 // indirect
+	golang.org/x/crypto v0.8.0 // indirect
 	gopkg.in/yaml.v3 v3.0.0-20220521103104-8f96da9f5d5e // indirect
 	k8s.io/api v0.20.2
 	k8s.io/apimachinery v0.20.2
