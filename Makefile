@@ -89,7 +89,7 @@ all: manager
 # Run tests
 .PHONY: test
 test: manifests generate vet envtest
-	KUBEBUILDER_ASSETS="$(shell $(ENVTEST) use $(ENVTEST_K8S_VERSION) --bin-dir $(LOCALBIN) -p path)" go test ./... -coverprofile cover.out
+	KUBEBUILDER_ASSETS="$(shell $(ENVTEST) use $(ENVTEST_K8S_VERSION) --bin-dir $(LOCALBIN) -p path)" go test ./api/... ./controllers/... ./internal/... -coverprofile cover.out
 
 .PHONY: k3d-up
 k3d-up:
