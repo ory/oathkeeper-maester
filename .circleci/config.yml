@@ -7,8 +7,6 @@ jobs:
       - <<: *golang_image
     steps:
       - checkout
-      - run:
-          <<: *install-kube-builder
       - run: make
   test:
     docker:
