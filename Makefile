@@ -144,6 +144,7 @@ deploy: manifests
 .PHONY: manifests
 manifests: controller-gen
 	$(CONTROLLER_GEN) rbac:roleName=manager-role crd webhook paths="./..." output:crd:artifacts:config=config/crd/bases
+	make format
 
 # Format the source code
 format: .bin/ory node_modules
