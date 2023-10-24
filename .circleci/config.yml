@@ -1,5 +1,5 @@
 golaing_image: &golang_image
-  image: circleci/golang:1.20
+  image: cimg/go:1.20
 version: 2
 jobs:
   build:
