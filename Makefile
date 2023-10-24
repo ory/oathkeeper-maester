@@ -102,7 +102,7 @@ k3d-down:
 	k3d cluster delete ory || true
 
 .PHONY: k3d-deploy
-k3d-deploy: manager manifests docker-build-notest k3d-up
+k3d-deploy: manager-ci manifests docker-build-notest k3d-up
 	kubectl config set-context k3d-ory
 	k3d image load controller:latest -c ory
 	kubectl apply -f config/crd/bases
