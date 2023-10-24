@@ -170,12 +170,9 @@ func validateRulesFileName(rfn string) error {
 }
 
 func selectMode(args []string, controllerCommand *flag.FlagSet, sidecarCommand *flag.FlagSet) (bool, error) {
-	sidecar := true
-	controller := false
-
 	if len(args) < 1 {
 		setupLog.Info("running in controller mode")
-		return controller, nil
+		return false, nil
 	}
 
 	switch args[0] {
@@ -184,13 +181,13 @@ func selectMode(args []string, controllerCommand *flag.FlagSet, sidecarCommand *
 			return false, err
 		}
 		setupLog.Info("running in controller mode")
-		return controller, nil
+		return false, nil
 	case "sidecar":
 		if err := sidecarCommand.Parse(args[1:]); err != nil {
 			return false, err
 		}
 		setupLog.Info("running in sidecar mode")
-		return sidecar, nil
+		return true, nil
 	default:
 		return false, fmt.Errorf(`modes "controller" and "sidecar" are supported but got: %s`, args[0])
 	}

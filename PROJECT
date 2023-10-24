@@ -1,6 +1,9 @@
-version: "2"
+version: "3"
 domain: ory.sh
 repo: github.com/ory/oathkeeper-maester
+projectName: oathkeeper-maester
+layout:
+- go.kubebuilder.io/v4
 resources:
 - group: oathkeeper
   version: v1alpha1
