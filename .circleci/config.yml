@@ -29,7 +29,6 @@ jobs:
   release:
     docker:
       - <<: *golang_image
-    working_directory: /go/src/github.com/ory/oathkeeper-maester
     steps:
       - checkout
       - run:
