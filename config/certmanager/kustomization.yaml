@@ -3,24 +3,30 @@ resources:
 
 # the following config is for teaching kustomize how to do var substitution
 vars:
-  - name: NAMESPACE # namespace of the service and the certificate CR
-    objref:
-      kind: Service
-      version: v1
-      name: webhook-service
-    fieldref:
+  - fieldref:
       fieldpath: metadata.namespace
-  - name: CERTIFICATENAME
-    objref:
-      kind: Certificate
-      group: certmanager.k8s.io
-      version: v1alpha1
-      name: serving-cert # this name should match the one in certificate.yaml
-  - name: SERVICENAME
+    name: NAMESPACE
     objref:
       kind: Service
-      version: v1
       name: webhook-service
+      version: v1
+  - fieldref:
+      fieldpath: ""
+    name: CERTIFICATENAME
+    objref:
+      group: certmanager.k8s.io
+      kind: Certificate
+      name: serving-cert
+      version: v1alpha1
+  - fieldref:
+      fieldpath: metadata.name
+    name: SERVICENAME
+    objref:
+      kind: Service
+      name: webhook-service
+      version: v1
 
 configurations:
   - kustomizeconfig.yaml
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
