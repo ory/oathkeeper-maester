@@ -2,9 +2,6 @@
 # Make sure to check the documentation at http://goreleaser.com
 project_name: oathkeeper-maester
 
-env:
-  - GO111MODULE=on
-
 before:
   hooks:
     - "go mod download"
@@ -31,12 +28,20 @@ changelog:
 
 dockers:
   - image_templates:
-      - "oryd/oathkeeper-maester:v{{ .Major }}"
-      - "oryd/oathkeeper-maester:v{{ .Major }}.{{ .Minor }}"
-      - "oryd/oathkeeper-maester:v{{ .Major }}.{{ .Minor }}.{{ .Patch }}"
-      - "oryd/oathkeeper-maester:{{ .Env.DOCKER_SHORT_TAG }}"
+      - "oryd/oathkeeper-maester:{{ .Tag }}-amd64"
+      - "oryd/oathkeeper-maester:{{ .ShortCommit }}-amd64"
       - "oryd/oathkeeper-maester:latest"
+    goarch: amd64
+    build_flag_templates:
+      - "--platform=linux/amd64"
+  - image_templates:
+      - "oryd/oathkeeper-maester:{{ .Tag }}-arm64"
+      - "oryd/oathkeeper-maester:{{ .ShortCommit }}-arm64"
+      - "oryd/oathkeeper-maester:latest"
+    goarch: arm64
+    build_flag_templates:
+      - "--platform=linux/arm64"
 
 release:
   prerelease: auto
-  name_template: "{{.Env.RELEASE_NAME}}"
+  name_template: "{{ .Tag }}"
