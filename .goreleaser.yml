@@ -33,7 +33,7 @@ dockers:
       - "oryd/oathkeeper-maester:latest"
     goarch: amd64
     build_flag_templates:
-      -  "--platform=linux/amd64"
+      - "--platform=linux/amd64"
   - image_templates:
       - "oryd/oathkeeper-maester:{{ .Tag }}-arm64"
       - "oryd/oathkeeper-maester:{{ .ShortCommit }}-arm64"
