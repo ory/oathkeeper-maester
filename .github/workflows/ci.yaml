@@ -75,7 +75,8 @@ jobs:
     name: Compile and test
     runs-on: ubuntu-latest
     if: |
-      needs.detect-repo-changes.outputs.code-changed == 'true'
+      needs.detect-repo-changes.outputs.code-changed == 'true' ||
+      github.ref_type == 'tag'
     needs:
       - detect-repo-changes
       - dependencies
@@ -94,7 +95,8 @@ jobs:
     runs-on: ubuntu-latest
     if: |
       needs.detect-repo-changes.outputs.code-changed == 'true' ||
-      needs.detect-repo-changes.outputs.dockerfile-changed == 'true'
+      needs.detect-repo-changes.outputs.dockerfile-changed == 'true' ||
+      github.ref_type == 'tag'
     needs:
       - detect-repo-changes
       - dependencies
@@ -114,7 +116,8 @@ jobs:
     name: Build docker image
     runs-on: ubuntu-latest
     if: |
-      needs.detect-repo-changes.outputs.dockerfile-changed == 'true'
+      needs.detect-repo-changes.outputs.dockerfile-changed == 'true' ||
+      github.ref_type == 'tag'
     needs:
       - detect-repo-changes
       - dependencies
@@ -123,8 +126,8 @@ jobs:
         uses: actions/checkout@v3
       - name: Checkout dependencies
         uses: ./.github/actions/deps-setup
-      - name: Test
-        run: make docker-build
+      - name: Build image
+        run: make docker-build-notest
 
   release:
     if: ${{ github.ref_type == 'tag' }}
