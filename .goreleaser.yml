@@ -6,18 +6,56 @@ before:
   hooks:
     - "go mod download"
 
-builds:
-  - flags:
+builds:  
+  - id: linux-amd64
+    flags:
       - -a
     binary: manager
     env:
       - CGO_ENABLED=0
     goarch:
       - amd64
-      - 386
+    goos:
+      - linux
+  - id: linux-arm64
+    flags:
+      - -a
+    binary: manager
+    env:
+      - CGO_ENABLED=0
+    goarch:
       - arm64
     goos:
       - linux
+  - id: linux-i386
+    flags:
+      - -a
+    binary: manager
+    env:
+      - CGO_ENABLED=0
+    goarch:
+      - 386
+    goos:
+      - linux
+  - id: darwin-amd64
+    flags:
+      - -a
+    binary: manager
+    env:
+      - CGO_ENABLED=0
+    goarch:
+      - amd64
+    goos:
+      - darwin
+  - id: darwin-arm64
+    flags:
+      - -a
+    binary: manager
+    env:
+      - CGO_ENABLED=0
+    goarch:
+      - arm64
+    goos:
       - darwin
 
 snapshot:
@@ -34,13 +72,18 @@ dockers:
     goarch: amd64
     build_flag_templates:
       - "--platform=linux/amd64"
+    dockerfile: ".docker/Dockerfile-release"
+    ids:
+      - "linux-amd64"
   - image_templates:
       - "oryd/oathkeeper-maester:{{ .Tag }}-arm64"
       - "oryd/oathkeeper-maester:{{ .ShortCommit }}-arm64"
-      - "oryd/oathkeeper-maester:latest"
     goarch: arm64
     build_flag_templates:
       - "--platform=linux/arm64"
+    dockerfile: ".docker/Dockerfile-release"
+    ids:
+      - "linux-arm64"
 
 release:
   prerelease: auto
