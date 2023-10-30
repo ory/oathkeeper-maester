@@ -6,7 +6,7 @@ before:
   hooks:
     - "go mod download"
 
-builds:  
+builds:
   - id: linux-amd64
     flags:
       - -a
