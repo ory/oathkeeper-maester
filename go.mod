@@ -5,7 +5,7 @@ go 1.23
 require (
 	github.com/avast/retry-go v3.0.0+incompatible
 	github.com/bitly/go-simplejson v0.5.1
-	github.com/go-logr/logr v1.2.4
+	github.com/go-logr/logr v1.4.3
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/onsi/ginkgo v1.16.5
 	github.com/onsi/gomega v1.28.1
