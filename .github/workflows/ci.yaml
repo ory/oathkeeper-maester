@@ -17,8 +17,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
-      - uses: actions/setup-go@v3
+        uses: actions/checkout@v5
+      - uses: actions/setup-go@v6
         with:
           go-version: "1.25"
       - name: Setup dependencies
@@ -33,8 +33,8 @@ jobs:
       cicd-definition-changed: ${{ steps.filter.outputs.cicd-definitions }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
-      - uses: dorny/paths-filter@v2.12.0
+        uses: actions/checkout@v5
+      - uses: dorny/paths-filter@v3.0.2
         id: filter
         with:
           base: master
@@ -63,10 +63,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v5
       - name: actionlint
         id: actionlint
-        uses: raven-actions/actionlint@v1
+        uses: raven-actions/actionlint@v2
         with:
           fail-on-error: true
 
@@ -81,7 +81,7 @@ jobs:
       - dependencies
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v5
       - name: Checkout dependencies
         uses: ./.github/actions/deps-setup
       - name: Build
@@ -101,10 +101,10 @@ jobs:
       - dependencies
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v5
       - name: Checkout dependencies
         uses: ./.github/actions/deps-setup
-      - uses: actions/setup-go@v4
+      - uses: actions/setup-go@v6
         with:
           go-version: "1.25"
           cache: false
@@ -122,7 +122,7 @@ jobs:
       - dependencies
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v5
       - name: Checkout dependencies
         uses: ./.github/actions/deps-setup
       - name: Build image
@@ -137,11 +137,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v5
       - name: Checkout dependencies
         uses: ./.github/actions/deps-setup
       - name: Set up Go
-        uses: actions/setup-go@v4
+        uses: actions/setup-go@v6
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
