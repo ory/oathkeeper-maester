@@ -20,7 +20,7 @@ jobs:
         uses: actions/checkout@v3
       - uses: actions/setup-go@v3
         with:
-          go-version: "1.23"
+          go-version: "1.25"
       - name: Setup dependencies
         uses: ./.github/actions/deps-setup
 
@@ -34,7 +34,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - uses: dorny/paths-filter@v2.11.1
+      - uses: dorny/paths-filter@v2.12.0
         id: filter
         with:
           base: master
@@ -106,7 +106,7 @@ jobs:
         uses: ./.github/actions/deps-setup
       - uses: actions/setup-go@v4
         with:
-          go-version: "1.23"
+          go-version: "1.25"
           cache: false
       - name: Test
         run: make test-integration
