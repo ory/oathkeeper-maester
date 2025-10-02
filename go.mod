@@ -9,7 +9,7 @@ require (
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/onsi/ginkgo v1.16.5
 	github.com/onsi/gomega v1.28.1
-	github.com/stretchr/testify v1.8.4
+	github.com/stretchr/testify v1.11.1
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	k8s.io/api v0.28.3
 	k8s.io/apiextensions-apiserver v0.28.3 // indirect
