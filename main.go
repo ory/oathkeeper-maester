@@ -79,7 +79,7 @@ func main() {
 		// Defaults to watching all namespaces
 		Cache: cache.Options{
 			DefaultNamespaces: map[string]cache.Config{
-				namespace: {},
+				os.Getenv("NAMESPACE"): {},
 			},
 		},
 	})
