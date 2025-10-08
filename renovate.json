@@ -14,5 +14,27 @@
       "groupName": "docker images",
       "matchFileNames": [".docker/**"]
     }
+  ],
+  "regexManagers": [
+    {
+      "fileMatch": ["^\\.deps/.*\\.yaml$"],
+      "matchStrings": [
+        "# renovate: datasource=(?<datasource>.*?) depName=(?<depName>.*?)\\nversion: (?<currentValue>.*)"
+      ],
+      "datasourceTemplate": "{{{ datasource }}}",
+      "depNameTemplate": "{{{ depName }}}",
+      "versioningTemplate": "semver"
+    },
+    {
+      "fileMatch": ["^Makefile$"],
+      "matchStrings": [
+        "# renovate: datasource=(?<datasource>.*?) depName=(?<depName>.*?)\\nCONTROLLER_TOOLS_VERSION \\?= (?<currentValue>.*)",
+        "# renovate: datasource=(?<datasource>.*?) depName=(?<depName>.*?) extractVersion=(?<extractVersion>.*?)\\nENVTEST_K8S_VERSION = (?<currentValue>.*)"
+      ],
+      "datasourceTemplate": "{{{ datasource }}}",
+      "depNameTemplate": "{{{ depName }}}",
+      "extractVersionTemplate": "{{{ extractVersion }}}",
+      "versioningTemplate": "semver"
+    }
   ]
 }

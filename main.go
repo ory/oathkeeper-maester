@@ -19,7 +19,9 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
 	ctrl "sigs.k8s.io/controller-runtime"
+	"sigs.k8s.io/controller-runtime/pkg/cache"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
+	"sigs.k8s.io/controller-runtime/pkg/metrics/server"
 	// +kubebuilder:scaffold:imports
 )
 
@@ -69,11 +71,17 @@ func main() {
 	}
 
 	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
-		Scheme:             scheme,
-		MetricsBindAddress: metricsAddr,
-		LeaderElection:     enableLeaderElection,
-		// Defaults to "" which means all namespaces
-		Namespace: os.Getenv("NAMESPACE"),
+		Scheme: scheme,
+		Metrics: server.Options{
+			BindAddress: metricsAddr,
+		},
+		LeaderElection: enableLeaderElection,
+		// Defaults to watching all namespaces
+		Cache: cache.Options{
+			DefaultNamespaces: map[string]cache.Config{
+				os.Getenv("NAMESPACE"): {},
+			},
+		},
 	})
 	if err != nil {
 		setupLog.Error(err, "unable to start manager")
