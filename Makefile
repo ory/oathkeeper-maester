@@ -53,7 +53,9 @@ CONTROLLER_GEN ?= $(LOCALBIN)/controller-gen
 ENVTEST ?= $(LOCALBIN)/setup-envtest
 
 ## Tool Versions
+# renovate: datasource=github-releases depName=kubernetes-sigs/controller-tools
 CONTROLLER_TOOLS_VERSION ?= v0.19.0
+# renovate: datasource=github-releases depName=kubernetes/kubernetes extractVersion=^v?(?<version>[\d.]+)
 ENVTEST_K8S_VERSION = 1.30.0
 
 # Image URL to use all building/pushing image targets
