@@ -117,6 +117,8 @@ test: manifests generate vet envtest
 .PHONY: k3d-up
 k3d-up:
 	k3d cluster create --image docker.io/rancher/k3s:$${K3SIMAGE} ory \
+		--api-port 127.0.0.1:6443 \
+		--k3s-arg=--tls-san="127.0.0.1@server:0"  \
 		--k3s-arg=--kube-apiserver-arg="enable-admission-plugins=NodeRestriction,ServiceAccount@server:0" \
 		--k3s-arg=feature-gates="NamespaceDefaultLabelName=true@server:0";
 
