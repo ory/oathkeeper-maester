@@ -49,7 +49,7 @@ export PATH := .bin:${PATH}
 export PWD := $(shell pwd)
 
 # renovate: datasource=docker depName=docker.io/rancher/k3s
-K3SIMAGE_VERSION ?= v1.32.2-k3s1
+K3SIMAGE_VERSION ?= v1.34.1-k3s1
 export K3SIMAGE := ${K3SIMAGE_VERSION}
 
 ## Tool Binaries
@@ -117,6 +117,7 @@ test: manifests generate vet envtest
 .PHONY: k3d-up
 k3d-up:
 	k3d cluster create --image docker.io/rancher/k3s:$${K3SIMAGE} ory \
+		--k3s-arg=--tls-san="127.0.0.1@server:0"  \
 		--k3s-arg=--kube-apiserver-arg="enable-admission-plugins=NodeRestriction,ServiceAccount@server:0" \
 		--k3s-arg=feature-gates="NamespaceDefaultLabelName=true@server:0";
 
