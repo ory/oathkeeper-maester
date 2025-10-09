@@ -18,20 +18,10 @@
   "customManagers": [
     {
       "customType": "regex",
-      "description": "Consolidated Makefile version/image updates",
-      "fileMatch": ["^Makefile$"],
+      "description": "Consolidated version/image updates for Makefile and .deps yaml files",
+      "fileMatch": ["^Makefile$", "^.deps/.*.yaml$"],
       "matchStrings": [
-        "# renovate: datasource=(?<datasource>.*?) depName=(?<depName>[^\\s]+)\\n(?<varName>[A-Z0-9_]+) ?(?:\\?=|=) ?(?<currentValue>.*)"
-      ],
-      "datasourceTemplate": "{{{ datasource }}}",
-      "depNameTemplate": "{{{ depName }}}"
-    },
-    {
-      "customType": "regex",
-      "description": "Advanced capture for .deps yaml files",
-      "fileMatch": ["^.deps/.*.yaml$"],
-      "matchStrings": [
-        "# renovate: datasource=(?<datasource>.*?) depName=(?<depName>.*?)\\nversion: (?<currentValue>.*)"
+        "# renovate: datasource=(?<datasource>.*?) depName=(?<depName>[^\\s]+)\\n(?:(?<varName>[A-Z0-9_]+) ?\\?= ?|version: )(?<currentValue>.*)"
       ],
       "datasourceTemplate": "{{{ datasource }}}",
       "depNameTemplate": "{{{ depName }}}"
