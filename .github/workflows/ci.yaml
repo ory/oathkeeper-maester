@@ -31,6 +31,7 @@ jobs:
       code-changed: ${{ steps.filter.outputs.code }}
       dockerfile-changed: ${{ steps.filter.outputs.docker }}
       cicd-definition-changed: ${{ steps.filter.outputs.cicd-definitions }}
+      makefile-changed: ${{ steps.filter.outputs.makefile }}
     steps:
       - name: Checkout
         uses: actions/checkout@v5
@@ -53,6 +54,8 @@ jobs:
             cicd-definitions:
               - '.github/workflows/**'
               - '.github/actions/**'
+            makefile:
+              - 'Makefile'
 
   gha-lint:
     name: Lint GithubAction files
@@ -95,6 +98,7 @@ jobs:
     if: |
       needs.detect-repo-changes.outputs.code-changed == 'true' ||
       needs.detect-repo-changes.outputs.dockerfile-changed == 'true' ||
+      needs.detect-repo-changes.outputs.makefile-changed == 'true' ||
       github.ref_type == 'tag'
     needs:
       - detect-repo-changes
