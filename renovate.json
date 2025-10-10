@@ -21,10 +21,11 @@
       "description": "Consolidated version/image updates for Makefile and .deps yaml files",
       "fileMatch": ["^Makefile$", "^.deps/.*.yaml$"],
       "matchStrings": [
-        "# renovate: datasource=(?<datasource>.*?) depName=(?<depName>[^\\s]+)\\n(?:(?<varName>[A-Z0-9_]+) ?\\?= ?|version: )(?<currentValue>.*)"
+        "# renovate: datasource=(?<datasource>.*?) depName=(?<depName>[^\\s]+)(?: extractVersion=(?<extractVersion>[^\\s]+))?\\n(?:(?<varName>[A-Z0-9_]+) ?\\?= ?|version: )(?<currentValue>.*)"
       ],
       "datasourceTemplate": "{{{ datasource }}}",
-      "depNameTemplate": "{{{ depName }}}"
+      "depNameTemplate": "{{{ depName }}}",
+      "extractVersionTemplate": "{{{ extractVersion }}}"
     }
   ]
 }
