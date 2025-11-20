@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
       - uses: actions/setup-go@v6
         with:
           go-version: "1.25"
@@ -34,7 +34,7 @@ jobs:
       makefile-changed: ${{ steps.filter.outputs.makefile }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
       - uses: dorny/paths-filter@v3.0.2
         id: filter
         with:
@@ -66,7 +66,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
       - name: actionlint
         id: actionlint
         uses: raven-actions/actionlint@v2
@@ -84,7 +84,7 @@ jobs:
       - dependencies
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
       - name: Checkout dependencies
         uses: ./.github/actions/deps-setup
       - name: Build
@@ -105,7 +105,7 @@ jobs:
       - dependencies
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
       - name: Checkout dependencies
         uses: ./.github/actions/deps-setup
       - uses: actions/setup-go@v6
@@ -126,7 +126,7 @@ jobs:
       - dependencies
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
       - name: Checkout dependencies
         uses: ./.github/actions/deps-setup
       - name: Build image
@@ -141,7 +141,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
       - name: Checkout dependencies
         uses: ./.github/actions/deps-setup
       - name: Set up Go
