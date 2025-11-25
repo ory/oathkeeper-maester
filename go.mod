@@ -7,7 +7,7 @@ require (
 	github.com/bitly/go-simplejson v0.5.1
 	github.com/go-logr/logr v1.4.3
 	github.com/gogo/protobuf v1.3.2 // indirect
-	github.com/onsi/ginkgo/v2 v2.26.0
+	github.com/onsi/ginkgo/v2 v2.27.2
 	github.com/onsi/gomega v1.38.2 // updated
 	github.com/stretchr/testify v1.11.1 // updated
 	gopkg.in/yaml.v3 v3.0.1 // indirect
