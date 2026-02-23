@@ -8,7 +8,7 @@ require (
 	github.com/go-logr/logr v1.4.3
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/onsi/ginkgo/v2 v2.28.1
-	github.com/onsi/gomega v1.39.0 // updated
+	github.com/onsi/gomega v1.39.1 // updated
 	github.com/stretchr/testify v1.11.1 // updated
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	k8s.io/api v0.35.1
