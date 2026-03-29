@@ -73,4 +73,4 @@ require (
 	sigs.k8s.io/yaml v1.6.0 // indirect
 )
 
-require github.com/onsi/ginkgo v1.16.5
+require github.com/onsi/ginkgo/v2 v2.28.1
