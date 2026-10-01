@@ -17,8 +17,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
-      - uses: actions/setup-go@v6
+        uses: actions/checkout@v7
+      - uses: actions/setup-go@v7
         with:
           go-version: "1.26"
       - name: Setup dependencies
@@ -34,7 +34,7 @@ jobs:
       makefile-changed: ${{ steps.filter.outputs.makefile }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
       - uses: dorny/paths-filter@v4.0.1
         id: filter
         with:
@@ -66,7 +66,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
       - name: actionlint
         id: actionlint
         uses: raven-actions/actionlint@v2
@@ -84,7 +84,7 @@ jobs:
       - dependencies
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
       - name: Checkout dependencies
         uses: ./.github/actions/deps-setup
       - name: Build
@@ -105,10 +105,10 @@ jobs:
       - dependencies
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
       - name: Checkout dependencies
         uses: ./.github/actions/deps-setup
-      - uses: actions/setup-go@v6
+      - uses: actions/setup-go@v7
         with:
           go-version: "1.26"
           cache: false
@@ -126,7 +126,7 @@ jobs:
       - dependencies
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
       - name: Checkout dependencies
         uses: ./.github/actions/deps-setup
       - name: Build image
@@ -141,11 +141,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
       - name: Checkout dependencies
         uses: ./.github/actions/deps-setup
       - name: Set up Go
-        uses: actions/setup-go@v6
+        uses: actions/setup-go@v7
         with:
           go-version: "1.26"
       - name: Login to Docker Hub
